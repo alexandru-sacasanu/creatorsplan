@@ -101,6 +101,7 @@ UNAVAILABLE = RuntimeError("503 UNAVAILABLE. This model is currently experiencin
 @pytest.fixture
 def no_sleep(monkeypatch):
     monkeypatch.setattr(thumbnail.time, "sleep", lambda s: None)
+    monkeypatch.setattr(thumbnail, "_text_model_down_until", 0.0)
 
 
 def test_generate_retries_a_503_then_succeeds(no_sleep):
@@ -128,3 +129,12 @@ def test_generate_does_not_retry_a_permanent_error(no_sleep):
     with pytest.raises(ValueError):
         thumbnail._generate(client, model=thumbnail.TEXT_MODEL, contents=["x"])
     assert len(client.models.calls) == 1
+
+
+def test_generate_skips_the_overloaded_model_for_the_next_call(no_sleep, monkeypatch):
+    monkeypatch.setattr(thumbnail, "FALLBACK_TEXT_MODEL", "fallback-model")
+    client = _FakeClient([UNAVAILABLE] * (len(thumbnail.RETRY_DELAYS) + 1))
+    thumbnail._generate(client, model=thumbnail.TEXT_MODEL, contents=["brainstorm"])
+    before = len(client.models.calls)
+    assert thumbnail._generate(client, model=thumbnail.TEXT_MODEL, contents=["critic"]) == "ok:fallback-model"
+    assert client.models.calls[before:] == ["fallback-model"]  # no retries the second time

@@ -27,6 +27,11 @@ FALLBACK_TEXT_MODEL = (os.environ.get("GEMINI_MODEL_THUMBNAIL_FALLBACK")
 _TRANSIENT = ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED", "500", "INTERNAL",
               "overloaded", "high demand", "Deadline", "502", "504")
 RETRY_DELAYS = (2, 5, 10)
+# After TEXT_MODEL has stayed overloaded through every retry, the next calls
+# skip it for this long: "Suggest titles" makes two calls back to back, and a
+# model that just failed for 17s will not be back for the second one.
+TEXT_MODEL_COOLDOWN_SECONDS = 300
+_text_model_down_until = 0.0
 
 
 def _is_transient(err):
@@ -38,9 +43,15 @@ def _generate(client, *, model, **kwargs):
     """client.models.generate_content with retries on transient Gemini errors.
 
     Studio requests are interactive, so the backoff is short (2s, 5s, 10s).
-    A text call still failing with a transient error after that is tried once
-    on FALLBACK_TEXT_MODEL. Anything else (a bad key, a blocked prompt) raises
-    at once, as before."""
+    A text call still failing with a transient error after that runs on
+    FALLBACK_TEXT_MODEL, and so does every text call for the next
+    TEXT_MODEL_COOLDOWN_SECONDS. Anything else (a bad key, a blocked prompt)
+    raises at once, as before."""
+    global _text_model_down_until
+    can_fall_back = (model == TEXT_MODEL and FALLBACK_TEXT_MODEL
+                     and FALLBACK_TEXT_MODEL != TEXT_MODEL)
+    if can_fall_back and time.time() < _text_model_down_until:
+        return client.models.generate_content(model=FALLBACK_TEXT_MODEL, **kwargs)
     for attempt, delay in enumerate((*RETRY_DELAYS, None), start=1):
         try:
             return client.models.generate_content(model=model, **kwargs)
@@ -48,8 +59,10 @@ def _generate(client, *, model, **kwargs):
             if not _is_transient(e):
                 raise
             if delay is None:
-                if model == TEXT_MODEL and FALLBACK_TEXT_MODEL and FALLBACK_TEXT_MODEL != model:
-                    print(f"⚠️ [Thumbnail] {model} still unavailable; using {FALLBACK_TEXT_MODEL}")
+                if can_fall_back:
+                    _text_model_down_until = time.time() + TEXT_MODEL_COOLDOWN_SECONDS
+                    print(f"⚠️ [Thumbnail] {model} still unavailable; using {FALLBACK_TEXT_MODEL} "
+                          f"for the next {TEXT_MODEL_COOLDOWN_SECONDS}s")
                     return client.models.generate_content(model=FALLBACK_TEXT_MODEL, **kwargs)
                 raise
             print(f"⚠️ [Thumbnail] Gemini transient error (attempt {attempt}), retrying in {delay}s: {str(e)[:150]}")
