@@ -138,3 +138,26 @@ def test_generate_skips_the_overloaded_model_for_the_next_call(no_sleep, monkeyp
     before = len(client.models.calls)
     assert thumbnail._generate(client, model=thumbnail.TEXT_MODEL, contents=["critic"]) == "ok:fallback-model"
     assert client.models.calls[before:] == ["fallback-model"]  # no retries the second time
+
+
+def test_generate_does_not_retry_a_quota_the_key_does_not_have(no_sleep):
+    err = RuntimeError("429 RESOURCE_EXHAUSTED. Quota exceeded for metric: "
+                       "generate_content_free_tier_requests, limit: 0, model: gemini-3.1-flash-image")
+    client = _FakeClient([err])
+    with pytest.raises(RuntimeError, match="limit: 0"):
+        thumbnail._generate(client, model=thumbnail.IMAGE_MODEL, contents=["x"])
+    assert len(client.models.calls) == 1
+
+
+def test_generate_still_retries_a_per_minute_rate_limit(no_sleep):
+    err = RuntimeError("429 RESOURCE_EXHAUSTED. Quota exceeded, limit: 10, quotaId: PerMinute")
+    client = _FakeClient([err])
+    assert thumbnail._generate(client, model=thumbnail.IMAGE_MODEL, contents=["x"]) == f"ok:{thumbnail.IMAGE_MODEL}"
+    assert len(client.models.calls) == 2
+
+
+def test_lite_image_model_renders_at_1k():
+    if os.environ.get("GEMINI_IMAGE_MODEL") or os.environ.get("GEMINI_IMAGE_SIZE"):
+        pytest.skip("image model overridden in the environment")
+    assert thumbnail.IMAGE_MODEL == "gemini-3.1-flash-lite-image"
+    assert thumbnail.IMAGE_SIZE == "1K"

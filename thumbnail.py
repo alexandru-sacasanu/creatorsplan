@@ -15,7 +15,14 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 # shows, and ten titles per video cost cents either way. The image model
 # stays on gemini-3.1-flash-image; the text models cannot draw.
 TEXT_MODEL = os.environ.get("GEMINI_MODEL_THUMBNAIL") or "gemini-3.7-flash"
-IMAGE_MODEL = os.environ.get("GEMINI_IMAGE_MODEL") or "gemini-3.1-flash-image"
+# Nano Banana 2 Lite by default: ~4s and ~$0.03 per image, and the one a
+# free-tier key can use (gemini-3.1-flash-image has a free-tier quota of 0, so
+# every thumbnail failed with 429 on keys without billing). Set
+# GEMINI_IMAGE_MODEL=gemini-3.1-flash-image for the full model on a paid key.
+IMAGE_MODEL = os.environ.get("GEMINI_IMAGE_MODEL") or "gemini-3.1-flash-lite-image"
+# The lite image models only render 1K; the full ones take 2K. Either way the
+# result is cover-cropped to 1280x720 (finalize_thumbnail).
+IMAGE_SIZE = os.environ.get("GEMINI_IMAGE_SIZE") or ("1K" if "lite" in IMAGE_MODEL else "2K")
 # When TEXT_MODEL stays overloaded through every retry, the text calls fall
 # back to this one rather than failing the user's request: a flash-lite title
 # beats an error. The image model has no fallback (the text models can't draw).
@@ -36,7 +43,16 @@ _text_model_down_until = 0.0
 
 def _is_transient(err):
     msg = str(err)
+    if _quota_is_exhausted(msg):
+        return False
     return any(tok in msg for tok in _TRANSIENT)
+
+
+def _quota_is_exhausted(msg):
+    """A 429 that no short retry can fix: a model the key has no quota for at
+    all ("limit: 0", e.g. a paid-only model on a free-tier key) or a daily
+    quota that is spent. Retrying those only adds 17s before the same error."""
+    return "RESOURCE_EXHAUSTED" in msg and ("limit: 0" in msg or "PerDay" in msg)
 
 
 def _generate(client, *, model, **kwargs):
@@ -688,7 +704,7 @@ Style: high contrast, saturated colours, crisp subject separation, cinematic lig
         contents=reference_images + [prompt],
         config=types.GenerateContentConfig(
             response_modalities=["TEXT", "IMAGE"],
-            image_config=types.ImageConfig(aspect_ratio="16:9", image_size="2K"),
+            image_config=types.ImageConfig(aspect_ratio="16:9", image_size=IMAGE_SIZE),
         ),
     )
     if not response.parts:

@@ -391,7 +391,12 @@ first 3 words, same language as the transcript. Text model is
 `GEMINI_MODEL_THUMBNAIL` (default `gemini-3.7-flash`), deliberately not
 `GEMINI_MODEL`: flash-lite is fine for a closed-choice layout pick and visibly
 worse at creative titles. Image model is `GEMINI_IMAGE_MODEL` (default
-`gemini-3.1-flash-image`).
+`gemini-3.1-flash-lite-image`, Nano Banana 2 Lite, rendered at 1K;
+`gemini-3.1-flash-image` has a free-tier quota of 0, so on a key without
+billing every thumbnail failed with 429). Every Gemini call in `thumbnail.py`
+goes through `_generate`: transient errors are retried (2s, 5s, 10s), a text
+call that stays overloaded falls back to `GEMINI_MODEL` for 5 minutes, and a
+quota that is spent (`limit: 0`, per-day) fails at once.
 
 Thumbnails are `count` **different concepts**, not one prompt repeated: a text
 call designs each (hook text, side for the text, palette, scene prompt), then
