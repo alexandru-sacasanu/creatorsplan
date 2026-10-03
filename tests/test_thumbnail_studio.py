@@ -149,6 +149,19 @@ def test_generate_does_not_retry_a_quota_the_key_does_not_have(no_sleep):
     assert len(client.models.calls) == 1
 
 
+def test_generate_text_model_daily_quota_falls_back_at_once(no_sleep, monkeypatch):
+    monkeypatch.setattr(thumbnail, "FALLBACK_TEXT_MODEL", "fallback-model")
+    err = RuntimeError("429 RESOURCE_EXHAUSTED. Quota exceeded for metric: "
+                       "generate_content_free_tier_requests, limit: 20, model: gemini-3.7-flash "
+                       "quotaId: GenerateRequestsPerDayPerProjectPerModel-FreeTier")
+    client = _FakeClient([err])
+    assert thumbnail._generate(client, model=thumbnail.TEXT_MODEL, contents=["brainstorm"]) == "ok:fallback-model"
+    assert client.models.calls == [thumbnail.TEXT_MODEL, "fallback-model"]  # no retries
+    # The critic call that follows goes straight to the fallback.
+    assert thumbnail._generate(client, model=thumbnail.TEXT_MODEL, contents=["critic"]) == "ok:fallback-model"
+    assert client.models.calls[2:] == ["fallback-model"]
+
+
 def test_generate_still_retries_a_per_minute_rate_limit(no_sleep):
     err = RuntimeError("429 RESOURCE_EXHAUSTED. Quota exceeded, limit: 10, quotaId: PerMinute")
     client = _FakeClient([err])
