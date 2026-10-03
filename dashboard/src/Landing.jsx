@@ -191,6 +191,8 @@ function SectionHead({ title, label, dark = false }) {
 
 export default function Landing({ onLaunchApp }) {
   const launch = (e) => { e.preventDefault(); onLaunchApp(); };
+  const logIn = (e) => { e.preventDefault(); onLaunchApp('login'); };
+  const signUp = (e) => { e.preventDefault(); onLaunchApp('signup'); };
   const videoRef = useRef(null);
   const heroRef = useRef(null);
   const nextRef = useRef(null);
@@ -220,8 +222,8 @@ export default function Landing({ onLaunchApp }) {
           <nav className="flex items-center gap-3 whitespace-nowrap text-[15px] font-medium sm:gap-7">
             <a href="#tools" className="hidden hover:text-cp-ink-2 sm:inline">Tools</a>
             <a href="#keys" className="hidden hover:text-cp-ink-2 sm:inline">Your keys</a>
-            <a href="#app" onClick={launch} className="hover:text-cp-ink-2">Log in</a>
-            <a href="#app" onClick={launch} className="btn-quiet min-h-[40px] px-3.5 text-sm sm:min-h-[42px] sm:px-[18px] sm:text-[15px]">Start free</a>
+            <a href="#app" onClick={logIn} className="hover:text-cp-ink-2">Log in</a>
+            <a href="#app" onClick={signUp} className="btn-quiet min-h-[40px] px-3.5 text-sm sm:min-h-[42px] sm:px-[18px] sm:text-[15px]">Start free</a>
           </nav>
         </header>
         {/* Hero */}

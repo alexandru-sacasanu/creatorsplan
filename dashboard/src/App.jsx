@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Upload, Youtube, Instagram, Share2, ChevronDown, Check, Activity, LayoutDashboard, Settings, Plus, History, X, Terminal, Shield, LayoutGrid, Image, Globe, RotateCcw, Calendar, AlertTriangle, KeyRound, Bot, Users, Smartphone, ExternalLink, Copy, CheckCircle2, Loader2, Download, Menu, Lock, Rocket, Clapperboard, SquareUser, SlidersHorizontal, CreditCard } from 'lucide-react';
 import KeyInput from './components/KeyInput';
 import MediaInput from './components/MediaInput';
@@ -21,6 +21,7 @@ import ClipTutorial from './components/ClipTutorial';
 import OnboardingSurvey from './components/OnboardingSurvey';
 import TrialUpgradeModal from './components/TrialUpgradeModal';
 import LoginModal from './components/LoginModal';
+import { takeAuthIntent } from './lib/authIntent';
 import TrialGate from './components/TrialGate';
 import AdvancedBanner from './components/AdvancedBanner';
 import HistoryTab from './components/HistoryTab';
@@ -270,8 +271,17 @@ const pollJob = async (jobId) => {
 
 function App() {
   // Cloud auth/billing session (inert when billing is disabled).
-  const { billingEnabled, isManaged, isSignedIn, me, plan, refreshMe, jobRetentionSeconds, localLlm } = useAuth();
+  const { billingEnabled, isManaged, isSignedIn, me, plan, refreshMe, jobRetentionSeconds, localLlm, loading: authLoading } = useAuth();
   const [showLogin, setShowLogin] = useState(false);
+  const [loginMode, setLoginMode] = useState('login'); // 'login' | 'signup': same backend, different screen
+  const openAuth = useCallback((mode = 'login') => { setLoginMode(mode); setShowLogin(true); }, []);
+  // "Log in" / "Start free" on the landing page: open that screen once auth
+  // has loaded. Ignored when signed in, and on self-host (no accounts there).
+  useEffect(() => {
+    if (authLoading) return;
+    const intent = takeAuthIntent();
+    if (intent && billingEnabled && !isSignedIn) openAuth(intent);
+  }, [authLoading, billingEnabled, isSignedIn, openAuth]);
   const [showTopUp, setShowTopUp] = useState(false);
   // Free plan: "want the watermark off?" once per job, when the clips land.
   const [showWmNotice, setShowWmNotice] = useState(false);
@@ -1010,7 +1020,7 @@ function App() {
       // the visitor asked for before sending them to sign in, so the resume
       // effect can hand the exact same request back to this function and let it
       // fall through the same gates.
-      if (!isSignedIn) { stashPendingJob(data); setShowLogin(true); return; }
+      if (!isSignedIn) { stashPendingJob(data); openAuth('signup'); return; }
       if (!isManaged) { window.location.hash = '#/pricing'; return; }
     } else if (keysMissing) {
       setShowKeyModal(true);
@@ -1427,10 +1437,16 @@ function App() {
               </button>
             )}
             {billingEnabled && !isSignedIn && (
-              <button onClick={() => setShowLogin(true)}
-                className="btn-ghost px-4 py-2 text-xs">
-                Sign in
-              </button>
+              <div className="flex items-center gap-2">
+                <button onClick={() => openAuth('login')}
+                  className="btn-ghost min-h-[36px] px-4 py-2 text-xs">
+                  Log in
+                </button>
+                <button onClick={() => openAuth('signup')}
+                  className="btn-quiet min-h-[36px] px-4 py-2 text-xs">
+                  Sign up
+                </button>
+              </div>
             )}
             {/* The rail carries the avatar from lg; the icon-only rail and
                 phones keep it up here. */}
@@ -1440,7 +1456,7 @@ function App() {
                 same thing, and two warnings in a 360px header is just noise. */}
             {keysMissing && (
               <button
-                onClick={() => (billingEnabled && !isSignedIn ? setShowLogin(true) : goToTab('settings'))}
+                onClick={() => (billingEnabled && !isSignedIn ? openAuth() : goToTab('settings'))}
                 className="badge-warn hover:brightness-125 transition-all hidden sm:inline-flex"
                 title="Configure API keys or choose a plan"
               >
@@ -1812,7 +1828,7 @@ function App() {
                       Connect your YouTube channel and every new video turns into shorts automatically.
                       Sign in to set it up.
                     </p>
-                    <button onClick={() => setShowLogin(true)} className="btn-primary">Sign in</button>
+                    <button onClick={() => openAuth()} className="btn-primary">Log in</button>
                   </div>
                 )}
             </Screen>
@@ -2331,7 +2347,7 @@ function App() {
           onReframed={handleClipRerendered}
         />
       )}
-      {showLogin && <LoginModal onClose={() => setShowLogin(false)} queued={typeof peekPendingJob()?.data?.payload === 'string'} />}
+      {showLogin && <LoginModal mode={loginMode} onClose={() => setShowLogin(false)} queued={typeof peekPendingJob()?.data?.payload === 'string'} />}
       {showSurvey && <OnboardingSurvey onDone={() => setSurveyDone(true)} />}
       {tutorialPhase && !showSurvey && (
         <ClipTutorial

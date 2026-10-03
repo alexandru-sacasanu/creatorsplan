@@ -4,8 +4,28 @@ import { useAuth } from '../contexts/AuthContext';
 import Modal from './ui/Modal';
 import ShortFrameLogo from './ShortFrameLogo';
 
-// Sign-in modal: magic link (email) + Google OAuth. Signing in and creating
-// an account are the same step, so the copy says both.
+const COPY = {
+  login: {
+    title: 'Welcome back',
+    body: 'Log in to your creatorsplan account.',
+    google: 'Log in with Google',
+    email: 'Email me a log-in link',
+    switchText: 'New to creatorsplan?',
+    switchCta: 'Create an account',
+  },
+  signup: {
+    title: 'Create your account',
+    body: 'Free to start: your first video up to 60 minutes, then 20 minutes a month. No card needed.',
+    google: 'Sign up with Google',
+    email: 'Email me a sign-up link',
+    switchText: 'Already have an account?',
+    switchCta: 'Log in',
+  },
+};
+
+// Log in / sign up modal: magic link (email) + Google OAuth. The backend has
+// one flow (the first verified link creates the account), so the two modes
+// differ only in copy, and a footer link switches between them.
 // `queued` says the visitor pressed "get free clips" before signing in and the
 // request is parked: the work resumes by itself once they are back, and saying
 // so is the difference between a sign-in wall and a saved job.
@@ -21,12 +41,14 @@ function GoogleGlyph() {
   );
 }
 
-export default function LoginModal({ onClose, queued = false }) {
+export default function LoginModal({ onClose, queued = false, mode: initialMode = 'login' }) {
   const { requestMagicLink, loginWithGoogle, googleAuthEnabled } = useAuth();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [mode, setMode] = useState(initialMode === 'signup' ? 'signup' : 'login');
+  const copy = COPY[mode];
 
   const submit = async (e) => {
     e.preventDefault();
@@ -55,7 +77,7 @@ export default function LoginModal({ onClose, queued = false }) {
             </span>
             <h2 className="m-0 mt-5 text-[26px] font-semibold leading-[1.1] tracking-[-0.03em] text-cp-ink">Check your inbox</h2>
             <p className="m-0 mt-2 max-w-[340px] text-[15px] leading-[1.5] text-cp-ink-2">
-              We sent a sign-in link to
+              We sent a {mode === 'signup' ? 'sign-up' : 'log-in'} link to
               <b className="block break-words font-semibold text-cp-ink">{email}</b>
               Open it on this device to continue.
             </p>
@@ -69,10 +91,8 @@ export default function LoginModal({ onClose, queued = false }) {
           </div>
         ) : (
           <>
-            <h2 className="m-0 mt-5 text-[28px] font-semibold leading-[1.1] tracking-[-0.03em] text-cp-ink">Sign in to creatorsplan</h2>
-            <p className="m-0 mt-2 max-w-[340px] text-[15px] leading-[1.5] text-cp-ink-2">
-              New here? The same step creates your account. No password to remember.
-            </p>
+            <h2 className="m-0 mt-5 text-[28px] font-semibold leading-[1.1] tracking-[-0.03em] text-cp-ink">{copy.title}</h2>
+            <p className="m-0 mt-2 max-w-[340px] text-[15px] leading-[1.5] text-cp-ink-2">{copy.body}</p>
 
             {queued && (
               <div className="mt-5 flex w-full items-start gap-2.5 rounded-input border-[1.5px] border-cp-ink bg-cp-volt-soft px-3.5 py-3 text-left">
@@ -87,7 +107,7 @@ export default function LoginModal({ onClose, queued = false }) {
               <>
                 <button type="button" onClick={loginWithGoogle} className="btn-ghost mt-6 min-h-[52px] w-full border-[1.5px] border-cp-ink">
                   <GoogleGlyph />
-                  Continue with Google
+                  {copy.google}
                 </button>
                 <div className="my-5 flex w-full items-center gap-3" aria-hidden="true">
                   <div className="flex-1 border-t border-cp-line" />
@@ -121,13 +141,24 @@ export default function LoginModal({ onClose, queued = false }) {
               <button type="submit" disabled={busy || !email.trim()} className="btn-primary mt-2 min-h-[52px] w-full">
                 {busy
                   ? <><Loader2 size={18} className="animate-spin" /> Sending link</>
-                  : <>Email me a sign-in link <ArrowRight size={16} /></>}
+                  : <>{copy.email} <ArrowRight size={16} /></>}
               </button>
             </form>
 
+            <p className="m-0 mt-6 text-sm text-cp-ink-2">
+              {copy.switchText}{' '}
+              <button
+                type="button"
+                onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); }}
+                className="font-semibold text-cp-ink underline underline-offset-2 hover:text-cp-ink-2"
+              >
+                {copy.switchCta}
+              </button>
+            </p>
+
             {/* The account is created by this button, so the terms have to be
                 reachable from it: a magic-link signup never passes the footer. */}
-            <p className="m-0 mt-6 text-xs leading-relaxed text-cp-ink-3">
+            <p className="m-0 mt-4 text-xs leading-relaxed text-cp-ink-3">
               By continuing you agree to our{' '}
               <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-cp-ink-2 underline underline-offset-2 hover:text-cp-ink">Terms of service</a>
               {' '}and{' '}
