@@ -1,8 +1,8 @@
 """Upload-Post white-label profiles for managed users.
 
-Each OpenShorts user maps to one Upload-Post profile (a container for their
+Each creatorsplan user maps to one Upload-Post profile (a container for their
 connected socials). We create it lazily and generate branded connection links so
-the user connects TikTok/IG/YouTube on a page that looks like OpenShorts.
+the user connects TikTok/IG/YouTube on a page that looks like creatorsplan.
 
 Docs: https://docs.upload-post.com/guides/user-profile-integration
 """
@@ -85,9 +85,9 @@ async def get_connect_url(username: str, return_to: str = "account") -> str:
         "username": username,
         "logoImage": settings.openshorts_logo_url,
         "connectTitle": "Connect your social accounts",
-        "connectDescription": "Link TikTok, Instagram and YouTube to post your shorts directly from OpenShorts.",
+        "connectDescription": "Link TikTok, Instagram and YouTube to post your shorts directly from creatorsplan.",
         "redirectUrl": f"{settings.frontend_url}{back}",
-        "redirectButtonText": "Back to OpenShorts",
+        "redirectButtonText": "Back to creatorsplan",
         "platforms": CONNECT_PLATFORMS,
         "showCalendar": True,  # keep the scheduling calendar available in the page
     }

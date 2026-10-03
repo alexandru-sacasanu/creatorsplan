@@ -34,11 +34,11 @@ from subtitles import CAPTION_PRESETS, line_budget
 router = APIRouter()
 
 PROTOCOL_VERSIONS = ("2025-06-18", "2025-03-26", "2024-11-05")
-SERVER_INFO = {"name": "openshorts", "title": "OpenShorts", "version": "1.0.0"}
+SERVER_INFO = {"name": "openshorts", "title": "creatorsplan", "version": "1.0.0"}
 INSTRUCTIONS = (
-    "OpenShorts turns long videos (YouTube URLs or direct video files) into "
+    "creatorsplan turns long videos (YouTube URLs or direct video files) into "
     "viral-ready vertical clips. When the user gives you a video URL, hand it "
-    "to process_video exactly as written: OpenShorts downloads, transcribes "
+    "to process_video exactly as written: creatorsplan downloads, transcribes "
     "and analyses the video on its own servers. Do NOT try to open, fetch, "
     "search for, summarise or transcribe the URL yourself first; you cannot "
     "reach the video and it is not needed. Typical flow: process_video -> "
@@ -61,7 +61,7 @@ TOOLS = [
         "name": "process_video",
         "title": "Process a video into short clips",
         "description": (
-            "Start clipping a video from its URL. OpenShorts downloads the "
+            "Start clipping a video from its URL. creatorsplan downloads the "
             "source itself, transcribes it, finds the most viral moments with AI "
             "and renders vertical (9:16) clips. Captions and the AI hook line are "
             "burned by default; pass captions=false or auto_hook=false to skip either. "
@@ -643,7 +643,7 @@ async def mcp_endpoint(request: Request):
         u = request.base_url
         return JSONResponse(
             {"error": "Authentication required. Connect with OAuth (claude.ai, ChatGPT) "
-                      "or pass an OpenShorts API key: Authorization: Bearer osk_... "
+                      "or pass a creatorsplan API key: Authorization: Bearer osk_... "
                       "(create one in the dashboard)."},
             status_code=401,
             headers={"WWW-Authenticate": mcp_oauth.www_authenticate(f"{u.scheme}://{u.netloc}")},
