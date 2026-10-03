@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { AuthProvider } from './contexts/AuthContext'
 import Landing from './Landing.jsx'
+import { setAuthIntent } from './lib/authIntent'
 
 const App = lazy(() => import('./App.jsx'))
 
@@ -42,7 +43,9 @@ function Root() {
     try { localStorage.setItem(SKIP_LANDING_KEY, '1') } catch { /* ignore */ }
   }, [view])
 
-  const launchApp = () => {
+  // `intent` ('login' | 'signup') opens that auth screen once the app is up.
+  const launchApp = (intent) => {
+    if (intent) setAuthIntent(intent)
     window.location.hash = '#app'
     setView('app')
   }
