@@ -2,6 +2,7 @@ import io
 import os
 import uuid
 import json
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 from google import genai
@@ -15,6 +16,44 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 # stays on gemini-3.1-flash-image; the text models cannot draw.
 TEXT_MODEL = os.environ.get("GEMINI_MODEL_THUMBNAIL") or "gemini-3.7-flash"
 IMAGE_MODEL = os.environ.get("GEMINI_IMAGE_MODEL") or "gemini-3.1-flash-image"
+# When TEXT_MODEL stays overloaded through every retry, the text calls fall
+# back to this one rather than failing the user's request: a flash-lite title
+# beats an error. The image model has no fallback (the text models can't draw).
+FALLBACK_TEXT_MODEL = (os.environ.get("GEMINI_MODEL_THUMBNAIL_FALLBACK")
+                       or os.environ.get("GEMINI_MODEL") or "gemini-3.1-flash-lite")
+
+# Errors worth another attempt: Google's 503 "model is experiencing high
+# demand", rate limits and 5xx. Same list main.py retries in the clip pipeline.
+_TRANSIENT = ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED", "500", "INTERNAL",
+              "overloaded", "high demand", "Deadline", "502", "504")
+RETRY_DELAYS = (2, 5, 10)
+
+
+def _is_transient(err):
+    msg = str(err)
+    return any(tok in msg for tok in _TRANSIENT)
+
+
+def _generate(client, *, model, **kwargs):
+    """client.models.generate_content with retries on transient Gemini errors.
+
+    Studio requests are interactive, so the backoff is short (2s, 5s, 10s).
+    A text call still failing with a transient error after that is tried once
+    on FALLBACK_TEXT_MODEL. Anything else (a bad key, a blocked prompt) raises
+    at once, as before."""
+    for attempt, delay in enumerate((*RETRY_DELAYS, None), start=1):
+        try:
+            return client.models.generate_content(model=model, **kwargs)
+        except Exception as e:
+            if not _is_transient(e):
+                raise
+            if delay is None:
+                if model == TEXT_MODEL and FALLBACK_TEXT_MODEL and FALLBACK_TEXT_MODEL != model:
+                    print(f"⚠️ [Thumbnail] {model} still unavailable; using {FALLBACK_TEXT_MODEL}")
+                    return client.models.generate_content(model=FALLBACK_TEXT_MODEL, **kwargs)
+                raise
+            print(f"⚠️ [Thumbnail] Gemini transient error (attempt {attempt}), retrying in {delay}s: {str(e)[:150]}")
+            time.sleep(delay)
 
 # Frames sent with the transcript instead of the whole video. Gemini bills
 # video at ~300 tokens/s, so an hour is ~1M tokens for what is a text task;
@@ -114,7 +153,8 @@ OUTPUT JSON:
 }}"""
 
     print("🤖 [Thumbnail] Brainstorming titles...")
-    response = client.models.generate_content(
+    response = _generate(
+        client,
         model=TEXT_MODEL,
         contents=frames + [brainstorm_prompt],
         config=types.GenerateContentConfig(response_mime_type="application/json"),
@@ -163,7 +203,8 @@ OUTPUT JSON:
 }}"""
 
     print("🧐 [Thumbnail] Scoring titles...")
-    response = client.models.generate_content(
+    response = _generate(
+        client,
         model=TEXT_MODEL,
         contents=[critic_prompt],
         config=types.GenerateContentConfig(response_mime_type="application/json"),
@@ -231,7 +272,8 @@ OUTPUT JSON:
     "language": "ISO 639-1 code of the language the titles are written in"
 }}"""
 
-    response = client.models.generate_content(
+    response = _generate(
+        client,
         model=TEXT_MODEL,
         contents=[prompt],
         config=types.GenerateContentConfig(
@@ -403,7 +445,8 @@ Per concept give:
 OUTPUT JSON:
 {{"concepts": [{{"text": "...", "text_position": "left", "text_color": "yellow", "scene": "...", "why": "..."}}, ...]}}"""
 
-    response = client.models.generate_content(
+    response = _generate(
+        client,
         model=TEXT_MODEL,
         contents=[prompt],
         config=types.GenerateContentConfig(response_mime_type="application/json"),
@@ -626,7 +669,8 @@ Style: high contrast, saturated colours, crisp subject separation, cinematic lig
                    "body type. Photorealistic, like a photo of them; do not idealize, slim, rejuvenate or "
                    "stylize them. Expression may change slightly but must stay natural and true to their face.")
 
-    response = client.models.generate_content(
+    response = _generate(
+        client,
         model=IMAGE_MODEL,
         contents=reference_images + [prompt],
         config=types.GenerateContentConfig(
@@ -774,7 +818,8 @@ REQUIREMENTS:
 OUTPUT: Return ONLY the description text (no JSON wrapper, no markdown code blocks). The description should be ready to paste directly into YouTube."""
 
     print("🤖 [Thumbnail] Generating YouTube description with chapters...")
-    response = client.models.generate_content(
+    response = _generate(
+        client,
         model=TEXT_MODEL,
         contents=[prompt],
     )
