@@ -202,6 +202,92 @@
     border: 1px solid var(--cp-ink);
   }
 
+  /* Toggle track + knob (ui/Toggle.jsx). Sits right after an sr-only
+     `peer` checkbox, so checked/disabled/focus come from the real input. */
+  .cp-toggle {
+    position: relative;
+    display: block;
+    width: 44px;
+    height: 26px;
+    border-radius: var(--cp-radius-pill);
+    background: var(--cp-line-strong);
+    transition: background-color var(--cp-dur-settle) var(--cp-ease-settle);
+  }
+  .cp-toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--cp-radius-pill);
+    background: var(--cp-field);
+    box-shadow: 0 1px 2px rgb(20 18 15 / 0.25);
+    transition: transform 200ms var(--cp-ease-settle);
+  }
+  .peer:checked ~ .cp-toggle { background: var(--cp-ink); }
+  .peer:checked ~ .cp-toggle::after { transform: translateX(18px); }
+  .peer:disabled ~ .cp-toggle { opacity: 0.4; cursor: not-allowed; }
+  .peer:focus-visible ~ .cp-toggle { box-shadow: 0 0 0 4px var(--cp-volt-soft); }
+
+  /* Underline tabs (upload / link): 52px, 15px/600, ink underline on a 1px
+     --cp-line baseline. Put .cp-tabs on the row, .cp-tab on each button and
+     aria-selected on the active one. */
+  .cp-tabs {
+    display: flex;
+    gap: 24px;
+    border-bottom: 1px solid var(--cp-line);
+  }
+  .cp-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 52px;
+    margin-bottom: -1px;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--cp-ink-2);
+    border-bottom: 2px solid transparent;
+    transition: color var(--cp-dur-settle) var(--cp-ease-settle), border-color var(--cp-dur-settle) var(--cp-ease-settle);
+  }
+  .cp-tab:hover { color: var(--cp-ink); }
+  .cp-tab[aria-selected='true'] { color: var(--cp-ink); border-bottom-color: var(--cp-ink); }
+
+  /* Sidebar nav item: 42px, radius 12, 18px icon, 15px/500 label. Active is
+     an ink pill with paper text and a volt icon. Set aria-current="page" on
+     the active one; icons inside take .cp-nav-icon, trailing meta (BYOK,
+     counts) takes .cp-nav-meta. */
+  .cp-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border-radius: var(--cp-radius-input);
+    font-size: 15px;
+    font-weight: 500;
+    text-align: left;
+    color: var(--cp-ink);
+    background: transparent;
+    transition: background-color 160ms var(--cp-ease-settle), color 160ms var(--cp-ease-settle);
+  }
+  .cp-nav-item:hover { background: var(--cp-tint); }
+  .cp-nav-item .cp-nav-icon { color: var(--cp-ink-2); flex-shrink: 0; }
+  .cp-nav-item .cp-nav-meta {
+    font-family: var(--cp-font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--cp-ink-3);
+  }
+  .cp-nav-item[aria-current='page'] { background: var(--cp-ink); color: var(--cp-paper); }
+  .cp-nav-item[aria-current='page'] .cp-nav-icon { color: var(--cp-volt); }
+  .cp-nav-item[aria-current='page'] .cp-nav-meta { color: var(--cp-ink-3); }
+  .cp-nav-item:disabled { opacity: 0.4; cursor: not-allowed; background: transparent; }
+
   /* narrow phones: tighter pill padding so CTA labels stay on one line */
   @media (max-width: 379px) {
     .btn-primary, .btn-ghost { padding-left: 1rem; padding-right: 1rem; }

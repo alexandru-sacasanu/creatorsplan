@@ -1228,7 +1228,7 @@ function App() {
       {billingEnabled && (
         <a
           href="#/pricing"
-          className="flex items-center gap-2 px-3 py-2 text-xs lowercase text-muted hover:text-ink2 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 text-xs lowercase text-cp-ink-2 hover:text-cp-ink transition-colors"
         >
           <Sparkles size={14} className="shrink-0" />
           <span className={collapsed ? 'hidden lg:block truncate' : 'truncate'}>plans &amp; pricing</span>
@@ -1240,10 +1240,10 @@ function App() {
   // Desktop rail: icon-only from md, labelled from lg. Below md it is gone
   // entirely — an unlabelled 80px rail ate a fifth of a phone screen.
   const Sidebar = () => (
-    <div className="hidden md:flex w-20 lg:w-64 bg-paper2 border-r border-rule flex-col h-full shrink-0 transition-all duration-300">
+    <div className="hidden md:flex w-20 lg:w-64 bg-cp-paper border-r border-cp-line flex-col h-full shrink-0 transition-all duration-300">
       <div className="p-6 flex items-center gap-[7px]">
         <ShortFrameLogo width={15} height={25} className="shrink-0" />
-        <span className="font-display font-bold lowercase text-[19px] tracking-[-0.042em] text-ink hidden lg:block">creatorsplan</span>
+        <span className="font-display font-bold lowercase text-[19px] tracking-[-0.042em] text-cp-ink hidden lg:block">creatorsplan</span>
       </div>
 
       <nav className="flex-1 px-4 py-4 space-y-1">
@@ -1257,24 +1257,21 @@ function App() {
               onClick={() => goToTab(item.id)}
               title={tabLocked(item.id) ? 'Finish your first clips to unlock' : item.label}
               disabled={tabLocked(item.id)}
-              className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-input transition-colors ${isActive ? 'bg-paper3 text-ink' : 'text-muted hover:text-ink2 hover:bg-paper3/50'} ${tabLocked(item.id) ? 'opacity-40 cursor-not-allowed hover:bg-transparent hover:text-muted' : ''}`}
+              aria-current={isActive ? 'page' : undefined}
+              className="cp-nav-item justify-center lg:justify-start"
             >
-              {isActive && (
-                <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 bg-brass rounded-full" aria-hidden="true" />
-              )}
-              <NavIcon size={18} className={`shrink-0 ${isActive ? 'text-brass' : ''}`} />
-              <span className="text-sm lowercase hidden lg:block flex-1 text-left truncate">{item.label}</span>
+              <NavIcon size={18} strokeWidth={1.8} className="cp-nav-icon" />
+              <span className="hidden lg:block flex-1 truncate">{item.label}</span>
               {tabLocked(item.id)
                 ? <Lock size={12} className="shrink-0 hidden lg:block" />
-                : item.byok ? <span className="readout hidden lg:block">BYOK</span>
-                  : item.isNew ? <span className="badge-brass hidden lg:block">new</span> : null}
-              <span className="readout hidden lg:block">{item.ord}</span>
+                : item.byok ? <span className="cp-nav-meta hidden lg:block">BYOK</span>
+                  : item.isNew ? <span className="cp-nav-meta hidden lg:block">NEW</span> : null}
             </button>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-rule space-y-1">
+      <div className="p-4 border-t border-cp-line space-y-1">
         <NavFooterLinks collapsed />
       </div>
     </div>
@@ -1293,16 +1290,16 @@ function App() {
         onClick={() => setNavOpen(false)}
         aria-hidden="true"
       />
-      <div className="relative w-[17rem] max-w-[82vw] h-full bg-paper2 border-r border-rule flex flex-col animate-slide-in-left">
-        <div className="flex items-center justify-between px-5 h-14 border-b border-rule shrink-0">
+      <div className="relative w-[17rem] max-w-[82vw] h-full bg-cp-paper border-r border-cp-line flex flex-col animate-slide-in-left">
+        <div className="flex items-center justify-between px-5 h-14 border-b border-cp-line shrink-0">
           <div className="flex items-center gap-[7px]">
             <ShortFrameLogo width={15} height={25} className="shrink-0" />
-            <span className="font-display font-bold lowercase text-[19px] tracking-[-0.042em] text-ink">creatorsplan</span>
+            <span className="font-display font-bold lowercase text-[19px] tracking-[-0.042em] text-cp-ink">creatorsplan</span>
           </div>
           <button
             onClick={() => setNavOpen(false)}
             aria-label="close navigation"
-            className="p-2 -mr-2 text-muted hover:text-ink transition-colors"
+            className="p-2 -mr-2 text-cp-ink-2 hover:text-cp-ink transition-colors"
           >
             <X size={18} />
           </button>
@@ -1319,23 +1316,20 @@ function App() {
                 disabled={tabLocked(item.id)}
                 aria-current={isActive ? 'page' : undefined}
                 title={tabLocked(item.id) ? 'Finish your first clips to unlock' : undefined}
-                className={`relative w-full flex items-center gap-3 px-3 py-3 rounded-input transition-colors ${isActive ? 'bg-paper3 text-ink' : 'text-muted active:bg-paper3/60'} ${tabLocked(item.id) ? 'opacity-40 cursor-not-allowed' : ''}`}
+                className="cp-nav-item"
               >
-                {isActive && (
-                  <span className="absolute left-0 top-2 bottom-2 w-0.5 bg-brass rounded-full" aria-hidden="true" />
-                )}
-                <NavIcon size={18} className={`shrink-0 ${isActive ? 'text-brass' : ''}`} />
-                <span className="text-[0.95rem] lowercase flex-1 text-left truncate">{item.label}</span>
+                <NavIcon size={18} strokeWidth={1.8} className="cp-nav-icon" />
+                <span className="flex-1 truncate">{item.label}</span>
                 {tabLocked(item.id)
                   ? <Lock size={12} className="shrink-0" />
-                  : item.byok ? <span className="readout shrink-0">BYOK</span>
-                    : item.isNew ? <span className="badge-brass shrink-0">new</span> : null}
+                  : item.byok ? <span className="cp-nav-meta shrink-0">BYOK</span>
+                    : item.isNew ? <span className="cp-nav-meta shrink-0">NEW</span> : null}
               </button>
             );
           })}
         </nav>
 
-        <div className="px-3 py-3 border-t border-rule space-y-0.5 safe-bottom shrink-0">
+        <div className="px-3 py-3 border-t border-cp-line space-y-0.5 safe-bottom shrink-0">
           <NavFooterLinks />
         </div>
       </div>
