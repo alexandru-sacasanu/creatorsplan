@@ -109,7 +109,7 @@ const ProcessingAnimation = ({ media, isComplete, syncedTime, isSyncedPlaying, s
             className={`w-full h-full ${isSyncedPlaying ? '' : 'pointer-events-none scale-110'}`}
             // Add enablejsapi=1 for postMessage control
             src={`https://www.youtube.com/embed/${videoSrc}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoSrc}&modestbranding=1&showinfo=0&rel=0&enablejsapi=1`}
-            title="Processing Video"
+            title="Processing video"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           />
@@ -155,7 +155,7 @@ const ProcessingAnimation = ({ media, isComplete, syncedTime, isSyncedPlaying, s
                 go when there is no room. */}
             {!isComplete && (
               <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-paper2/90 rounded-full readout shrink-0">
-                VIRAL_DETECTION: ACTIVE
+                FINDING MOMENTS
               </div>
             )}
           </div>

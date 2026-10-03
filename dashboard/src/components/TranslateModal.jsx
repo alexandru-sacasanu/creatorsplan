@@ -75,7 +75,7 @@ export default function TranslateModal({ isOpen, onClose, onTranslate, isProcess
                         ) : (
                             <>
                                 <Languages size={16} />
-                                Dub Voice
+                                Dub the voice
                             </>
                         )}
                     </button>
@@ -92,7 +92,7 @@ export default function TranslateModal({ isOpen, onClose, onTranslate, isProcess
             {!hasApiKey && (
                 <div className="mb-4 flex items-start gap-2">
                     <span className="badge-warn shrink-0"><AlertCircle size={12} /> key missing</span>
-                    <p className="text-sm text-muted">Configure ElevenLabs API Key in Settings first.</p>
+                    <p className="text-sm text-muted">Add your ElevenLabs API key in settings first.</p>
                 </div>
             )}
 
@@ -109,7 +109,7 @@ export default function TranslateModal({ isOpen, onClose, onTranslate, isProcess
             {/* Language Selection */}
             <div className="mb-5">
                 <label className="eyebrow block mb-2">
-                    Target Language
+                    Language
                 </label>
                 <select
                     value={targetLanguage}
@@ -127,7 +127,7 @@ export default function TranslateModal({ isOpen, onClose, onTranslate, isProcess
 
             {/* Info */}
             <p className="text-xs text-muted leading-relaxed mb-2">
-                The audio will be dubbed with AI-generated voice in the selected language, matching the original speaker's characteristics.
+                The audio is dubbed into the language you pick, in a voice that matches the original speaker.
             </p>
 
             {/* AI Act art. 50: we mark the file, the person publishing it is the
@@ -143,8 +143,8 @@ export default function TranslateModal({ isOpen, onClose, onTranslate, isProcess
                     <div className="flex items-center gap-3">
                         <Loader2 size={18} className="text-brass animate-spin" />
                         <div>
-                            <p className="text-sm text-ink font-medium lowercase">Dubbing audio...</p>
-                            <p className="text-xs text-muted lowercase">This may take a few minutes</p>
+                            <p className="text-sm text-ink font-medium">Dubbing audio...</p>
+                            <p className="text-xs text-muted">This may take a few minutes</p>
                         </div>
                     </div>
                 </div>

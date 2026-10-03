@@ -57,9 +57,9 @@ export default function HistoryTab({ onReopenProject }) {
   return (
     <div className="h-full overflow-y-auto p-8 max-w-5xl mx-auto animate-fade">
       <p className="eyebrow mb-1.5">07 · HISTORY</p>
-      <h1 className="font-display lowercase text-2xl text-ink mb-2">Your library</h1>
-      <p className="text-muted text-sm mb-8 lowercase">
-        All the shorts you've generated, saved while your plan is active. Kept for 7 days after your plan ends. Reopen a project to keep editing its clips.
+      <h1 className="font-display text-2xl text-ink mb-2">Your library</h1>
+      <p className="text-muted text-sm mb-8">
+        All the shorts you've made, saved while your plan is active. Kept for 7 days after your plan ends. Reopen a project to keep editing its clips.
       </p>
 
       {error && <p className="text-danger text-sm">{error}</p>}
@@ -68,7 +68,7 @@ export default function HistoryTab({ onReopenProject }) {
       {videos && videos.length === 0 && (
         <div className="text-center py-20 text-muted">
           <Film size={40} className="mx-auto mb-4 text-muted" />
-          <p className="lowercase">No videos yet. Generate your first short from the Clip Generator.</p>
+          <p className="">No videos yet. Generate your first short from the clip generator.</p>
         </div>
       )}
 
@@ -91,10 +91,10 @@ export default function HistoryTab({ onReopenProject }) {
                     onClick={() => handleReopen(jobId)}
                     disabled={!!reopening}
                     className="btn-ghost px-3 py-2 text-xs shrink-0"
-                    title="Restore this project in the Clip Generator to keep editing subtitles, hooks, effects and dubbing"
+                    title="Restore this project in the clip generator to keep editing subtitles, hooks, effects and dubbing"
                   >
                     {reopening === jobId
-                      ? <><Loader2 size={14} className="animate-spin" /> reopening…</>
+                      ? <><Loader2 size={14} className="animate-spin" /> Reopening…</>
                       : <><FolderOpen size={14} /> reopen project</>}
                   </button>
                 )}

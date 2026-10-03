@@ -63,7 +63,7 @@ function StatusBadge({ run }) {
     );
   }
   if (status === 'processing' || status === 'queued') {
-    return <span className="badge-brass inline-flex items-center gap-1"><Loader2 size={11} className="animate-spin" /> clipping</span>;
+    return <span className="badge-brass inline-flex items-center gap-1"><Loader2 size={11} className="animate-spin" /> Clipping</span>;
   }
   if (status === 'skipped') return <span className="badge-warn">{REASON_TEXT[run.reason] || 'skipped'}</span>;
   return <span className="badge-danger">{REASON_TEXT[run.reason] || 'failed'}</span>;
@@ -204,7 +204,7 @@ export default function AutopilotTab({ onOpenProject, onUpgrade, justConnected }
   return (
     <div className="max-w-4xl mx-auto animate-fade">
       <p className="eyebrow mb-1.5">02 · AUTOPILOT</p>
-      <h1 className="font-display lowercase text-3xl text-ink mb-2">your channel, clipped on its own</h1>
+      <h1 className="font-display text-3xl text-ink mb-2">Your channel, clipped on its own</h1>
       <p className="text-muted text-sm mb-8 max-w-2xl">
         Publish on YouTube as usual. Autopilot notices every new video, turns it into shorts
         and emails you when they are ready. Switch on autopublish and the best ones go out on
@@ -219,12 +219,12 @@ export default function AutopilotTab({ onOpenProject, onUpgrade, justConnected }
       {/* Plan gate: Autopilot spends minutes on its own, so it is a paid feature. */}
       {!eligible && (
         <div className="card p-6 mb-6">
-          <h3 className="font-display lowercase text-lg text-ink mb-1 flex items-center gap-2">
+          <h3 className="font-display text-lg text-ink mb-1 flex items-center gap-2">
             <Lock size={16} className="text-brass" /> included in paid plans
           </h3>
           <p className="text-muted text-sm mb-4">
             Autopilot runs on your plan&apos;s minutes, so it comes with Starter, Creator and Pro.
-            Every new upload turns into shorts without you opening OpenShorts.
+            Every new upload turns into shorts without you opening creatorsplan.
           </p>
           <button onClick={() => { track('AutopilotUpgradeClick'); onUpgrade?.(); }} className="btn-primary">
             <Rocket size={16} /> choose a plan
@@ -244,7 +244,7 @@ export default function AutopilotTab({ onOpenProject, onUpgrade, justConnected }
               {yt ? (
                 <p className="text-ink truncate">{yt.display_name || yt.handle} <span className="readout ml-1">{yt.handle}</span></p>
               ) : (
-                <p className="text-muted text-sm">no YouTube channel connected yet</p>
+                <p className="text-muted text-sm">No YouTube channel connected yet</p>
               )}
             </div>
           </div>
@@ -254,7 +254,7 @@ export default function AutopilotTab({ onOpenProject, onUpgrade, justConnected }
             </button>
           )}
           {yt && !yt.reauth_required && (
-            <button onClick={connect} className="btn-quiet text-xs">manage accounts</button>
+            <button onClick={connect} className="btn-quiet text-xs">Manage accounts</button>
           )}
         </div>
         {yt?.reauth_required && (
@@ -336,12 +336,12 @@ export default function AutopilotTab({ onOpenProject, onUpgrade, justConnected }
                       onClick={() => togglePlatform(p)}
                       disabled={saving}
                       aria-pressed={on}
-                      className={`px-4 py-2 rounded-full text-sm lowercase border transition-colors ${on ? 'border-brass bg-brass/10 text-ink' : 'border-rule2 text-muted hover:text-ink2'}`}
+                      className={`px-4 py-2 rounded-full text-sm  border transition-colors ${on ? 'border-brass bg-brass/10 text-ink' : 'border-rule2 text-muted hover:text-ink2'}`}
                     >
                       {on && <CheckCircle2 size={13} className="inline mr-1.5 -mt-0.5 text-brass" />}{PLATFORM_LABELS[p]}
                     </button>
                   ) : (
-                    <button key={p} onClick={connect} className="px-4 py-2 rounded-full text-sm lowercase border border-dashed border-rule2 text-muted hover:text-ink2">
+                    <button key={p} onClick={connect} className="px-4 py-2 rounded-full text-sm border border-dashed border-rule2 text-muted hover:text-ink2">
                       + connect {PLATFORM_LABELS[p]}
                     </button>
                   );
@@ -394,7 +394,7 @@ export default function AutopilotTab({ onOpenProject, onUpgrade, justConnected }
               <p className="eyebrow mb-1">04 · YOUR LATEST VIDEOS</p>
               <p className="text-muted text-sm">Clip any of them now, or let Autopilot handle the next one.</p>
             </div>
-            <button onClick={load} className="btn-quiet text-xs" aria-label="refresh"><RefreshCw size={13} /> refresh</button>
+            <button onClick={load} className="btn-quiet text-xs" aria-label="refresh"><RefreshCw size={13} /> Refresh</button>
           </div>
           {listNotice && (
             <div className="mb-4 rounded-card border border-brass/40 bg-brass/5 px-4 py-3 text-sm text-ink2" role="status">{listNotice}</div>

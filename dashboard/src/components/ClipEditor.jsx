@@ -956,7 +956,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                 <div className="card p-6 max-w-md" onMouseDown={(e) => e.stopPropagation()}>
                     <p className="eyebrow mb-2">EDITOR · CLIP {clipIndex + 1}</p>
                     <div className="flex items-center gap-2 text-danger text-sm"><AlertCircle size={16} /> {loadError}</div>
-                    <button className="btn-ghost mt-5" onClick={onClose}>close</button>
+                    <button className="btn-ghost mt-5" onClick={onClose}>Close</button>
                 </div>
             </div>
         );
@@ -965,7 +965,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
     if (!edl) {
         return (
             <div className="fixed inset-0 z-[110] bg-paper/90 flex items-center justify-center animate-fade">
-                <div className="flex items-center gap-3 text-muted text-sm lowercase">
+                <div className="flex items-center gap-3 text-muted text-sm">
                     <Loader2 size={18} className="animate-spin text-brass" /> loading clip recipe…
                 </div>
             </div>
@@ -1097,7 +1097,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
             <div className="px-4 sm:px-6 pt-4 pb-3 border-b border-rule flex items-start justify-between gap-4 shrink-0">
                 <div className="min-w-0">
                     <p className="eyebrow mb-1">EDITOR · CLIP {clipIndex + 1}</p>
-                    <h2 className="font-display lowercase text-xl sm:text-2xl text-ink truncate">edit clip</h2>
+                    <h2 className="font-display text-xl sm:text-2xl text-ink truncate">Edit clip</h2>
                     {clipTitle && <p className="text-xs text-muted truncate mt-0.5">{clipTitle}</p>}
                     {/* Phone: the readouts move under the title — as a third
                         column they squeezed the title to two characters. */}
@@ -1120,7 +1120,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                                 ? 'put the source monitor away and edit the clip on its own'
                                 : 'bring back the source monitor, its transcript and in/out marking'}
                             aria-label={showSource ? 'hide source' : 'show source'}
-                            className="btn-quiet text-xs py-1.5 px-2.5 sm:px-3 flex items-center gap-1.5 lowercase"
+                            className="btn-quiet text-xs py-1.5 px-2.5 sm:px-3 flex items-center gap-1.5"
                         >
                             {showSource ? <PanelLeftClose size={14} /> : <PanelLeft size={14} />}
                             <span className="hidden sm:inline">{showSource ? 'hide source' : 'show source'}</span>
@@ -1128,7 +1128,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                     )}
                     {confirmClose ? (
                         <div className="flex flex-wrap items-center justify-end gap-2">
-                            <span className="text-xs text-warn lowercase hidden sm:inline">discard changes?</span>
+                            <span className="text-xs text-warn hidden sm:inline">Discard changes?</span>
                             <button className="btn-danger text-xs py-1.5 px-3" onClick={onClose}>discard</button>
                             <button className="btn-ghost text-xs py-1.5 px-3" onClick={() => setConfirmClose(false)}>keep editing</button>
                         </div>
@@ -1181,7 +1181,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                                     <ChevronsRight size={12} /> in <span className="text-muted">i</span>
                                 </button>
                                 <button onClick={() => markHere('out')} className="btn-quiet text-[11px] py-1 px-2 flex items-center gap-1 shrink-0">
-                                    <ChevronsLeft size={12} /> out <span className="text-muted">o</span>
+                                    <ChevronsLeft size={12} /> Out <span className="text-muted">o</span>
                                 </button>
                                 <p className={`readout px-1 truncate ${markRange ? 'text-ink' : ''}`}>
                                     {markIn === null ? '—:——' : fmt(markIn)}
@@ -1252,7 +1252,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                                 ) : null}
                             </div>
                             {words.length === 0 ? (
-                                <p className="text-xs text-muted lowercase">this job kept no transcript</p>
+                                <p className="text-xs text-muted">This job kept no transcript</p>
                             ) : (
                                 <div
                                     ref={transcriptRef}
@@ -1449,7 +1449,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                                             <button className="p-1 rounded-input text-muted hover:text-danger hover:bg-paper disabled:opacity-45 ml-auto" disabled={segments.length <= 1} onClick={(e) => { e.stopPropagation(); deleteSegment(i); }} aria-label="delete segment"><Trash2 size={13} /></button>
                                         </div>
                                         {outOfRange(seg) && (
-                                            <p className="text-[11px] text-danger mt-1.5 lowercase">outside the original range — the source video is gone</p>
+                                            <p className="text-[11px] text-danger mt-1.5">Outside the original range. The source video is gone.</p>
                                         )}
                                     </div>
                                 ))}
@@ -1457,7 +1457,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                             <button
                                 onClick={addSegment}
                                 disabled={segments.length >= limits.max_segments}
-                                className="mt-2 w-full flex items-center justify-center gap-1.5 py-2 rounded-input border border-dashed border-rule2 text-xs lowercase text-ink2 hover:bg-paper3 transition-colors disabled:opacity-45"
+                                className="mt-2 w-full flex items-center justify-center gap-1.5 py-2 rounded-input border border-dashed border-rule2 text-xs text-ink2 hover:bg-paper3 transition-colors disabled:opacity-45"
                             >
                                 <Plus size={14} /> add segment
                             </button>
@@ -1485,7 +1485,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                                         title={f.hint}
                                         disabled={f.value !== 'auto' && !sourceAvailable}
                                         onClick={() => setFraming(f.value)}
-                                        className={`py-1.5 px-2 rounded-input border text-xs lowercase transition-colors
+                                        className={`py-1.5 px-2 rounded-input border text-xs  transition-colors
                                             ${framing === f.value
                                                 ? 'border-[color:var(--color-accent)] text-ink'
                                                 : 'border-rule2 text-muted hover:border-[color:var(--color-accent)]'}
@@ -1510,11 +1510,11 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                         {/* toggles */}
                         <div className="space-y-2.5">
                             <label className="flex items-center justify-between cursor-pointer">
-                                <span className="text-xs lowercase text-ink2">snap cuts to words</span>
+                                <span className="text-xs text-ink2">Snap cuts to words</span>
                                 <Toggle checked={snapToWords} onChange={setSnapToWords} />
                             </label>
                             <label className="flex items-center justify-between cursor-pointer">
-                                <span className="text-xs lowercase text-ink2">re-apply captions after recut</span>
+                                <span className="text-xs text-ink2">Re-apply captions after a recut</span>
                                 <Toggle checked={reapplyCaptions} onChange={setReapplyCaptions} />
                             </label>
                         </div>
@@ -1538,7 +1538,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                             </div>
                         )}
                         {overCaps && (
-                            <p className="mb-3 text-[11px] text-warn lowercase">
+                            <p className="mb-3 text-[11px] text-warn">
                                 {total > limits.max_total_seconds ? `clip is over ${Math.round(limits.max_total_seconds)}s` : `more than ${limits.max_segments} segments`}
                             </p>
                         )}
@@ -1556,7 +1556,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                             </button>
                         </div>
                         {rendering && (
-                            <p className="text-[11px] text-muted mt-2 lowercase">
+                            <p className="text-[11px] text-muted mt-2">
                                 you can close this editor; the render keeps going and the clip card updates when it finishes
                             </p>
                         )}

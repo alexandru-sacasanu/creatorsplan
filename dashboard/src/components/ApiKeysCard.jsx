@@ -48,7 +48,7 @@ export default function ApiKeysCard() {
 
   return (
     <div className="card p-6">
-      <h3 className="font-display lowercase text-lg text-ink mb-1 flex items-center gap-2">
+      <h3 className="font-display text-lg text-ink mb-1 flex items-center gap-2">
         <KeyRound size={16} className="text-brass" /> API keys
       </h3>
       <p className="text-muted text-sm mb-4">
@@ -84,7 +84,7 @@ export default function ApiKeysCard() {
                     <code className="readout">{k.prefix}…</code>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <span className="text-muted text-xs lowercase">
+                    <span className="text-muted text-xs">
                       {k.last_used_at ? `used ${new Date(k.last_used_at).toLocaleDateString()}` : 'never used'}
                     </span>
                     <button onClick={() => revoke(k)} title="Revoke key"

@@ -1295,7 +1295,7 @@ function App() {
     <aside className="hidden md:flex w-20 lg:w-[248px] bg-cp-paper border-r border-cp-line flex-col h-full shrink-0 px-3.5 py-6">
       <div className="flex items-center justify-center lg:justify-start gap-[7px] px-3 pb-7">
         <ShortFrameLogo width={15} height={25} className="shrink-0" />
-        <span className="font-display font-bold lowercase text-[19px] tracking-[-0.042em] text-cp-ink hidden lg:block">creatorsplan</span>
+        <span className="font-display font-bold text-[19px] tracking-[-0.042em] text-cp-ink hidden lg:block">creatorsplan</span>
       </div>
       <NavBody rail />
     </aside>
@@ -1318,7 +1318,7 @@ function App() {
         <div className="flex items-center justify-between px-3 h-12 mb-4 shrink-0">
           <div className="flex items-center gap-[7px]">
             <ShortFrameLogo width={15} height={25} className="shrink-0" />
-            <span className="font-display font-bold lowercase text-[19px] tracking-[-0.042em] text-cp-ink">creatorsplan</span>
+            <span className="font-display font-bold text-[19px] tracking-[-0.042em] text-cp-ink">creatorsplan</span>
           </div>
           <button
             onClick={() => setNavOpen(false)}
@@ -1356,7 +1356,7 @@ function App() {
                 className={`flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-colors ${isActive ? 'text-ink' : 'text-muted active:text-ink2'} ${tabLocked(item.id) ? 'opacity-40 cursor-not-allowed' : ''}`}
               >
                 <NavIcon size={19} className={isActive ? 'text-brass' : ''} />
-                <span className="text-[10.5px] lowercase leading-none truncate max-w-full px-0.5">{item.short}</span>
+                <span className="text-[10.5px] leading-none truncate max-w-full px-0.5">{item.short}</span>
               </button>
             );
           })}
@@ -1367,7 +1367,7 @@ function App() {
             className={`flex-1 min-w-0 flex flex-col items-center justify-center gap-1 py-2 min-h-[56px] transition-colors ${moreActive ? 'text-ink' : 'text-muted active:text-ink2'}`}
           >
             <Menu size={19} className={moreActive ? 'text-brass' : ''} />
-            <span className="text-[10.5px] lowercase leading-none">more</span>
+            <span className="text-[10.5px] leading-none">More</span>
           </button>
         </div>
       </nav>
@@ -1402,10 +1402,10 @@ function App() {
               <button
                 onClick={handleReset}
                 className="btn-quiet px-3 py-1.5 text-xs shrink-0"
-                aria-label="New Project"
+                aria-label="New project"
               >
                 <Plus size={14} />
-                <span className="hidden sm:inline">New Project</span>
+                <span className="hidden sm:inline">New project</span>
               </button>
             )}
           </div>
@@ -1447,12 +1447,12 @@ function App() {
                 <AlertTriangle size={12} />
                 <span className="hidden md:inline">
                   {!geminiOk && !uploadPostKey
-                    ? 'Gemini & Upload-Post keys missing'
+                    ? 'Gemini and Upload-Post keys missing'
                     : !geminiOk
-                      ? 'Gemini API Key Missing'
-                      : 'Upload-Post API Key Missing'}
+                      ? 'Gemini API key missing'
+                      : 'Upload-Post API key missing'}
                 </span>
-                <span className="md:hidden">keys missing</span>
+                <span className="md:hidden">Keys missing</span>
               </button>
             )}
           </div>
@@ -1464,13 +1464,13 @@ function App() {
             <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 text-sm text-ink2 min-w-0 flex-1">
               <KeyRound size={16} className="shrink-0 text-warn mt-0.5 sm:mt-0" />
               <div className="min-w-0">
-                <span className="font-medium text-ink">Required API keys missing.</span>{' '}
+                <span className="font-medium text-ink">Required API keys are missing.</span>{' '}
                 <span className="text-muted">
                   {!geminiOk && !uploadPostKey
-                    ? 'Set your Gemini and Upload-Post API keys to use CreatorsPlan.'
+                    ? 'Set your Gemini and Upload-Post API keys to use creatorsplan.'
                     : !geminiOk
-                      ? 'Set your Gemini API key to use CreatorsPlan.'
-                      : 'Set your Upload-Post API key to use CreatorsPlan.'}
+                      ? 'Set your Gemini API key to use creatorsplan.'
+                      : 'Set your Upload-Post API key to use creatorsplan.'}
                 </span>
               </div>
             </div>
@@ -1478,7 +1478,7 @@ function App() {
               onClick={() => goToTab('settings')}
               className="btn-quiet px-3 py-1.5 text-xs shrink-0 w-full sm:w-auto"
             >
-              Go to Settings
+              Go to settings
             </button>
           </div>
         )}
@@ -1489,7 +1489,7 @@ function App() {
             <div className="flex items-start sm:items-center gap-2 text-sm text-ink2 flex-wrap min-w-0">
               <RotateCcw size={16} className="text-brass shrink-0 mt-0.5 sm:mt-0" />
               <span className="font-medium">Session recovered</span>
-              <span className="text-muted text-xs">Your previous work has been restored.</span>
+              <span className="text-muted text-xs">Your previous work is back.</span>
             </div>
             <button
               onClick={() => setSessionRecovered(false)}
@@ -1625,7 +1625,7 @@ function App() {
                         }}
                         className={falSaved ? 'badge-ok px-4 self-center' : 'btn-ghost px-5 shrink-0'}
                       >
-                        {falSaved ? <><Check size={12} /> saved</> : (falKey ? 'Save key' : 'Add key')}
+                        {falSaved ? <><Check size={12} /> Saved</> : (falKey ? 'Save key' : 'Add key')}
                       </button>
                     </div>
                     <p className="cp-help">
@@ -1658,7 +1658,7 @@ function App() {
                         }}
                         className={elevenLabsSaved ? 'badge-ok px-4 self-center' : 'btn-ghost px-5 shrink-0'}
                       >
-                        {elevenLabsSaved ? <><Check size={12} /> saved</> : (elevenLabsKey ? 'Save key' : 'Add key')}
+                        {elevenLabsSaved ? <><Check size={12} /> Saved</> : (elevenLabsKey ? 'Save key' : 'Add key')}
                       </button>
                     </div>
                     <p className="cp-help">
@@ -1694,7 +1694,7 @@ function App() {
                 <div className="px-5 py-4 rounded-cp-select border border-cp-line bg-cp-paper flex items-start gap-3">
                   <Smartphone size={18} className="text-cp-ink shrink-0 mt-0.5" />
                   <div className="text-sm text-ink2">
-                    <p className="font-medium text-ink mb-1">Upload videos already in vertical (9:16) mobile format.</p>
+                    <p className="font-medium text-ink mb-1">Upload videos that are already vertical (9:16).</p>
                     <p className="text-muted leading-relaxed">
                       The agent does not reframe horizontal footage. Make sure every source video is shot or pre-cropped to mobile/portrait format before dropping it into the input folder.
                     </p>
@@ -1717,9 +1717,9 @@ function App() {
                     <div className="w-11 h-11 rounded-cp-input bg-cp-tint flex items-center justify-center">
                       <Users size={18} className="text-brass" />
                     </div>
-                    <h3 className="text-[17px] font-semibold text-cp-ink">2. AI clippers work</h3>
+                    <h3 className="text-[17px] font-semibold text-cp-ink">2. The clippers get to work</h3>
                     <p className="text-xs text-muted leading-relaxed">
-                      Whisper transcribes, Gemini 3 Flash spots viral beats, FFmpeg cuts each clip and adds a hook overlay.
+                      Whisper transcribes, Gemini 3 Flash picks the moments worth posting, FFmpeg cuts each clip and adds a hook overlay.
                     </p>
                   </div>
 
@@ -1727,7 +1727,7 @@ function App() {
                     <div className="w-11 h-11 rounded-cp-input bg-cp-tint flex items-center justify-center">
                       <CheckCircle2 size={18} className="text-brass" />
                     </div>
-                    <h3 className="text-[17px] font-semibold text-cp-ink">3. You validate, it ships</h3>
+                    <h3 className="text-[17px] font-semibold text-cp-ink">3. You approve, it publishes</h3>
                     <p className="text-xs text-muted leading-relaxed">
                       Approve the candidates you like and the skill auto-publishes them to TikTok, Reels and YouTube Shorts via Upload-Post.
                     </p>
@@ -1767,7 +1767,7 @@ function App() {
                   <div className="grid sm:grid-cols-2 gap-3 text-sm">
                     <div className="flex items-start gap-2 text-ink2">
                       <Check size={16} className="text-brass shrink-0 mt-0.5" />
-                      <span>Daily batch — picks one long video per run</span>
+                      <span>Daily batch: picks one long video per run</span>
                     </div>
                     <div className="flex items-start gap-2 text-ink2">
                       <Check size={16} className="text-brass shrink-0 mt-0.5" />
@@ -1775,11 +1775,11 @@ function App() {
                     </div>
                     <div className="flex items-start gap-2 text-ink2">
                       <Check size={16} className="text-brass shrink-0 mt-0.5" />
-                      <span>Gemini 3 Flash multimodal moment detection</span>
+                      <span>Gemini 3 Flash finds the moments worth posting</span>
                     </div>
                     <div className="flex items-start gap-2 text-ink2">
                       <Check size={16} className="text-brass shrink-0 mt-0.5" />
-                      <span>Auto-publish to TikTok, Reels & YouTube Shorts</span>
+                      <span>Auto-publish to TikTok, Reels and YouTube Shorts</span>
                     </div>
                   </div>
                 </div>
@@ -1807,12 +1807,12 @@ function App() {
                 ) : (
                   <div className="max-w-2xl mx-auto card p-8 text-center">
                     <Rocket size={28} className="mx-auto mb-4 text-brass" />
-                    <h1 className="font-display lowercase text-2xl text-ink mb-2">your channel, clipped on its own</h1>
+                    <h1 className="font-display text-2xl text-ink mb-2">Your channel, clipped on its own</h1>
                     <p className="text-muted text-sm mb-6">
                       Connect your YouTube channel and every new video turns into shorts automatically.
                       Sign in to set it up.
                     </p>
-                    <button onClick={() => setShowLogin(true)} className="btn-primary">sign in</button>
+                    <button onClick={() => setShowLogin(true)} className="btn-primary">Sign in</button>
                   </div>
                 )}
             </Screen>
@@ -1910,9 +1910,9 @@ function App() {
                     {billingEnabled && !['starter', 'creator', 'pro'].includes(plan) && queueInfo.ahead > 0 && (
                       <button
                         onClick={() => { track('QueueUpsellClick', { props: { position: String(queueInfo.position) } }); setShowPlanChoice(true); }}
-                        className="mt-2 text-xs lowercase text-brass hover:underline"
+                        className="mt-2 text-xs text-brass hover:underline"
                       >
-                        paid plans skip the line →
+                        Paid plans skip the line →
                       </button>
                     )}
                   </div>
@@ -2096,9 +2096,9 @@ function App() {
                         </div>
                         <button
                           onClick={() => { track('SocialNudgeConnect'); handleConnectSocials(); }}
-                          className="btn-quiet shrink-0 text-xs py-1.5 px-3 lowercase w-full sm:w-auto"
+                          className="btn-quiet shrink-0 text-xs py-1.5 px-3 w-full sm:w-auto"
                         >
-                          connect socials →
+                          Connect socials →
                         </button>
                         <button
                           onClick={() => {
@@ -2158,7 +2158,7 @@ function App() {
                     status === 'processing' ? (
                       <div className="h-full min-h-[140px] flex flex-col items-center justify-center text-muted space-y-3 text-center px-4">
                         <Loader2 size={28} className="animate-spin text-brass" />
-                        <p className="text-sm lowercase">Waiting for clips...</p>
+                        <p className="text-sm">Waiting for clips...</p>
                         <p className="text-xs text-muted/80 max-w-[26ch] leading-snug">
                           They appear here one by one as each finishes rendering.
                         </p>
@@ -2205,14 +2205,14 @@ function App() {
               onClick={() => { setShowKeyModal(false); goToTab('settings'); }}
               className="btn-primary flex-1 px-4 py-2 text-sm"
             >
-              Go to Settings
+              Go to settings
             </button>
           </div>
         }
       >
         <div className="space-y-4">
           <p className="text-sm text-muted">
-            CreatorsPlan needs both a <strong className="text-ink2">Gemini</strong> API key and an <strong className="text-ink2">Upload-Post</strong> API key. Both have free tiers.
+            creatorsplan needs both a <strong className="text-ink2">Gemini</strong> API key and an <strong className="text-ink2">Upload-Post</strong> API key. Both have free tiers.
           </p>
 
           {/* Gemini block */}
@@ -2226,7 +2226,7 @@ function App() {
                 <ol className="text-xs text-muted space-y-1 list-decimal list-inside">
                   <li>Go to <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-brass underline">aistudio.google.com/app/apikey</a></li>
                   <li>Sign in with your Google account</li>
-                  <li>Click "Create API Key"</li>
+                  <li>Click "Create API key"</li>
                   <li>Copy the key and paste it below</li>
                 </ol>
                 <input

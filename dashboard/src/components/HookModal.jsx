@@ -7,7 +7,7 @@ import SegmentedControl from './ui/SegmentedControl';
 const ENTRANCE_OPTIONS = [
     { value: 'spring', label: 'Bounce' },
     { value: 'fade', label: 'Fade' },
-    { value: 'slide-up', label: 'Slide Up' },
+    { value: 'slide-up', label: 'Slide up' },
     { value: 'none', label: 'None' },
 ];
 
@@ -56,7 +56,7 @@ function loadHookPrefs() {
 
 export default function HookModal({ isOpen, onClose, onGenerate, onRemove, isProcessing, videoUrl, initialText, durationInSeconds, existingSubtitles, hasCaptions, serverRender, burnedHook }) {
     const prefs = loadHookPrefs();
-    const [text, setText] = useState(initialText || 'POV: You are using the viral hook feature');
+    const [text, setText] = useState(initialText || 'POV: you found the moment worth posting');
     const [position, setPosition] = useState(prefs.position || 'top');
     const [size, setSize] = useState(prefs.size || 'M');
     const [style, setStyle] = useState(prefs.style || 'pill');

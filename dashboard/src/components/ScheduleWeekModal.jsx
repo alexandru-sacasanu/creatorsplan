@@ -346,7 +346,7 @@ export default function ScheduleWeekModal({ isOpen, onClose, clips, jobId, uploa
             {(scheduling || done) && (
                 <div className="mb-1">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs text-muted lowercase">{scheduling ? 'scheduling...' : 'complete'}</span>
+                        <span className="text-xs text-muted">{scheduling ? 'scheduling...' : 'complete'}</span>
                         <span className="readout">{progress.current}/{progress.total}</span>
                     </div>
                     <div className="w-full h-1.5 bg-paper3 rounded-full overflow-hidden">
@@ -356,9 +356,9 @@ export default function ScheduleWeekModal({ isOpen, onClose, clips, jobId, uploa
                         />
                     </div>
                     {done && (
-                        <div className="mt-3 text-xs text-center lowercase">
+                        <div className="mt-3 text-xs text-center">
                             {failCount === 0 ? (
-                                <span className="text-ok">all clips scheduled</span>
+                                <span className="text-ok">All clips scheduled</span>
                             ) : (
                                 <span className="text-danger">{successCount} scheduled, {failCount} failed</span>
                             )}

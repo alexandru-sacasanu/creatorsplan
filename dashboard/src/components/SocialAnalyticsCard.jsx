@@ -51,27 +51,27 @@ export default function SocialAnalyticsCard() {
   return (
     <div className="card p-6">
       <div className="flex items-baseline justify-between gap-4 mb-1">
-        <h3 className="font-display lowercase text-lg text-ink flex items-center gap-2">
+        <h3 className="font-display text-lg text-ink flex items-center gap-2">
           <BarChart3 size={16} className="text-brass" /> Your posts
         </h3>
-        <span className="text-muted text-xs lowercase">last 30 days</span>
+        <span className="text-muted text-xs">Last 30 days</span>
       </div>
 
       {data.posts.length === 0 && !total ? (
-        <p className="text-muted text-sm lowercase">
+        <p className="text-muted text-sm">
           Nothing published yet. Post a clip from your results and its views show up here.
         </p>
       ) : (
         <>
           <div className="flex items-end gap-3 mb-3">
             <span className="readout text-2xl text-ink">{fmtNum(total)}</span>
-            <span className="text-muted text-sm lowercase mb-0.5">impressions</span>
+            <span className="text-muted text-sm mb-0.5">Impressions</span>
           </div>
 
           {perPlatform.length > 0 && (
             <div className="flex flex-wrap gap-x-4 gap-y-1 mb-4 text-sm">
               {perPlatform.map(([platform, v]) => (
-                <span key={platform} className="text-ink2 lowercase">
+                <span key={platform} className="text-ink2">
                   {platform} <span className="text-brass">{fmtNum(Number(v))}</span>
                 </span>
               ))}
