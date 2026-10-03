@@ -1,5 +1,9 @@
-import { allows } from './consent';
 import { firstTouchProps } from './attribution';
+
+// Consent gating is gone along with the cookie banner / marketing pages;
+// window.op is never injected any more (no analytics bootstrap in
+// index.html), so every call below already no-ops on that check alone.
+const allows = () => true;
 
 // Lightweight custom-event helper (OpenPanel).
 //

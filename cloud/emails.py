@@ -84,9 +84,6 @@ async def send_magic_link_email(email: str, link: str):
     await send_email(email, "Your OpenShorts sign-in link", html)
 
 
-GITHUB_REPO_URL = "https://github.com/mutonby/openshorts"
-
-
 async def send_clips_ready_email(email: str, job_title: str, clip_count: int,
                                  dashboard_url: str):
     """Job-completion notice: lets the user close the tab during processing."""
@@ -98,8 +95,6 @@ async def send_clips_ready_email(email: str, job_title: str, clip_count: int,
            clip{'s' if clip_count != 1 else ''}. They're waiting in your dashboard.</p>
         <p><a href="{dashboard_url}" style="display:inline-block;background:#111;color:#fff;
            padding:12px 20px;border-radius:8px;text-decoration:none">View my clips</a></p>
-        <p style="color:#666;font-size:13px">Enjoying OpenShorts? A
-           <a href="{GITHUB_REPO_URL}" style="color:#666">star on GitHub</a> helps a lot ⭐</p>
       </div>
     """
     await send_email(email, f"Your clips are ready — {title}", html)
@@ -222,7 +217,7 @@ async def send_account_deleted_email(email: str):
         <p>You can sign up again any time with the same address; it will be a
            brand-new, empty account.</p>
         <p style="color:#666;font-size:13px">If this wasn't you, reply to this
-           email straight away &mdash; info@openshorts.app.</p>
+           email straight away.</p>
       </div>
     """
     print(f"✉️  Account-deleted confirmation → {email}")

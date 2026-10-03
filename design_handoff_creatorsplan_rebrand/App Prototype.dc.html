@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#F1EEE7;color:#14120F;font-family:'Hanken Grotesk',sans-serif;-webkit-font-smoothing:antialiased}a{color:#14120F;text-underline-offset:3px}a:hover{color:#6B665E}*{box-sizing:border-box}button,input,textarea{font-family:inherit;color:inherit}input::placeholder,textarea::placeholder{color:#9A948A}@keyframes cpRise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}@keyframes cpStrike{0%{transform:translateY(-5px);opacity:0}60%{transform:translateY(0);opacity:1}100%{opacity:1}}</style>
+</helmet>
+<div style="display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh">
+
+  <aside style="background:#FBFAF7;border-right:1px solid #E5E0D6;padding:24px 14px;display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh">
+    <div style="display:flex;align-items:center;gap:9px;padding:0 10px">
+      <svg width="15" height="25" viewBox="0 0 28 46"><rect x="1" y="1" width="26" height="44" rx="7" fill="#FFCF1A" stroke="#14120F" stroke-width="2"></rect><path d="M16.5 8 L7.5 24.5 H13.5 L11.5 38 L20.5 21 H14.5 Z" fill="#14120F" style="animation:cpStrike 600ms cubic-bezier(.2,.8,.2,1) both"></path></svg>
+      <div style="font-size:19px;font-weight:700;letter-spacing:-0.04em">creatorsplan</div>
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:2px">
+      <div style="font:500 11px 'Geist Mono';letter-spacing:0.08em;color:#9A948A;padding:0 12px 8px">CREATE</div>
+      <button onClick="{{ go.clips }}" style="height:42px;border:none;border-radius:12px;display:flex;align-items:center;gap:12px;padding:0 12px;cursor:pointer;text-align:left;transition:background 160ms,color 160ms;background:{{ nav.clips.bg }};color:{{ nav.clips.fg }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ nav.clips.ic }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"></path></svg><span style="font-size:15px;font-weight:500;flex:1">Clip generator</span></button>
+      <button onClick="{{ go.shorts }}" style="height:42px;border:none;border-radius:12px;display:flex;align-items:center;gap:12px;padding:0 12px;cursor:pointer;text-align:left;transition:background 160ms,color 160ms;background:{{ nav.shorts.bg }};color:{{ nav.shorts.fg }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ nav.shorts.ic }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.5" width="14" height="19" rx="3"></rect><circle cx="12" cy="10" r="2.5"></circle><path d="M8 17c1-2 2.4-3 4-3s3 1 4 3"></path></svg><span style="font-size:15px;font-weight:500;flex:1">AI shorts</span><span style="font:500 10px 'Geist Mono';letter-spacing:0.06em;color:{{ nav.shorts.meta }}">BYOK</span></button>
+      <button onClick="{{ go.studio }}" style="height:42px;border:none;border-radius:12px;display:flex;align-items:center;gap:12px;padding:0 12px;cursor:pointer;text-align:left;transition:background 160ms,color 160ms;background:{{ nav.studio.bg }};color:{{ nav.studio.fg }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ nav.studio.ic }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="4"></rect><path d="M10 9.5v5l4.5-2.5z"></path></svg><span style="font-size:15px;font-weight:500;flex:1">YouTube studio</span></button>
+      <div style="font:500 11px 'Geist Mono';letter-spacing:0.08em;color:#9A948A;padding:20px 12px 8px">LIBRARY</div>
+      <button onClick="{{ go.gallery }}" style="height:42px;border:none;border-radius:12px;display:flex;align-items:center;gap:12px;padding:0 12px;cursor:pointer;text-align:left;transition:background 160ms,color 160ms;background:{{ nav.gallery.bg }};color:{{ nav.gallery.fg }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ nav.gallery.ic }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="11" rx="2"></rect><rect x="13.5" y="3" width="7.5" height="7" rx="2"></rect><rect x="3" y="17" width="7.5" height="4" rx="1.5"></rect><rect x="13.5" y="13" width="7.5" height="8" rx="2"></rect></svg><span style="font-size:15px;font-weight:500;flex:1">Gallery</span><span style="font:500 11px 'Geist Mono';color:{{ nav.gallery.meta }}">24</span></button>
+      <button onClick="{{ go.agent }}" style="height:42px;border:none;border-radius:12px;display:flex;align-items:center;gap:12px;padding:0 12px;cursor:pointer;text-align:left;transition:background 160ms,color 160ms;background:{{ nav.agent.bg }};color:{{ nav.agent.fg }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ nav.agent.ic }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="3"></rect><path d="M12 4v4M9 13v2M15 13v2"></path></svg><span style="font-size:15px;font-weight:500;flex:1">Agents</span><span style="font:500 10px 'Geist Mono';letter-spacing:0.06em;color:{{ nav.agent.meta }}">BYOK</span></button>
+    </nav>
+    <div style="margin-top:auto;display:flex;flex-direction:column;gap:12px">
+      <div style="border:1px solid #E5E0D6;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="font-weight:600">Creator plan</span><span style="font:500 12px 'Geist Mono';color:#6B665E">340 / 500</span></div>
+        <div style="height:6px;border-radius:99px;background:#EFEBE3;overflow:hidden"><div style="width:68%;height:100%;background:#14120F;border-radius:99px"></div></div>
+        <div style="font-size:12px;color:#6B665E">Credits reset Oct 18</div>
+      </div>
+      <button onClick="{{ go.settings }}" style="height:42px;border:none;border-radius:12px;display:flex;align-items:center;gap:12px;padding:0 12px;cursor:pointer;text-align:left;transition:background 160ms,color 160ms;background:{{ nav.settings.bg }};color:{{ nav.settings.fg }}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="{{ nav.settings.ic }}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="10" cy="17" r="2"></circle></svg><span style="font-size:15px;font-weight:500;flex:1">Settings</span><span style="width:26px;height:26px;border-radius:99px;background:#FFCF1A;border:1px solid #14120F;color:#14120F;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">Z</span></button>
+    </div>
+  </aside>
+
+  <main style="min-width:0;padding:56px 40px 96px">
+    <div style="max-width:880px;margin:0 auto">
+
+      <sc-if value="{{ is.clips }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:32px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font:500 12px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">01 · CLIP GENERATOR</div>
+            <div style="font-size:44px;font-weight:600;letter-spacing:-0.035em;line-height:1.05">Turn long videos into shorts</div>
+            <div style="font-size:17px;line-height:1.55;color:#6B665E;max-width:620px;text-wrap:pretty">Drop in a long video. We'll find the moments worth posting, reframe them and add captions.</div>
+            <div style="font-size:14px;color:#6B665E">Prefer to automate it? <a href="#" onClick="{{ go.agentLink }}">Connect Claude, ChatGPT or n8n →</a></div>
+          </div>
+
+          <sc-if value="{{ job.idle }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:8px 28px 28px;display:flex;flex-direction:column;gap:24px">
+              <div style="display:flex;gap:24px;border-bottom:1px solid #E5E0D6">
+                <button onClick="{{ setTabFile }}" style="height:52px;border:none;background:transparent;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:-1px;transition:color 160ms;color:{{ tabFile.fg }};border-bottom:2px solid {{ tabFile.bar }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg>Upload file</button>
+                <button onClick="{{ setTabUrl }}" style="height:52px;border:none;background:transparent;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:-1px;transition:color 160ms;color:{{ tabUrl.fg }};border-bottom:2px solid {{ tabUrl.bar }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path></svg>Video link</button>
+              </div>
+
+              <sc-if value="{{ showDrop }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ startUpload }}" style="border:1.5px dashed #9A948A;border-radius:16px;padding:44px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;background:transparent;cursor:pointer;transition:background 160ms,border-color 160ms" style-hover="background:#FFF8DB;border-color:#14120F">
+                  <div style="width:44px;height:44px;border-radius:99px;background:#14120F;color:#FFCF1A;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg></div>
+                  <div style="font-size:17px;font-weight:600">Drop a video here, or browse</div>
+                  <div style="font:500 12px 'Geist Mono';letter-spacing:0.05em;color:#6B665E">MP4, MOV · UP TO 500MB · AT LEAST 45S</div>
+                </button>
+              </sc-if>
+              <sc-if value="{{ showFile }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1px solid #E5E0D6;background:#FFFFFF;border-radius:16px;padding:16px;display:flex;align-items:center;gap:16px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+                  <div style="width:72px;height:44px;border-radius:8px;background:repeating-linear-gradient(135deg,#E5E0D6 0 8px,#EDE9E1 8px 16px);flex:none"></div>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;justify-content:space-between;gap:12px"><span style="font-weight:600;font-size:15px">podcast-ep42-final.mp4</span><span style="font:500 12px 'Geist Mono';color:#6B665E">{{ upLabel }}</span></div>
+                    <div style="height:4px;border-radius:99px;background:#EFEBE3;overflow:hidden"><div style="height:100%;border-radius:99px;background:#14120F;transition:width 80ms linear;width:{{ upPct }}"></div></div>
+                  </div>
+                  <button onClick="{{ clearUpload }}" style="border:none;background:transparent;cursor:pointer;color:#6B665E;font-size:14px;text-decoration:underline;text-underline-offset:3px">Remove</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ showUrl }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:8px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+                  <div style="font-size:14px;font-weight:600">YouTube, Vimeo or a direct link</div>
+                  <input value="{{ url }}" onChange="{{ onUrl }}" placeholder="https://youtube.com/watch?v=…" style="height:52px;border-radius:12px;border:1px solid #D6D0C4;background:#FFFFFF;padding:0 16px;font-size:15px;outline:none;transition:border-color 140ms,box-shadow 140ms" style-focus="border-color:#14120F;box-shadow:0 0 0 4px #FFF1B8">
+                </div>
+              </sc-if>
+
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="font-size:15px;font-weight:600">Output format</div>
+                <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+                  <button onClick="{{ fmt916.pick }}" style="border-radius:16px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:background 160ms,border-color 160ms;border:1.5px solid {{ fmt916.bd }};background:{{ fmt916.bg }}"><div style="width:20px;height:34px;border-radius:5px;border:1.5px solid #14120F;background:{{ fmt916.fill }}"></div><div style="font-weight:600;font-size:16px">9:16</div><div style="font-size:13px;color:#6B665E">Shorts · Reels · TikTok</div></button>
+                  <button onClick="{{ fmt11.pick }}" style="border-radius:16px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:background 160ms,border-color 160ms;border:1.5px solid {{ fmt11.bd }};background:{{ fmt11.bg }}"><div style="width:28px;height:28px;border-radius:5px;border:1.5px solid #14120F;margin:3px 0;background:{{ fmt11.fill }}"></div><div style="font-weight:600;font-size:16px">1:1</div><div style="font-size:13px;color:#6B665E">Feed posts</div></button>
+                  <button onClick="{{ fmt169.pick }}" style="border-radius:16px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:background 160ms,border-color 160ms;border:1.5px solid {{ fmt169.bd }};background:{{ fmt169.bg }}"><div style="width:40px;height:23px;border-radius:5px;border:1.5px solid #14120F;margin:5.5px 0;background:{{ fmt169.fill }}"></div><div style="font-weight:600;font-size:16px">16:9</div><div style="font-size:13px;color:#6B665E">Keep landscape · YouTube</div></button>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <button onClick="{{ toggleAdv }}" style="align-self:flex-start;border:none;background:transparent;padding:0;display:flex;align-items:center;gap:6px;font-size:15px;font-weight:600;cursor:pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 200ms cubic-bezier(.2,.8,.2,1);transform:{{ advRot }}"><path d="M6 9l6 6 6-6"></path></svg>Advanced options</button>
+                <sc-if value="{{ adv }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;padding:4px 0 4px 22px;animation:cpRise 280ms cubic-bezier(.2,.8,.2,1) both">
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <div style="font-size:13px;color:#6B665E">Clip length</div>
+                      <div style="display:flex;gap:4px;background:#EFEBE3;border-radius:12px;padding:4px">
+                        <sc-for list="{{ lens }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="flex:1;height:34px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:background 160ms;background:{{ o.bg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for>
+                      </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                      <div style="font-size:13px;color:#6B665E">Captions</div>
+                      <div style="display:flex;gap:4px;background:#EFEBE3;border-radius:12px;padding:4px">
+                        <sc-for list="{{ caps }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="flex:1;height:34px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:background 160ms;background:{{ o.bg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for>
+                      </div>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="height:1px;background:#E5E0D6"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap">
+                <button onClick="{{ toggleRights }}" style="border:none;background:transparent;padding:0;display:flex;align-items:flex-start;gap:10px;cursor:pointer;text-align:left;max-width:440px">
+                  <span style="width:20px;height:20px;border-radius:6px;flex:none;display:flex;align-items:center;justify-content:center;transition:background 140ms;border:1.5px solid #14120F;background:{{ rightsBg }};color:#FFCF1A"><sc-if value="{{ rights }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></sc-if></span>
+                  <span style="font-size:14px;line-height:1.45;color:#6B665E">I own this video or have the rights to edit and publish it.</span>
+                </button>
+                <sc-if value="{{ canGen }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ runJob }}" style="height:52px;padding:0 26px;border-radius:999px;border:1.5px solid #14120F;background:#FFCF1A;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 2px 0 #14120F;transition:transform 140ms,box-shadow 140ms" style-hover="transform:translateY(-1px);box-shadow:0 3px 0 #14120F" style-active="transform:translateY(2px);box-shadow:0 0 0 #14120F">Generate clips<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+                </sc-if>
+                <sc-if value="{{ cantGen }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;align-items:center;gap:14px"><span style="font-size:13px;color:#6B665E">{{ genHint }}</span><button style="height:52px;padding:0 26px;border-radius:999px;border:none;background:#E5E0D6;color:#9A948A;font-size:16px;font-weight:600">Generate clips</button></div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ job.running }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:40px 28px;display:flex;flex-direction:column;gap:20px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:22px;font-weight:600;letter-spacing:-0.015em">{{ jobStage }}</div><div style="font:500 13px 'Geist Mono';color:#6B665E">{{ jobPctLabel }}</div></div>
+              <div style="height:8px;border-radius:99px;background:#EFEBE3;overflow:hidden"><div style="height:100%;background:#14120F;border-radius:99px;transition:width 90ms linear;width:{{ jobPct }}"></div></div>
+              <div style="font-size:14px;color:#6B665E">podcast-ep42-final.mp4 · 48:12 · {{ fmtLabel }}</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ job.done }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap">
+                <div style="font-size:22px;font-weight:600;letter-spacing:-0.015em">4 clips worth posting</div>
+                <button onClick="{{ resetJob }}" style="border:none;background:transparent;cursor:pointer;font-size:14px;text-decoration:underline;text-underline-offset:3px">Start a new video</button>
+              </div>
+              <sc-for list="{{ clips }}" as="c" hint-placeholder-count="4">
+                <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:16px;display:flex;gap:20px;align-items:center;animation:cpRise 360ms cubic-bezier(.2,.8,.2,1) both;animation-delay:{{ c.delay }};transition:border-color 160ms" style-hover="border-color:#14120F">
+                  <div style="width:64px;height:112px;border-radius:10px;background:repeating-linear-gradient(135deg,#E5E0D6 0 8px,#EDE9E1 8px 16px);flex:none;position:relative"><span style="position:absolute;left:6px;bottom:6px;font:500 10px 'Geist Mono';background:#14120F;color:#FBFAF7;padding:2px 5px;border-radius:4px">{{ c.dur }}</span></div>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+                    <div style="font-size:17px;font-weight:600;line-height:1.3;text-wrap:pretty">{{ c.title }}</div>
+                    <div style="font:500 12px 'Geist Mono';color:#6B665E">{{ c.range }}</div>
+                  </div>
+                  <div style="width:120px;display:flex;flex-direction:column;gap:6px;flex:none">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:#6B665E"><span>Hook score</span><span style="font:600 13px 'Geist Mono';color:#14120F">{{ c.score }}</span></div>
+                    <div style="height:4px;border-radius:99px;background:#EFEBE3"><div style="height:100%;border-radius:99px;background:#14120F;width:{{ c.scoreW }}"></div></div>
+                  </div>
+                  <button style="height:40px;padding:0 16px;border-radius:999px;border:1px solid #D6D0C4;background:#FBFAF7;font-size:14px;font-weight:600;cursor:pointer;flex:none;transition:border-color 140ms" style-hover="border-color:#14120F">Download</button>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ is.shorts }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:32px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font:500 12px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">02 · AI SHORTS · BYOK</div>
+            <div style="font-size:44px;font-weight:600;letter-spacing:-0.035em;line-height:1.05">Make a UGC-style ad</div>
+            <div style="font-size:17px;line-height:1.55;color:#6B665E;max-width:620px">Describe a product and an AI presenter will talk about it on camera.</div>
+          </div>
+          <div style="display:flex;align-items:center">
+            <sc-for list="{{ sSteps }}" as="st" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:10px;flex:{{ st.flex }}">
+                <sc-if value="{{ st.done }}"><button onClick="{{ st.go }}" style="width:28px;height:28px;border-radius:99px;background:#14120F;border:none;color:#FBFAF7;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></button></sc-if>
+                <sc-if value="{{ st.cur }}"><div style="height:28px;padding:0 12px;border-radius:99px;background:#FFCF1A;border:1.5px solid #14120F;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;white-space:nowrap;flex:none"><span style="font:500 11px 'Geist Mono'">{{ st.n }}</span>{{ st.label }}</div></sc-if>
+                <sc-if value="{{ st.next }}"><div style="width:28px;height:28px;border-radius:99px;border:1px solid #D6D0C4;display:flex;align-items:center;justify-content:center;font:500 11px 'Geist Mono';color:#6B665E;flex:none">{{ st.n }}</div></sc-if>
+                <sc-if value="{{ st.line }}"><div style="flex:1;height:2px;min-width:12px;margin-right:10px;transition:background 300ms;background:{{ st.lineColor }}"></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ s0 }}" hint-placeholder-val="{{ true }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:28px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="font-size:15px;font-weight:600">Video quality</div>
+                <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+                  <button onClick="{{ modeLow.pick }}" style="text-align:left;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:background 160ms,border-color 160ms;border:1.5px solid {{ modeLow.bd }};background:{{ modeLow.bg }}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;width:100%"><span style="font-size:17px;font-weight:600">Standard</span><span style="height:24px;padding:0 8px;border-radius:99px;background:#14120F;color:#FBFAF7;display:flex;align-items:center;font:500 10px 'Geist Mono';letter-spacing:0.05em">RECOMMENDED</span></div>
+                    <div style="font:500 12px 'Geist Mono';color:#6B665E">~$0.80 / VIDEO</div>
+                    <div style="font-size:14px;color:#6B665E;line-height:1.45">Hailuo 2.3 + VEED Lipsync. Natural movement and lip-sync.</div>
+                  </button>
+                  <button onClick="{{ modeHi.pick }}" style="text-align:left;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:background 160ms,border-color 160ms;border:1.5px solid {{ modeHi.bd }};background:{{ modeHi.bg }}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;width:100%"><span style="font-size:17px;font-weight:600">Premium</span><span style="height:24px;padding:0 8px;border-radius:99px;border:1px solid #14120F;display:flex;align-items:center;font:500 10px 'Geist Mono';letter-spacing:0.05em">BEST QUALITY</span></div>
+                    <div style="font:500 12px 'Geist Mono';color:#6B665E">~$2.00 / VIDEO</div>
+                    <div style="font-size:14px;color:#6B665E;line-height:1.45">Kling Avatar v2. Full-body movement, studio lighting.</div>
+                  </button>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:15px;font-weight:600">Website <span style="font-weight:400;color:#6B665E">· optional</span></div>
+                <input value="{{ site }}" onChange="{{ onSite }}" placeholder="https://your-website.com" style="height:52px;border-radius:12px;border:1px solid #D6D0C4;background:#FFFFFF;padding:0 16px;font-size:15px;outline:none;transition:border-color 140ms,box-shadow 140ms" style-focus="border-color:#14120F;box-shadow:0 0 0 4px #FFF1B8">
+                <div style="font-size:13px;color:#6B665E">We'll read your site and pull out the product details.</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:15px;font-weight:600">What are you selling? <span style="font-weight:400;color:#6B665E">· required without a website</span></div>
+                <textarea value="{{ desc }}" onChange="{{ onDesc }}" rows="3" placeholder="e.g. A neighborhood pizzeria in Madrid, a productivity coach, a meditation app…" style="border-radius:12px;border:1px solid #D6D0C4;background:#FFFFFF;padding:14px 16px;font-size:15px;line-height:1.5;outline:none;resize:vertical;transition:border-color 140ms,box-shadow 140ms" style-focus="border-color:#14120F;box-shadow:0 0 0 4px #FFF1B8"></textarea>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="font-size:15px;font-weight:600">Language</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <sc-for list="{{ langs }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.pick }}" style="height:40px;padding:0 16px;border-radius:99px;font-size:14px;font-weight:600;cursor:pointer;transition:background 160ms,border-color 160ms;border:1.5px solid {{ o.bd }};background:{{ o.bg }}">{{ o.label }}</button></sc-for>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;align-items:center;gap:14px">
+                <sc-if value="{{ s0Blocked }}" hint-placeholder-val="{{ true }}"><span style="font-size:13px;color:#6B665E">Add a website or a description to continue</span></sc-if>
+                <button onClick="{{ sNext }}" style="height:48px;padding:0 24px;border-radius:99px;border:none;font-size:15px;font-weight:600;transition:background 160ms;cursor:pointer;background:{{ s0Btn.bg }};color:{{ s0Btn.fg }}">Analyze</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ s1 }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:24px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:22px;font-weight:600;letter-spacing:-0.015em">Here's what we understood</div><div style="font-size:15px;color:#6B665E">Fix anything that's off, then pick an opening line.</div></div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+                <div style="border:1px solid #E5E0D6;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;background:#FFFFFF"><div style="font:500 11px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">PRODUCT</div><div style="font-size:15px;line-height:1.4">{{ brief.product }}</div></div>
+                <div style="border:1px solid #E5E0D6;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;background:#FFFFFF"><div style="font:500 11px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">AUDIENCE</div><div style="font-size:15px;line-height:1.4">Locals and tourists, 20–40, who search for dinner on TikTok</div></div>
+                <div style="border:1px solid #E5E0D6;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;background:#FFFFFF"><div style="font:500 11px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">ANGLE</div><div style="font-size:15px;line-height:1.4">A hidden spot worth the walk, told by a regular</div></div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:15px;font-weight:600">Opening line</div>
+                <sc-for list="{{ hooks }}" as="h" hint-placeholder-count="3">
+                  <button onClick="{{ h.pick }}" style="text-align:left;border-radius:14px;padding:16px;display:flex;gap:12px;align-items:center;cursor:pointer;transition:background 160ms,border-color 160ms;border:1.5px solid {{ h.bd }};background:{{ h.bg }}"><span style="width:18px;height:18px;border-radius:99px;border:1.5px solid #14120F;flex:none;display:flex;align-items:center;justify-content:center"><span style="width:8px;height:8px;border-radius:99px;background:{{ h.dot }}"></span></span><span style="font-size:15px;line-height:1.4">{{ h.text }}</span></button>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><button onClick="{{ sBack }}" style="border:none;background:transparent;cursor:pointer;font-size:15px;text-decoration:underline;text-underline-offset:3px">Back</button><button onClick="{{ sNext }}" style="height:48px;padding:0 24px;border-radius:99px;border:none;background:#14120F;color:#FBFAF7;font-size:15px;font-weight:600;cursor:pointer">Continue</button></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ s2 }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:24px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:22px;font-weight:600;letter-spacing:-0.015em">Choose a presenter</div><div style="font-size:15px;color:#6B665E">Each presenter has a matching voice in {{ lang }}.</div></div>
+              <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px">
+                <sc-for list="{{ presenters }}" as="p" hint-placeholder-count="4">
+                  <button onClick="{{ p.pick }}" style="border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:background 160ms,border-color 160ms;border:1.5px solid {{ p.bd }};background:{{ p.bg }}"><div style="aspect-ratio:3/4;border-radius:10px;background:repeating-linear-gradient(135deg,#E5E0D6 0 8px,#EDE9E1 8px 16px);display:flex;align-items:flex-end;padding:8px;font:500 10px 'Geist Mono';color:#6B665E">PORTRAIT</div><div style="display:flex;justify-content:space-between;padding:0 4px 4px;font-size:14px;font-weight:600"><span>{{ p.name }}</span><span style="font-weight:400;color:#6B665E">{{ p.tone }}</span></div></button>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;max-width:320px">
+                <div style="font-size:15px;font-weight:600">Length</div>
+                <div style="display:flex;gap:4px;background:#EFEBE3;border-radius:12px;padding:4px">
+                  <sc-for list="{{ slens }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="flex:1;height:34px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:background 160ms;background:{{ o.bg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><button onClick="{{ sBack }}" style="border:none;background:transparent;cursor:pointer;font-size:15px;text-decoration:underline;text-underline-offset:3px">Back</button>
+                <button onClick="{{ sGenerate }}" style="height:52px;padding:0 26px;border-radius:999px;border:1.5px solid #14120F;background:#FFCF1A;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:10px;box-shadow:0 2px 0 #14120F;transition:transform 140ms,box-shadow 140ms" style-hover="transform:translateY(-1px);box-shadow:0 3px 0 #14120F" style-active="transform:translateY(2px);box-shadow:0 0 0 #14120F">Generate video<span style="font:500 12px 'Geist Mono'">{{ sCost }}</span></button></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ s3 }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:40px 28px;display:flex;flex-direction:column;gap:20px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-size:22px;font-weight:600;letter-spacing:-0.015em">{{ sStage }}</div><div style="font:500 13px 'Geist Mono';color:#6B665E">{{ sPctLabel }}</div></div>
+              <div style="height:8px;border-radius:99px;background:#EFEBE3;overflow:hidden"><div style="height:100%;background:#14120F;border-radius:99px;transition:width 90ms linear;width:{{ sPctW }}"></div></div>
+              <div style="font-size:14px;color:#6B665E">This usually takes 2–4 minutes. You can leave this page; it will be in your gallery.</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ s4 }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:28px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:32px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="aspect-ratio:9/16;border-radius:16px;background:repeating-linear-gradient(135deg,#E5E0D6 0 10px,#EDE9E1 10px 20px);position:relative;display:flex;align-items:center;justify-content:center"><div style="width:52px;height:52px;border-radius:99px;background:#14120F;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="#FFCF1A"><path d="M8 5.5v13l11-6.5z"></path></svg></div><span style="position:absolute;left:10px;bottom:10px;font:500 11px 'Geist Mono';background:#14120F;color:#FBFAF7;padding:3px 6px;border-radius:5px">0:{{ slenNum }}</span></div>
+              <div style="display:flex;flex-direction:column;gap:20px;justify-content:center">
+                <div style="display:flex;align-items:center;gap:8px"><span style="height:26px;padding:0 10px;border-radius:99px;background:#E3F2E8;color:#1F7A4A;display:flex;align-items:center;font:500 11px 'Geist Mono';letter-spacing:0.05em">READY</span><span style="font:500 12px 'Geist Mono';color:#6B665E">{{ sCost }} CHARGED TO YOUR KEY</span></div>
+                <div style="font-size:28px;font-weight:600;letter-spacing:-0.02em;line-height:1.15;text-wrap:pretty">{{ hookText }}</div>
+                <div style="font-size:15px;color:#6B665E">{{ presenterName }} · {{ lang }} · {{ slenLabel }} · 9:16</div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                  <button style="height:48px;padding:0 22px;border-radius:99px;border:none;background:#14120F;color:#FBFAF7;font-size:15px;font-weight:600;cursor:pointer">Download MP4</button>
+                  <button onClick="{{ sRestart }}" style="height:48px;padding:0 22px;border-radius:99px;border:1px solid #D6D0C4;background:#FBFAF7;font-size:15px;font-weight:600;cursor:pointer;transition:border-color 140ms" style-hover="border-color:#14120F">Make another</button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ is.studio }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:32px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font:500 12px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">03 · YOUTUBE STUDIO</div>
+            <div style="font-size:44px;font-weight:600;letter-spacing:-0.035em;line-height:1.05">Package a video for YouTube</div>
+            <div style="font-size:17px;line-height:1.55;color:#6B665E;max-width:620px">Title, thumbnail and description in one pass, then publish straight to your channel.</div>
+          </div>
+          <div style="display:flex;align-items:center">
+            <sc-for list="{{ ySteps }}" as="st" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:10px;flex:{{ st.flex }}">
+                <sc-if value="{{ st.done }}"><button onClick="{{ st.go }}" style="width:28px;height:28px;border-radius:99px;background:#14120F;border:none;color:#FBFAF7;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"></path></svg></button></sc-if>
+                <sc-if value="{{ st.cur }}"><div style="height:28px;padding:0 12px;border-radius:99px;background:#FFCF1A;border:1.5px solid #14120F;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;white-space:nowrap;flex:none"><span style="font:500 11px 'Geist Mono'">{{ st.n }}</span>{{ st.label }}</div></sc-if>
+                <sc-if value="{{ st.next }}"><div style="width:28px;height:28px;border-radius:99px;border:1px solid #D6D0C4;display:flex;align-items:center;justify-content:center;font:500 11px 'Geist Mono';color:#6B665E;flex:none">{{ st.n }}</div></sc-if>
+                <sc-if value="{{ st.line }}"><div style="flex:1;height:2px;min-width:12px;margin-right:10px;transition:background 300ms;background:{{ st.lineColor }}"></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ y0 }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:18px">
+                <div style="display:flex;flex-direction:column;gap:4px"><div style="font:500 11px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">OPTION A</div><div style="font-size:19px;font-weight:600">Start from the video</div><div style="font-size:14px;color:#6B665E">We watch it and suggest titles that match what's in it.</div></div>
+                <button onClick="{{ yUpload }}" style="flex:1;min-height:150px;border:1.5px dashed {{ yDrop.bd }};border-radius:16px;background:{{ yDrop.bg }};display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background 160ms,border-color 160ms" style-hover="background:#FFF8DB;border-color:#14120F"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2.5"></rect><path d="M16 10.5l5-3v9l-5-3"></path></svg><div style="font-weight:600">{{ yDrop.label }}</div><div style="font-size:13px;color:#6B665E">{{ yDrop.sub }}</div></button>
+                <button onClick="{{ ySuggest }}" style="height:48px;border-radius:99px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:background 160ms;background:{{ yA.bg }};color:{{ yA.fg }}">Suggest titles</button>
+              </div>
+              <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:18px">
+                <div style="display:flex;flex-direction:column;gap:4px"><div style="font:500 11px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">OPTION B</div><div style="font-size:19px;font-weight:600">I have a title</div><div style="font-size:14px;color:#6B665E">Skip analysis and go straight to the thumbnail.</div></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+                  <input value="{{ yTitle }}" onChange="{{ onYTitle }}" maxlength="70" placeholder="Your YouTube title" style="height:52px;border-radius:12px;border:1px solid #D6D0C4;background:#FFFFFF;padding:0 16px;font-size:15px;outline:none;transition:border-color 140ms,box-shadow 140ms" style-focus="border-color:#14120F;box-shadow:0 0 0 4px #FFF1B8">
+                  <div style="display:flex;justify-content:space-between;font-size:13px;color:#6B665E"><span>Under 60 characters shows in full on mobile</span><span style="font-family:'Geist Mono';color:{{ yCountColor }}">{{ yCount }} / 70</span></div>
+                </div>
+                <button onClick="{{ yUseTitle }}" style="height:48px;border-radius:99px;font-size:15px;font-weight:600;cursor:pointer;transition:background 160ms,border-color 160ms;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid {{ yB.bd }};background:{{ yB.bg }};color:{{ yB.fg }}">Use this title<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ y1 }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:20px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:22px;font-weight:600;letter-spacing:-0.015em">Pick a title</div><div style="font-size:15px;color:#6B665E">Based on studio-tour-final.mp4 · 14:32</div></div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ yTitles }}" as="t" hint-placeholder-count="5">
+                  <button onClick="{{ t.pick }}" style="text-align:left;border-radius:14px;padding:16px;display:flex;gap:12px;align-items:center;cursor:pointer;transition:background 160ms,border-color 160ms;border:1.5px solid {{ t.bd }};background:{{ t.bg }}"><span style="width:18px;height:18px;border-radius:99px;border:1.5px solid #14120F;flex:none;display:flex;align-items:center;justify-content:center"><span style="width:8px;height:8px;border-radius:99px;background:{{ t.dot }}"></span></span><span style="font-size:15px;line-height:1.4;flex:1">{{ t.text }}</span><span style="font:500 12px 'Geist Mono';color:#6B665E">{{ t.len }}</span></button>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><button onClick="{{ yBack }}" style="border:none;background:transparent;cursor:pointer;font-size:15px;text-decoration:underline;text-underline-offset:3px">Back</button><button onClick="{{ yNext }}" style="height:48px;padding:0 24px;border-radius:99px;border:none;background:#14120F;color:#FBFAF7;font-size:15px;font-weight:600;cursor:pointer">Continue</button></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ y2 }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:20px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:22px;font-weight:600;letter-spacing:-0.015em">Choose a thumbnail</div><div style="font-size:15px;color:#6B665E;text-wrap:pretty">For "{{ yChosen }}"</div></div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+                <sc-for list="{{ thumbs }}" as="t" hint-placeholder-count="3">
+                  <button onClick="{{ t.pick }}" style="border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:background 160ms,border-color 160ms;border:1.5px solid {{ t.bd }};background:{{ t.bg }}"><div style="aspect-ratio:16/9;border-radius:10px;background:repeating-linear-gradient(135deg,#E5E0D6 0 8px,#EDE9E1 8px 16px);display:flex;align-items:flex-end;padding:8px;font:500 10px 'Geist Mono';color:#6B665E">THUMBNAIL</div><div style="font-size:14px;font-weight:600;text-align:left;padding:0 4px 4px">{{ t.label }}</div></button>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><button onClick="{{ yBack }}" style="border:none;background:transparent;cursor:pointer;font-size:15px;text-decoration:underline;text-underline-offset:3px">Back</button><button onClick="{{ yNext }}" style="height:48px;padding:0 24px;border-radius:99px;border:none;background:#14120F;color:#FBFAF7;font-size:15px;font-weight:600;cursor:pointer">Continue</button></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ y3 }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:20px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="font-size:22px;font-weight:600;letter-spacing:-0.015em">Description</div>
+              <textarea rows="7" style="border-radius:12px;border:1px solid #D6D0C4;background:#FFFFFF;padding:14px 16px;font-size:15px;line-height:1.55;outline:none;resize:vertical" style-focus="border-color:#14120F;box-shadow:0 0 0 4px #FFF1B8">A full tour of the studio I built for under $3k: the camera, the lighting and the one mistake I'd fix first.
+
+00:00 Why I rebuilt the room
+02:14 Camera and lens
+06:40 Lighting for under $400
+11:05 What I'd change</textarea>
+              <div style="display:flex;gap:8px;flex-wrap:wrap"><span style="height:30px;padding:0 12px;border-radius:99px;border:1px solid #D6D0C4;display:flex;align-items:center;font-size:13px">studio tour</span><span style="height:30px;padding:0 12px;border-radius:99px;border:1px solid #D6D0C4;display:flex;align-items:center;font-size:13px">youtube setup</span><span style="height:30px;padding:0 12px;border-radius:99px;border:1px solid #D6D0C4;display:flex;align-items:center;font-size:13px">budget lighting</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><button onClick="{{ yBack }}" style="border:none;background:transparent;cursor:pointer;font-size:15px;text-decoration:underline;text-underline-offset:3px">Back</button><button onClick="{{ yNext }}" style="height:48px;padding:0 24px;border-radius:99px;border:none;background:#14120F;color:#FBFAF7;font-size:15px;font-weight:600;cursor:pointer">Continue</button></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ y4 }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:28px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+              <div style="display:flex;flex-direction:column;gap:12px"><div style="aspect-ratio:16/9;border-radius:14px;background:repeating-linear-gradient(135deg,#E5E0D6 0 10px,#EDE9E1 10px 20px)"></div><div style="font-size:17px;font-weight:600;line-height:1.3">{{ yChosen }}</div><div style="font-size:13px;color:#6B665E">Zeus Creates · 14:32</div></div>
+              <div style="display:flex;flex-direction:column;gap:20px;justify-content:center">
+                <sc-if value="{{ yLive }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:12px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both"><span style="align-self:flex-start;height:26px;padding:0 10px;border-radius:99px;background:#E3F2E8;color:#1F7A4A;display:flex;align-items:center;font:500 11px 'Geist Mono';letter-spacing:0.05em">PUBLISHED</span><div style="font-size:24px;font-weight:600;letter-spacing:-0.02em">It's live on your channel.</div><div style="display:flex;gap:10px"><button style="height:44px;padding:0 18px;border-radius:99px;border:none;background:#14120F;color:#FBFAF7;font-size:14px;font-weight:600;cursor:pointer">Open on YouTube</button><button onClick="{{ yRestart }}" style="height:44px;padding:0 18px;border-radius:99px;border:1px solid #D6D0C4;background:#FBFAF7;font-size:14px;font-weight:600;cursor:pointer">Package another</button></div></div>
+                </sc-if>
+                <sc-if value="{{ yNotLive }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;flex-direction:column;gap:20px">
+                    <div style="display:flex;flex-direction:column;gap:8px"><div style="font-size:15px;font-weight:600">Visibility</div><div style="display:flex;gap:4px;background:#EFEBE3;border-radius:12px;padding:4px"><sc-for list="{{ vis }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.pick }}" style="flex:1;height:36px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:background 160ms;background:{{ o.bg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for></div></div>
+                    <div style="font-size:14px;color:#6B665E">Publishing to <strong style="color:#14120F">Zeus Creates</strong> · 128K subscribers</div>
+                    <button onClick="{{ yPublish }}" style="align-self:flex-start;height:52px;padding:0 26px;border-radius:999px;border:1.5px solid #14120F;background:#FFCF1A;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 2px 0 #14120F;transition:transform 140ms,box-shadow 140ms" style-hover="transform:translateY(-1px);box-shadow:0 3px 0 #14120F" style-active="transform:translateY(2px);box-shadow:0 0 0 #14120F">Publish to YouTube</button>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ is.gallery }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:28px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap">
+            <div style="display:flex;flex-direction:column;gap:12px"><div style="font:500 12px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">04 · GALLERY</div><div style="font-size:44px;font-weight:600;letter-spacing:-0.035em;line-height:1.05">Everything you've made</div></div>
+            <div style="display:flex;gap:4px;background:#E5E0D6;border-radius:12px;padding:4px">
+              <sc-for list="{{ filters }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.pick }}" style="height:34px;padding:0 14px;border:none;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;transition:background 160ms;background:{{ o.bg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px">
+            <sc-for list="{{ gallery }}" as="g" hint-placeholder-count="8">
+              <div style="display:flex;flex-direction:column;gap:10px;cursor:pointer;animation:cpRise 340ms cubic-bezier(.2,.8,.2,1) both;animation-delay:{{ g.delay }}">
+                <div style="border-radius:16px;background:repeating-linear-gradient(135deg,#E5E0D6 0 10px,#EDE9E1 10px 20px);position:relative;border:1px solid #E5E0D6;transition:border-color 160ms,transform 200ms cubic-bezier(.2,.8,.2,1);aspect-ratio:{{ g.ratio }}" style-hover="border-color:#14120F;transform:translateY(-2px)">
+                  <span style="position:absolute;left:8px;top:8px;font:500 10px 'Geist Mono';letter-spacing:0.05em;background:#FBFAF7;padding:3px 6px;border-radius:5px">{{ g.type }}</span>
+                  <span style="position:absolute;right:8px;bottom:8px;font:500 10px 'Geist Mono';background:#14120F;color:#FBFAF7;padding:3px 6px;border-radius:5px">{{ g.dur }}</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;padding:0 2px"><div style="font-size:14px;font-weight:600;line-height:1.35">{{ g.title }}</div><div style="font-size:12px;color:#6B665E">{{ g.when }}</div></div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ is.agent }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:32px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font:500 12px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">05 · AGENTS · BYOK</div>
+            <div style="font-size:44px;font-weight:600;letter-spacing:-0.035em;line-height:1.05">Let an agent do the busywork</div>
+            <div style="font-size:17px;line-height:1.55;color:#6B665E;max-width:620px">Connect the assistant you already use. It can clip videos, write titles and schedule posts with your keys.</div>
+          </div>
+          <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;display:flex;flex-direction:column">
+            <sc-for list="{{ providers }}" as="p" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:16px;padding:20px 24px;border-bottom:1px solid #E5E0D6">
+                <div style="width:44px;height:44px;border-radius:12px;background:#EFEBE3;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex:none">{{ p.initial }}</div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font-size:16px;font-weight:600">{{ p.name }}</div><div style="font-size:14px;color:#6B665E">{{ p.desc }}</div></div>
+                <sc-if value="{{ p.on }}"><span style="height:26px;padding:0 10px;border-radius:99px;background:#E3F2E8;color:#1F7A4A;display:flex;align-items:center;font:500 11px 'Geist Mono';letter-spacing:0.05em">CONNECTED</span></sc-if>
+                <button onClick="{{ p.toggle }}" style="height:40px;padding:0 16px;border-radius:99px;font-size:14px;font-weight:600;cursor:pointer;transition:background 160ms,border-color 160ms;border:1px solid {{ p.bd }};background:{{ p.bg }};color:{{ p.fg }}">{{ p.cta }}</button>
+              </div>
+            </sc-for>
+            <div style="padding:20px 24px;display:flex;flex-direction:column;gap:8px">
+              <div style="font-size:14px;font-weight:600">Your MCP endpoint</div>
+              <div style="display:flex;gap:8px">
+                <div style="flex:1;min-width:0;height:44px;border-radius:12px;border:1px solid #D6D0C4;background:#FFFFFF;padding:0 14px;display:flex;align-items:center;font:400 13px 'Geist Mono';overflow:hidden;white-space:nowrap;text-overflow:ellipsis">https://api.creatorsplan.com/mcp/u_8f2k91xq</div>
+                <button onClick="{{ copy }}" style="height:44px;padding:0 16px;border-radius:12px;border:1px solid #D6D0C4;background:#FBFAF7;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;min-width:96px;justify-content:center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"></rect><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"></path></svg>{{ copyLabel }}</button>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:15px;font-weight:600">Recent agent runs</div>
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px">
+              <sc-for list="{{ runs }}" as="r" hint-placeholder-count="3">
+                <div style="display:grid;grid-template-columns:90px minmax(0,1fr) 90px;gap:16px;padding:16px 24px;border-bottom:1px solid {{ r.bd }};align-items:center"><span style="font:500 12px 'Geist Mono';color:#6B665E">{{ r.who }}</span><span style="font-size:15px">{{ r.what }}</span><span style="font-size:13px;color:#6B665E;text-align:right">{{ r.when }}</span></div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ is.settings }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:32px;animation:cpRise 320ms cubic-bezier(.2,.8,.2,1) both">
+          <div style="display:flex;flex-direction:column;gap:12px"><div style="font:500 12px 'Geist Mono';letter-spacing:0.06em;color:#6B665E">06 · SETTINGS</div><div style="font-size:44px;font-weight:600;letter-spacing:-0.035em;line-height:1.05">Settings</div></div>
+          <div style="display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;border-top:1px solid #E5E0D6;padding-top:24px">
+            <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:16px;font-weight:600">Your keys</div><div style="font-size:14px;color:#6B665E;line-height:1.45">AI shorts and agents run on your own accounts. We never mark up usage.</div></div>
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px">
+              <sc-for list="{{ keys }}" as="k" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid {{ k.bd }}"><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font-size:15px;font-weight:600">{{ k.name }}</div><div style="font:400 13px 'Geist Mono';color:#6B665E">{{ k.val }}</div></div><button style="height:36px;padding:0 14px;border-radius:99px;border:1px solid #D6D0C4;background:#FBFAF7;font-size:13px;font-weight:600;cursor:pointer">{{ k.cta }}</button></div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;border-top:1px solid #E5E0D6;padding-top:24px">
+            <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:16px;font-weight:600">Defaults</div><div style="font-size:14px;color:#6B665E;line-height:1.45">Applied to every new clip.</div></div>
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px">
+              <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="3">
+                <button onClick="{{ t.flip }}" style="width:100%;display:flex;align-items:center;gap:16px;padding:18px 20px;border:none;background:transparent;text-align:left;cursor:pointer;border-bottom:1px solid {{ t.bd }}"><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="font-size:15px;font-weight:600">{{ t.name }}</div><div style="font-size:13px;color:#6B665E">{{ t.desc }}</div></div><span style="width:44px;height:26px;border-radius:99px;padding:3px;flex:none;transition:background 180ms;background:{{ t.track }}"><span style="display:block;width:20px;height:20px;border-radius:99px;background:#FFFFFF;box-shadow:0 1px 2px rgba(20,18,15,.25);transition:transform 200ms cubic-bezier(.2,.8,.2,1);transform:{{ t.knob }}"></span></span></button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;border-top:1px solid #E5E0D6;padding-top:24px">
+            <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:16px;font-weight:600">Account</div></div>
+            <div style="background:#FBFAF7;border:1px solid #E5E0D6;border-radius:20px;padding:20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px">
+              <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;color:#6B665E">Name</div><input value="Zeus Creates" style="height:44px;border-radius:12px;border:1px solid #D6D0C4;background:#FFFFFF;padding:0 14px;font-size:15px;outline:none" style-focus="border-color:#14120F;box-shadow:0 0 0 4px #FFF1B8"></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;color:#6B665E">Email</div><input value="zeus@creatorsplan.com" style="height:44px;border-radius:12px;border:1px solid #D6D0C4;background:#FFFFFF;padding:0 14px;font-size:15px;outline:none" style-focus="border-color:#14120F;box-shadow:0 0 0 4px #FFF1B8"></div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { screen: 'clips', tab: 'file', up: -1, url: '', fmt: '9:16', adv: false, len: '30–60s', cap: 'Clean', rights: false, job: 'idle', pct: 0,
+    sStep: 0, mode: 'low', site: '', desc: '', lang: 'English', hook: 0, presenter: 0, slen: '30s', sPct: 0,
+    yStep: 0, yFile: false, yTitle: '', yPick: 0, thumb: 0, vis: 'Public', yLive: false,
+    filter: 'All', tg: { captions: true, watermark: false, notify: true }, prov: { Claude: true, ChatGPT: false, n8n: false }, copied: false };
+  timers = [];
+  componentWillUnmount() { this.timers.forEach(clearInterval); }
+  run(key, step, done) {
+    this.setState({ [key]: 0 });
+    const id = setInterval(() => {
+      const v = Math.min(100, this.state[key] + step);
+      this.setState({ [key]: v });
+      if (v >= 100) { clearInterval(id); if (done) setTimeout(done, 300); }
+    }, 60);
+    this.timers.push(id);
+  }
+  steps(labels, cur, setter) {
+    return labels.map((label, i) => ({ label, n: String(i + 1).padStart(2, '0'), done: i < cur, cur: i === cur, next: i > cur,
+      line: i < labels.length - 1, lineColor: i < cur ? '#14120F' : '#E5E0D6', flex: i < labels.length - 1 ? '1' : 'none', go: () => setter(i) }));
+  }
+  renderVals() {
+    const s = this.state, set = (o) => this.setState(o);
+    const ids = ['clips', 'shorts', 'studio', 'gallery', 'agent', 'settings'];
+    const nav = {}, is = {}, go = {};
+    ids.forEach(id => { const a = s.screen === id; is[id] = a;
+      nav[id] = { bg: a ? '#14120F' : 'transparent', fg: a ? '#FBFAF7' : '#14120F', ic: a ? '#FFCF1A' : '#6B665E', meta: a ? '#9A948A' : '#6B665E' };
+      go[id] = () => set({ screen: id }); });
+    go.agentLink = (e) => { e.preventDefault(); set({ screen: 'agent' }); };
+    const card = (on, pick) => ({ bd: on ? '#14120F' : '#E5E0D6', bg: on ? '#FFF1B8' : '#FBFAF7', fill: on ? '#FFCF1A' : 'transparent', dot: on ? '#14120F' : 'transparent', pick });
+    const seg = (opts, val, key) => opts.map(label => ({ label, bg: label === val ? '#FFFFFF' : 'transparent', sh: label === val ? '0 1px 2px rgba(20,18,15,.12)' : 'none', pick: () => set({ [key]: label }) }));
+    const fileReady = s.up >= 100, srcReady = s.tab === 'file' ? fileReady : s.url.trim().length > 4;
+    const canGen = srcReady && s.rights;
+    const stage = s.pct < 35 ? 'Transcribing' : s.pct < 72 ? 'Finding the best moments' : 'Reframing and adding captions';
+    const hooks = ['"I almost walked past this place. Don\'t make my mistake."', '"The best pizza in Madrid is down an alley with no sign."', '"Locals asked me not to post this."'];
+    const presenters = [['Lucía', 'Warm'], ['Dani', 'Upbeat'], ['Marta', 'Calm'], ['Leo', 'Direct']];
+    const ytTitles = ['I built a pro YouTube studio for under $3k', 'My $3k studio, and the one mistake I made', 'Studio tour: what actually matters (and what doesn\'t)', 'Everything in my studio, ranked by how much it helped', 'Don\'t buy a camera until you watch this'];
+    const yChosen = s.yTitle.trim() && s.yStep > 0 && !s.yFile ? s.yTitle.trim() : ytTitles[s.yPick];
+    const sSetter = (i) => set({ sStep: i }), ySetter = (i) => set({ yStep: i, yLive: false });
+    const s0ok = s.site.trim().length > 3 || s.desc.trim().length > 3;
+    const gall = [
+      { type: 'CLIP', title: 'Nobody tells you the first 100 videos are practice', dur: '0:37', when: 'Today', k: 'Clips', ratio: '9/16' },
+      { type: 'AI SHORT', title: 'Pizzeria Nonna · Lucía', dur: '0:30', when: 'Today', k: 'AI shorts', ratio: '9/16' },
+      { type: 'THUMBNAIL', title: 'Studio tour, option B', dur: '1280×720', when: 'Yesterday', k: 'Thumbnails', ratio: '9/16' },
+      { type: 'CLIP', title: 'Why I stopped posting every day', dur: '0:52', when: 'Yesterday', k: 'Clips', ratio: '9/16' },
+      { type: 'AI SHORT', title: 'Focus app launch · Leo', dur: '0:15', when: 'Sep 29', k: 'AI shorts', ratio: '9/16' },
+      { type: 'CLIP', title: 'What 1M views actually paid', dur: '0:53', when: 'Sep 28', k: 'Clips', ratio: '9/16' },
+      { type: 'THUMBNAIL', title: 'Camera guide, final', dur: '1280×720', when: 'Sep 26', k: 'Thumbnails', ratio: '9/16' },
+      { type: 'CLIP', title: 'The thumbnail test that changed everything', dur: '0:33', when: 'Sep 25', k: 'Clips', ratio: '9/16' }
+    ].filter(g => s.filter === 'All' || g.k === s.filter).map((g, i) => ({ ...g, delay: (i * 40) + 'ms' }));
+    const provs = [['Claude', 'Through our MCP server'], ['ChatGPT', 'As a custom GPT action'], ['n8n', 'HTTP node with your API key']].map(([name, desc]) => {
+      const on = s.prov[name];
+      return { name, desc, on, initial: name[0], cta: on ? 'Disconnect' : 'Connect', bd: on ? '#D6D0C4' : '#14120F', bg: on ? '#FBFAF7' : '#14120F', fg: on ? '#14120F' : '#FBFAF7',
+        toggle: () => set({ prov: { ...s.prov, [name]: !on } }) };
+    });
+    const tgs = [['captions', 'Burn in captions', 'Word-by-word captions on every clip'], ['watermark', 'Add watermark', 'Small creatorsplan mark in the corner'], ['notify', 'Email me when jobs finish', 'One email per batch, not per clip']].map(([k, name, desc], i, arr) => ({
+      name, desc, bd: i < arr.length - 1 ? '#E5E0D6' : 'transparent', track: s.tg[k] ? '#14120F' : '#D6D0C4', knob: s.tg[k] ? 'translateX(18px)' : 'none',
+      flip: () => set({ tg: { ...s.tg, [k]: !s.tg[k] } }) }));
+    const cost = s.mode === 'low' ? '~$0.80' : '~$2.00';
+    return {
+      nav, is, go,
+      setTabFile: () => set({ tab: 'file' }), setTabUrl: () => set({ tab: 'url' }),
+      tabFile: { fg: s.tab === 'file' ? '#14120F' : '#6B665E', bar: s.tab === 'file' ? '#14120F' : 'transparent' },
+      tabUrl: { fg: s.tab === 'url' ? '#14120F' : '#6B665E', bar: s.tab === 'url' ? '#14120F' : 'transparent' },
+      showDrop: s.tab === 'file' && s.up < 0, showFile: s.tab === 'file' && s.up >= 0, showUrl: s.tab === 'url',
+      startUpload: () => this.run('up', 5), clearUpload: () => set({ up: -1 }),
+      upPct: Math.max(0, s.up) + '%', upLabel: fileReady ? '412 MB · 48:12' : 'Uploading ' + Math.max(0, s.up) + '%',
+      url: s.url, onUrl: (e) => set({ url: e.target.value }),
+      fmt916: card(s.fmt === '9:16', () => set({ fmt: '9:16' })), fmt11: card(s.fmt === '1:1', () => set({ fmt: '1:1' })), fmt169: card(s.fmt === '16:9', () => set({ fmt: '16:9' })),
+      fmtLabel: s.fmt, adv: s.adv, toggleAdv: () => set({ adv: !s.adv }), advRot: s.adv ? 'rotate(0deg)' : 'rotate(-90deg)',
+      lens: seg(['15–30s', '30–60s', '60–90s'], s.len, 'len'), caps: seg(['Clean', 'Bold', 'None'], s.cap, 'cap'),
+      rights: s.rights, rightsBg: s.rights ? '#14120F' : '#FFFFFF', toggleRights: () => set({ rights: !s.rights }),
+      canGen, cantGen: !canGen, genHint: !srcReady ? (s.tab === 'file' ? 'Add a video first' : 'Paste a link first') : 'Confirm the rights checkbox',
+      job: { idle: s.job === 'idle', running: s.job === 'running', done: s.job === 'done' },
+      runJob: () => { set({ job: 'running' }); this.run('pct', 2.2, () => set({ job: 'done' })); },
+      resetJob: () => set({ job: 'idle', up: -1, rights: false, pct: 0 }),
+      jobStage: stage, jobPct: s.pct + '%', jobPctLabel: Math.round(s.pct) + '%',
+      clips: [
+        { title: '"Nobody tells you the first 100 videos are practice"', range: '04:12 – 04:49', dur: '0:37', score: 94 },
+        { title: 'Why I stopped posting every day', range: '17:30 – 18:22', dur: '0:52', score: 88 },
+        { title: 'The thumbnail test that changed everything', range: '26:05 – 26:38', dur: '0:33', score: 81 },
+        { title: 'What 1M views actually paid', range: '39:48 – 40:41', dur: '0:53', score: 77 }
+      ].map((c, i) => ({ ...c, scoreW: c.score + '%', delay: (i * 60) + 'ms' })),
+      sSteps: this.steps(['Setup', 'Analysis', 'Presenter', 'Generate', 'Result'], s.sStep, sSetter),
+      s0: s.sStep === 0, s1: s.sStep === 1, s2: s.sStep === 2, s3: s.sStep === 3, s4: s.sStep === 4,
+      modeLow: card(s.mode === 'low', () => set({ mode: 'low' })), modeHi: card(s.mode === 'hi', () => set({ mode: 'hi' })),
+      site: s.site, onSite: (e) => set({ site: e.target.value }), desc: s.desc, onDesc: (e) => set({ desc: e.target.value }),
+      langs: ['English', 'Spanish', 'Portuguese', 'German'].map(l => ({ ...card(s.lang === l, () => set({ lang: l })), label: l })),
+      lang: s.lang, s0Blocked: !s0ok, s0Btn: { bg: s0ok ? '#14120F' : '#E5E0D6', fg: s0ok ? '#FBFAF7' : '#9A948A' },
+      sNext: () => { if (s.sStep === 0 && !s0ok) return; set({ sStep: s.sStep + 1 }); }, sBack: () => set({ sStep: Math.max(0, s.sStep - 1) }),
+      brief: { product: s.desc.trim() || (s.site.trim() ? 'From ' + s.site.trim().replace(/^https?:\/\//, '') : '') },
+      hooks: hooks.map((text, i) => ({ text, ...card(s.hook === i, () => set({ hook: i })) })),
+      presenters: presenters.map(([name, tone], i) => ({ name, tone, ...card(s.presenter === i, () => set({ presenter: i })) })),
+      slens: seg(['15s', '30s', '45s'], s.slen, 'slen'), sCost: cost,
+      sGenerate: () => { set({ sStep: 3 }); this.run('sPct', 2.6, () => set({ sStep: 4 })); },
+      sStage: s.sPct < 30 ? 'Writing the script' : s.sPct < 65 ? 'Animating ' + presenters[s.presenter][0] : 'Syncing voice and lips',
+      sPctW: s.sPct + '%', sPctLabel: Math.round(s.sPct) + '%',
+      hookText: hooks[s.hook], presenterName: presenters[s.presenter][0], slenLabel: s.slen, slenNum: s.slen.replace('s', '').padStart(2, '0'),
+      sRestart: () => set({ sStep: 0, sPct: 0 }),
+      ySteps: this.steps(['Input', 'Title', 'Thumbnail', 'Description', 'Publish'], s.yStep, ySetter),
+      y0: s.yStep === 0, y1: s.yStep === 1, y2: s.yStep === 2, y3: s.yStep === 3, y4: s.yStep === 4,
+      yUpload: () => set({ yFile: !s.yFile }),
+      yDrop: s.yFile ? { bd: '#14120F', bg: '#FFF1B8', label: 'studio-tour-final.mp4', sub: '1.8 GB · 14:32 · click to remove' } : { bd: '#9A948A', bg: 'transparent', label: 'Upload the video', sub: 'Drop it here, or click to browse' },
+      yA: { bg: s.yFile ? '#14120F' : '#E5E0D6', fg: s.yFile ? '#FBFAF7' : '#9A948A' },
+      ySuggest: () => { if (s.yFile) set({ yStep: 1 }); },
+      yTitle: s.yTitle, onYTitle: (e) => set({ yTitle: e.target.value }), yCount: s.yTitle.length, yCountColor: s.yTitle.length > 60 ? '#B53A26' : '#6B665E',
+      yB: s.yTitle.trim() ? { bd: '#14120F', bg: '#14120F', fg: '#FBFAF7' } : { bd: '#E5E0D6', bg: '#FBFAF7', fg: '#9A948A' },
+      yUseTitle: () => { if (s.yTitle.trim()) set({ yStep: 2, yFile: false }); },
+      yTitles: ytTitles.map((text, i) => ({ text, len: text.length, ...card(s.yPick === i, () => set({ yPick: i })) })),
+      yChosen, yNext: () => set({ yStep: Math.min(4, s.yStep + 1) }), yBack: () => set({ yStep: Math.max(0, s.yStep - 1), yLive: false }),
+      thumbs: ['Face + big number', 'Before / after', 'Room wide shot'].map((label, i) => ({ label, ...card(s.thumb === i, () => set({ thumb: i })) })),
+      vis: seg(['Public', 'Unlisted', 'Private'], s.vis, 'vis'),
+      yLive: s.yLive, yNotLive: !s.yLive, yPublish: () => set({ yLive: true }), yRestart: () => set({ yStep: 0, yLive: false, yFile: false, yTitle: '' }),
+      filters: seg(['All', 'Clips', 'AI shorts', 'Thumbnails'], s.filter, 'filter'), gallery: gall,
+      providers: provs,
+      copy: () => { set({ copied: true }); setTimeout(() => this.setState({ copied: false }), 1400); }, copyLabel: s.copied ? 'Copied' : 'Copy',
+      runs: [
+        { who: 'CLAUDE', what: 'Clipped "Podcast ep. 42" into 6 shorts', when: '2h ago' },
+        { who: 'N8N', what: 'Weekly upload → 4 shorts → scheduled', when: 'Yesterday' },
+        { who: 'CLAUDE', what: 'Wrote 5 titles for "Studio tour"', when: 'Mon' }
+      ].map((r, i, a) => ({ ...r, bd: i < a.length - 1 ? '#E5E0D6' : 'transparent' })),
+      keys: [['fal.ai', 'fal_••••••••••3f9a', 'Replace'], ['OpenAI', 'sk-••••••••••k2Lm', 'Replace'], ['ElevenLabs', 'Not set', 'Add key']].map(([name, val, cta], i, a) => ({ name, val, cta, bd: i < a.length - 1 ? '#E5E0D6' : 'transparent' })),
+      toggles: tgs
+    };
+  }
+}
+</script>
+</body>
+</html>

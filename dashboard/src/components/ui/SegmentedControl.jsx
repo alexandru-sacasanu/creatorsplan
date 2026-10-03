@@ -29,7 +29,11 @@ export default function SegmentedControl({ options, value, onChange, multi = fal
   const gridTemplateColumns = `repeat(auto-fill, minmax(max(${minCol}px, calc((100% - ${(cols - 1) * 6}px) / ${cols})), 1fr))`;
 
   return (
-    <div className="grid gap-1.5" style={{ gridTemplateColumns }} role={multi ? 'group' : 'radiogroup'}>
+    <div
+      className="grid gap-1 bg-cp-tint p-1 rounded-cp-input"
+      style={{ gridTemplateColumns }}
+      role={multi ? 'group' : 'radiogroup'}
+    >
       {options.map((opt) => {
         const active = isActive(opt.value);
         return (
@@ -40,14 +44,14 @@ export default function SegmentedControl({ options, value, onChange, multi = fal
             aria-checked={active}
             disabled={opt.disabled}
             onClick={() => toggle(opt.value)}
-            className={`${pad} rounded-input border text-xs lowercase flex flex-col items-center justify-center gap-1 transition-colors duration-200
+            className={`${pad} rounded-[9px] text-[13px] font-semibold lowercase flex flex-col items-center justify-center gap-1 transition-colors duration-[var(--cp-dur-settle)]
               ${active
-                ? 'border-brass bg-paper3 text-ink'
-                : 'border-rule bg-paper text-muted hover:text-ink2 hover:border-rule2'}
+                ? 'bg-cp-field text-cp-ink shadow-[var(--cp-shadow-segment)]'
+                : 'bg-transparent text-cp-ink-2 hover:text-cp-ink'}
               disabled:opacity-40 disabled:cursor-not-allowed`}
           >
-            {opt.icon && <span className={active ? 'text-brass' : 'text-muted'}>{opt.icon}</span>}
-            <span className="font-medium">{opt.label}</span>
+            {opt.icon && <span className={active ? 'text-cp-ink' : 'text-cp-ink-2'}>{opt.icon}</span>}
+            <span>{opt.label}</span>
             {opt.hint && <span className="readout normal-case">{opt.hint}</span>}
           </button>
         );

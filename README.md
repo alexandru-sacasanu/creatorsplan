@@ -1,40 +1,11 @@
-# OpenShorts.app
+# CreatorsPlan
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Open Source](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
-[![GitHub stars](https://img.shields.io/github/stars/mutonby/openshorts?style=social)](https://github.com/mutonby/openshorts)
-[![Last Commit](https://img.shields.io/github/last-commit/mutonby/openshorts)](https://github.com/mutonby/openshorts/commits/main)
 
-**Open source AI video platform** with 3 tools in one: **Clip Generator**, **AI Shorts (UGC videos with AI actors)**, and **YouTube Studio**.
+**AI video platform** with 3 tools in one: **Clip Generator**, **AI Shorts (UGC videos with AI actors)**, and **YouTube Studio**.
 
-![Your podcast, and the vertical clip OpenShorts makes of it: both speakers stacked, captions on the seam](screenshots/split-before-after.gif)
-
-Two people on camera? OpenShorts stacks them instead of shrinking the wide shot, puts the captions on the seam where they cover nobody, and switches back to a face-tracked crop when the cut goes to one person. The AI picks the layout per video; nothing to configure.
-
-**Two ways to run it, same software either way:**
-
-|  | Self-hosted (this repo) | Hosted on [openshorts.app](https://www.openshorts.app/) |
-|---|---|---|
-| **Price** | Free forever, MIT | Free plan, paid from $12/mo |
-| **Speed** | 5 to 8 min per 8-min video on CPU | About 50s on our NVIDIA GPU |
-| **API keys** | Bring your own Gemini, ElevenLabs, fal.ai | Gemini included, nothing to set up |
-| **Watermark / limits** | None, ever | Watermark and 20 min/mo on the free plan, neither on paid |
-| **Setup** | Docker, 8GB+ RAM, model downloads | Sign in and paste a link |
-| **MCP / API for agents** | Same `/mcp` endpoint, but only while your machine is on | Always-on endpoint at [mcp.openshorts.app](https://www.openshorts.app/mcp), API keys in one click |
-| **Your data** | Your server | Ours |
-
-Self-hosting is genuinely free and always will be. It costs you a machine, your own API keys and the time to keep it running. The hosted plans exist to cover that hardware and those keys, not to unlock features.
-
-https://github.com/user-attachments/assets/b45fa983-16b4-48b5-ac5b-a267836b9ad9
-
-
-
-### Video Tutorial: How it works
-[![OpenShorts Tutorial](https://img.youtube.com/vi/xlyjD1qCaX0/maxresdefault.jpg)](https://www.youtube.com/watch?v=xlyjD1qCaX0 "Click to watch the video on YouTube")
-
-*Click the image above to watch the full walkthrough.*
+Two people on camera? CreatorsPlan stacks them instead of shrinking the wide shot, puts the captions on the seam where they cover nobody, and switches back to a face-tracked crop when the cut goes to one person. The AI picks the layout per video; nothing to configure.
 
 ---
 
@@ -43,12 +14,8 @@ https://github.com/user-attachments/assets/b45fa983-16b4-48b5-ac5b-a267836b9ad9
 ### 1. Clip Generator
 Turn your long-form videos — podcasts, webinars, livestreams, vlogs, interviews — into viral-ready 9:16 shorts for TikTok, Instagram Reels, and YouTube Shorts.
 
-![Clip Results](screenshots/clip-results.png)
-
 ### 2. AI Shorts (UGC Video Creator)
 Generate marketing videos with AI actors for **any product or business**. No camera, no studio, no influencer budget. Just describe your product or paste a URL.
-
-![AI Shorts Setup](screenshots/ai-shorts.png)
 
 - **Two cost modes**: Low Cost (~$0.65/video) and Premium (~$2/video)
 - Works for any business: SaaS, restaurants, e-commerce, coaching, local businesses
@@ -57,9 +24,7 @@ Generate marketing videos with AI actors for **any product or business**. No cam
 - Publish directly to TikTok, Instagram, and YouTube
 
 ### 3. YouTube Studio
-Complete free AI YouTube toolkit: thumbnails, titles, descriptions, and direct publishing.
-
-![YouTube Studio](screenshots/youtube-studio.png)
+Complete AI YouTube toolkit: thumbnails, titles, descriptions, and direct publishing.
 
 - AI thumbnail generator with face overlay
 - 10 viral title suggestions with refinement chat
@@ -67,13 +32,10 @@ Complete free AI YouTube toolkit: thumbnails, titles, descriptions, and direct p
 - One-click publish to YouTube
 
 ### UGC Video Gallery
-All generated videos and avatars are saved to a public gallery with SEO pages for each video.
+All generated videos and avatars are saved to a gallery.
 
-![UGC Gallery](screenshots/ugc-gallery.png)
-
-- Public gallery page with hover-to-play (`/gallery`)
-- Individual SEO video pages with og:video meta tags (`/video/{id}`)
-- JSON-LD structured data for search engines
+- Gallery page with hover-to-play (`/gallery`)
+- Individual video pages (`/video/{id}`)
 - Avatar gallery with prompt history
 
 ---
@@ -108,14 +70,12 @@ All generated videos and avatars are saved to a public gallery with SEO pages fo
 
 ### Social Auto-Publishing
 - **One-click posting** to TikTok, Instagram Reels, and YouTube Shorts simultaneously
-- **Schedule uploads** for any date and time — plan your content calendar and let OpenShorts publish automatically
+- **Schedule uploads** for any date and time — plan your content calendar and let CreatorsPlan publish automatically
 - **Multi-platform distribution** — publish to all your social networks at once from a single interface
 - Upload-Post integration with async uploads
 
 ### Infrastructure
 - S3 cloud backup (private bucket for clips, public bucket for gallery/avatars)
-- SEO gallery pages served by FastAPI with JSON-LD structured data
-- Shared avatar gallery across all users
 - Async job queue with configurable concurrency
 
 ---
@@ -128,62 +88,6 @@ All generated videos and avatars are saved to a public gallery with SEO pages fo
 - **E-commerce brands** — Product videos with AI actors for TikTok Shop, Instagram, YouTube
 - **Local businesses** — Restaurants, gyms, real estate, coaching — affordable video marketing
 - **Developers** — Self-host, customize the pipeline, integrate via API
-
----
-
-## AI Shorts Showcase
-
-Videos generated with OpenShorts AI Shorts — no camera, no studio, no actors:
-
-| | | |
-|:---:|:---:|:---:|
-| [![Biohacking for Investors](https://test-videos-upload-post.s3.eu-west-3.amazonaws.com/videos/cdceec1b/actor.png)](https://openshorts.app/video/cdceec1b) | [![Secret Weapon for Devs](https://test-videos-upload-post.s3.eu-west-3.amazonaws.com/videos/d3a80b6b/actor.png)](https://openshorts.app/video/d3a80b6b) | [![El Secreto de los Agentes de IA](https://test-videos-upload-post.s3.eu-west-3.amazonaws.com/videos/8ab7de92/actor.png)](https://openshorts.app/video/8ab7de92) |
-| **Biohacking for Investors** · LOW COST | **Secret Weapon for Devs** · LOW COST | **El Secreto de los Agentes de IA** · PREMIUM |
-
-> Browse all videos at [openshorts.app/gallery](https://openshorts.app/gallery)
-
----
-
-## OpenShorts vs Competitors
-
-| Feature | OpenShorts | Opus Clip | CapCut | Vizard | Klap | Descript |
-|---------|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Price** | **Free self-hosted**<br>from $12/mo hosted | $15-29/mo | $8/mo | $15-20/mo | $23-63/mo | $24-65/mo |
-| **Self-hosted** | **Yes** | No | No | No | No | No |
-| **Open source** | **Yes** | No | No | No | No | No |
-| **Watermark** | **Never self-hosted**<br>free plan only when hosted | Free tier | Some | Free tier | Free tier | Free tier |
-| **Upload limits** | **None self-hosted**<br>by plan when hosted | 10-30GB | Credit-based | 60min-10hr | 10-100 vids/mo | 60min-40hr |
-| **AI clip detection** | Yes | Yes | Yes | Yes | Yes | Yes |
-| **Smart 9:16 reframing** | Yes | Yes | Yes | Yes | Yes | No |
-| **Auto subtitles** | Yes | Yes | Yes | Yes | Yes | Yes |
-| **Voice dubbing (30+ langs)** | Yes | No | Pro only | No | Pro only | Business only |
-| **AI UGC actors** | **Yes** | No | No | No | No | No |
-| **AI video effects** | Yes | No | Yes | No | No | No |
-| **Hook text overlays** | Yes | No | No | No | No | No |
-| **YouTube Studio (titles, thumbnails)** | **Yes** | No | No | No | No | No |
-| **Social auto-publishing** | Yes | Pro only | TikTok only | Paid only | Paid only | No |
-| **Schedule uploads** | Yes | Pro only | No | Paid only | Paid only | No |
-| **Data privacy** | **Your server** | Their cloud | Their cloud | Their cloud | Their cloud | Their cloud |
-| **Works with a local LLM (Ollama)** | **Yes** | No | No | No | No | No |
-
----
-
-## How Much Does It Cost?
-
-Self-hosting OpenShorts is free. You provide the machine and you only pay for the AI APIs you use, and most have generous free tiers:
-
-| Service | Free Tier | Paid Cost | Used For |
-|---------|-----------|-----------|----------|
-| **Google Gemini** | Free trial with generous limits | < $0.01 per 10-min video | Viral moment detection, script generation, web research |
-| **Local LLM (Ollama, LM Studio, vLLM...)** | **Free, your hardware** | $0 | Viral moment detection instead of Gemini (`LLM_BASE_URL`) |
-| **fal.ai** | Pay-per-use | ~$0.50-1.50 per AI Short | Actor generation, talking head video, lip-sync |
-| **ElevenLabs** | Free tier available | Pay-per-use | Voiceover, voice dubbing |
-| **Upload-Post** | **10 free uploads/month** to all networks (no credit card) | Pay-per-use | Auto-publishing to TikTok, Instagram, YouTube |
-| **AWS S3** | Optional | ~$0.023/GB | Cloud backup for clips and gallery |
-
-**Bottom line:** You can clip videos for practically free with Gemini, and publish 10 videos/month to all social networks at zero cost with Upload-Post.
-
-**Don't want to run any of that?** [openshorts.app](https://www.openshorts.app/) is the same software on our hardware: our NVIDIA GPU clips an 8-minute video in about 50 seconds instead of the 5 to 8 minutes it takes on a typical CPU, the Gemini key is included, and auto-publishing is already wired up. Free plan is 20 minutes a month with a watermark and no credit card; paid plans start at $12/mo for 100 minutes without watermark.
 
 ---
 
@@ -200,9 +104,10 @@ Self-hosting OpenShorts is free. You provide the machine and you only pay for th
 ## Getting Started
 
 ### 1. Clone
+
 ```bash
-git clone https://github.com/mutonby/openshorts.git
-cd openshorts
+git clone <repo-url>
+cd creatorsplan
 ```
 
 ### 2. Configure (optional)
@@ -266,8 +171,8 @@ ASR_GPU_CONCURRENCY=1
 **Verify:**
 ```bash
 docker compose up --build -d
-docker exec openshorts-backend nvidia-smi -L
-docker exec openshorts-backend ffmpeg -hide_banner -f lavfi -i testsrc=size=256x256:rate=1 -frames:v 1 -c:v h264_nvenc -f null -
+docker exec creatorsplan-backend nvidia-smi -L
+docker exec creatorsplan-backend ffmpeg -hide_banner -f lavfi -i testsrc=size=256x256:rate=1 -frames:v 1 -c:v h264_nvenc -f null -
 ```
 The backend log on the first job reports the chosen encoder and transcription device. A CUDA error in whisper (e.g. VRAM exhausted) retries once on CPU automatically. 8 GB of VRAM is enough for `large-v3-turbo` fp16 plus the detection models.
 
@@ -322,7 +227,7 @@ know:
 5. **Video** — Hailuo 2.3 Fast img2video + VEED Lipsync (Low Cost) or Kling Avatar v2 (Premium)
 6. **B-roll** — Flux 2 Pro image generation + Ken Burns effect
 7. **Composite** — FFmpeg assembly with ASS subtitles and hook overlays
-8. **Gallery** — Upload to public S3 with metadata for SEO pages
+8. **Gallery** — Upload to public S3 with metadata
 9. **Publish** — Upload-Post to TikTok, Instagram, YouTube
 
 ---
@@ -333,33 +238,25 @@ You don't need the dashboard. The whole pipeline is callable by AI agents and sc
 
 ### MCP server (`/mcp`)
 
-OpenShorts ships a built-in [MCP](https://modelcontextprotocol.io) server, so Claude, ChatGPT, Cursor or any MCP client can clip and publish videos for you:
-
-**claude.ai and ChatGPT**: paste `https://mcp.openshorts.app/mcp` as a custom connector (Settings → Connectors) and approve the access on openshorts.app. The server does OAuth 2.1 with dynamic client registration, so there is no key to copy; the connection shows up under Account → API keys, where revoking it disconnects the app.
+CreatorsPlan ships a built-in [MCP](https://modelcontextprotocol.io) server, so Claude, ChatGPT, Cursor or any MCP client can clip and publish videos for you:
 
 ```bash
-# Claude Code / Cursor / n8n (hosted): create an API key in your account page
-claude mcp add --transport http openshorts https://mcp.openshorts.app/mcp \
-  --header "Authorization: Bearer osk_..."
-
 # Self-hosted (no key needed, BYOK rules apply):
-claude mcp add --transport http openshorts http://localhost:8000/mcp
+claude mcp add --transport http creatorsplan http://localhost:8000/mcp
 
 # Self-hosted without running the web server: same tools over stdio
-claude mcp add openshorts -- python mcp_stdio.py
+claude mcp add creatorsplan -- python mcp_stdio.py
 ```
 
 Tools: `process_video` (URL or `upload_id`; `captions: false` when the source already has subtitles, `auto_hook: false` to skip the hook line, burned by default like the dashboard), `create_upload` (hand the agent a local file: PUT the bytes, then process), `get_job_status`, `list_clips`, `get_quota`, `add_subtitles`, `recut_clip`, `publish_clip`. A prompt like *"clip this podcast and schedule the best 3 to TikTok"* is now a one-liner in your agent of choice.
 
-### REST API + API keys
-
-Hosted accounts can mint `osk_...` API keys (account page). A key authenticates as you everywhere — same plan, same minutes, same job ownership:
+### REST API
 
 ```bash
-curl -X POST https://api.openshorts.app/api/process \
-  -H "Authorization: Bearer osk_..." -H "Content-Type: application/json" \
+curl -X POST http://localhost:8000/api/process \
+  -H "Content-Type: application/json" \
   -d '{"url": "https://youtube.com/watch?v=...", "acknowledged": true,
-       "webhook_url": "https://your-server.com/hooks/openshorts"}'
+       "webhook_url": "https://your-server.com/hooks/creatorsplan"}'
 ```
 
 Interactive docs at `/docs` (OpenAPI) on any instance.
@@ -373,39 +270,7 @@ Pass `webhook_url` (and optionally `webhook_secret`) to `POST /api/process` and 
  "clips": [{"index": 0, "title": "…", "video_url": "…", "download_url": "…"}]}
 ```
 
-With a secret, the body is signed: `X-OpenShorts-Signature: sha256=<hmac-sha256(body)>`.
-
-### CLI
-
-The same API from the terminal, zero dependencies (`cli/`):
-
-```bash
-pip install openshorts   # or: uvx openshorts
-
-export OPENSHORTS_API_KEY=osk_...              # hosted
-# export OPENSHORTS_API_URL=http://localhost:8000   # self-hosted, no key
-
-openshorts process "https://youtube.com/watch?v=..." --wait
-openshorts clips <job_id>
-openshorts publish <job_id> 0 --platforms tiktok,youtube
-```
-
-### Agent skill
-
-`skills/openshorts/SKILL.md` follows the open
-[Agent Skills](https://agentskills.io) standard, so it works in any
-skill-capable agent:
-
-```bash
-# Claude Code (and most agents): copy the folder into the skills directory
-cp -r skills/openshorts ~/.claude/skills/
-
-# Hermes Agent: install straight from this repo
-hermes skills install mutonby/openshorts/skills/openshorts
-
-# OpenClaw: from ClawHub
-openclaw skills install @mutonby/openshorts
-```
+With a secret, the body is signed: `X-CreatorsPlan-Signature: sha256=<hmac-sha256(body)>`.
 
 ### n8n
 
@@ -469,20 +334,12 @@ lives in [`examples/n8n/`](examples/n8n/).
 2. **Create Profile**: Go to [Manage Users](https://app.upload-post.com/manage-users)
 3. **Connect Accounts**: Link TikTok, Instagram, and/or YouTube
 4. **Get API Key**: Navigate to [API Keys](https://app.upload-post.com/api-keys)
-5. **Use in OpenShorts**: Paste the key in Settings
+5. **Use in CreatorsPlan**: Paste the key in Settings
 
 ---
 
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=mutonby/openshorts&type=Date)](https://star-history.com/#mutonby/openshorts&Date)
-
-## Contributions
-
-Contributions are welcome! Whether it's adding new AI models, improving the lip-sync pipeline, or building new features — feel free to open a PR.
-
 ## License
 
-MIT License for the core application — OpenShorts is yours to use, modify, and scale.
+MIT License for the core application — CreatorsPlan is yours to use, modify, and scale.
 
-**Exception:** the [`cloud/`](cloud/LICENSE) directory (billing, managed keys, and the hosted-service infrastructure behind the optional `BILLING_ENABLED` flag) is source-available under the OpenShorts Commercial License. You can read it, modify it, and self-host it for personal or internal use, but you can't offer it to third parties as a paid/hosted service. Self-hosting the core app never requires this directory.
+**Exception:** the [`cloud/`](cloud/LICENSE) directory (billing, managed keys, and the hosted-service infrastructure behind the optional `BILLING_ENABLED` flag) is source-available under a commercial license. You can read it, modify it, and self-host it for personal or internal use, but you can't offer it to third parties as a paid/hosted service. Self-hosting the core app never requires this directory.

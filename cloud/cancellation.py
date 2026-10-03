@@ -177,8 +177,7 @@ async def accept_retention_offer(body: CancelRequest, request: Request):
     except Exception as e:
         print(f"⚠️  Retention coupon failed for {user.id}: {e}")
         raise HTTPException(status_code=502, detail=(
-            "We couldn't apply the discount right now. Please try again, "
-            "or email info@openshorts.app."))
+            "We couldn't apply the discount right now. Please try again."))
 
     details, review = _clean(body.details), _clean(body.review)
     async with database.session() as session:
@@ -220,8 +219,7 @@ async def resume_subscription(request: Request):
     except Exception as e:
         print(f"⚠️  Stripe resume failed for {user.id}: {e}")
         raise HTTPException(status_code=502, detail=(
-            "We couldn't resume your subscription right now. Please try again, "
-            "or email info@openshorts.app."))
+            "We couldn't resume your subscription right now. Please try again."))
     async with database.session() as session:
         async with session.begin():
             row = (await session.execute(
@@ -253,8 +251,7 @@ async def cancel_subscription(body: CancelRequest, request: Request):
     except Exception as e:
         print(f"⚠️  Stripe cancel failed for {user.id}: {e}")
         raise HTTPException(status_code=502, detail=(
-            "We couldn't cancel your subscription right now. Please try again, "
-            "or email info@openshorts.app."))
+            "We couldn't cancel your subscription right now. Please try again."))
 
     # Written after Stripe accepted the cancel, so a failed call leaves no
     # feedback row claiming a cancellation that never happened. Flipping

@@ -866,9 +866,11 @@ def download_youtube_video(url, output_dir=".", on_audio=None):
         except Exception as e:
             print(f"⚠️ Failed to write cookies file: {e}")
             cookies_path = None
+    elif os.path.exists(cookies_path):
+        print("🍪 Using existing cookies.txt mounted at /app/cookies.txt")
     else:
         cookies_path = None
-        print("⚠️ YOUTUBE_COOKIES env var not found.")
+        print("⚠️ YOUTUBE_COOKIES env var not found and no cookies.txt present.")
     
     # Optional HTTP proxy. Set PROXY_URL to route downloads through it; unset
     # (self-host) goes direct as before.

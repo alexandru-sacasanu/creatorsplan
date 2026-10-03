@@ -4,7 +4,6 @@ import { getApiUrl } from '../config';
 import { apiFetch } from '../lib/api';
 import StepIndicator from './ui/StepIndicator';
 import SegmentedControl from './ui/SegmentedControl';
-import StarBanner from './StarBanner';
 
 const STYLE_OPTIONS = [
   { id: 'ugc', label: 'UGC Natural', desc: 'Authentic, talking to camera' },
@@ -1278,10 +1277,6 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
               <h2 className="font-display lowercase text-xl text-ink mb-4">
                 Your Short is Ready
               </h2>
-
-              <div className="mb-4">
-                <StarBanner message="Happy with your short?" />
-              </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Video Player */}

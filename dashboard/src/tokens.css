@@ -1,53 +1,128 @@
-/* Hallmark · genre: atmospheric · theme: lumen (night foundry) · design-system: design.md · designed-as-app
- * macrostructure: Marquee Hero (marketing) / Workbench (app) / Long Document (content)
- * nav: N9 edge-aligned · footer: Ft5 statement · enrichment: filament apparatus (landing only)
- * pre-emit critique: P5 H4 E4 S5 R5 V4
- */
+/* Rebrand v1 (Zeus/night): dark cyan/violet palette — kept live until the
+ * creatorsplan v2 rebrand (paper/ink/volt) finishes repainting every
+ * component in steps 3-6. See design_handoff_creatorsplan_rebrand/README.md. */
 
 :root {
   /* paper */
-  --color-paper: oklch(13% 0.014 265);
-  --color-paper-2: oklch(16.5% 0.015 265);
-  --color-paper-3: oklch(20% 0.016 265);
+  --color-paper: #05070c;
+  --color-paper-2: #0b0f1a;
+  --color-paper-3: #0e1422;
 
   /* ink */
-  --color-ink: oklch(96% 0.006 262);
-  --color-ink-2: oklch(86% 0.01 262);
-  --color-muted: oklch(64% 0.012 262);
+  --color-ink: #e9edf6;
+  --color-ink-2: #8891a4;
+  --color-muted: #5b6376;
 
   /* rules */
-  --color-rule: oklch(96% 0.006 262 / 0.08);
-  --color-rule-2: oklch(96% 0.006 262 / 0.14);
-  --rule-blueprint: oklch(96% 0.006 262 / 0.04);
+  --color-rule: rgb(255 255 255 / 0.09);
+  --color-rule-2: rgb(255 255 255 / 0.16);
+  --rule-blueprint: rgb(255 255 255 / 0.04);
 
   /* accents */
-  --color-accent: oklch(76% 0.17 50);
-  --color-accent-ink: oklch(17% 0.03 50);
-  --color-accent-2: oklch(68% 0.16 18);
-  --color-glow: oklch(80% 0.16 50 / 0.42);
-  --color-paper-emit: oklch(76% 0.17 50 / 0.04);
-  --color-focus: oklch(76% 0.17 50);
+  --color-accent: #4dd8ff;
+  --color-accent-ink: #05070c;
+  --color-accent-2: #a78bff;
+  --color-glow: rgb(77 216 255 / 0.5);
+  --color-paper-emit: rgb(77 216 255 / 0.04);
+  --color-focus: #4dd8ff;
 
   /* states */
-  --color-ok: oklch(75% 0.11 150);
-  --color-danger: oklch(66% 0.18 25);
-  --color-warn: oklch(78% 0.14 75);
+  --color-ok: #c9f76a;
+  --color-danger: #ff5c7a;
+  --color-warn: #ffcf5c;
 
-  /* type */
-  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-body: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  /* type: Hanken Grotesk for all UI/headlines, Geist Mono for metadata only
+   * (step numbers, prices, timecodes, eyebrow labels) — see Design tokens >
+   * Typography in the handoff README. Applied now (step 1) since a font swap
+   * carries none of the surface-semantic ambiguity a color repaint would. */
+  --font-display: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Hanken Grotesk", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
   --text-display: clamp(3rem, 6vw + 1rem, 6rem);
   --tracking-display: -0.032em;
   --tracking-micro: 0.10em;
 
   /* geometry */
-  --radius-card: 10px;
-  --radius-input: 8px;
+  --radius-card: 12px;
+  --radius-input: 10px;
 
   /* motion */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-short: 220ms;
   --dur-reveal: 600ms;
   --dur-pulse: 4s;
+
+  /* ---- creatorsplan v2 design tokens (handoff README) ----
+   * Added now, not yet wired into components or Tailwind defaults: steps
+   * 3-6 restyle buttons, inputs, cards, shell and screens onto these,
+   * at which point the old rebrand-v1 tokens above get removed. */
+
+  /* color */
+  --cp-ink: #14120f;
+  --cp-ink-2: #6b665e;
+  --cp-ink-3: #9a948a;
+  --cp-line: #e5e0d6;
+  --cp-line-strong: #d6d0c4;
+  --cp-paper: #fbfaf7;
+  --cp-canvas: #f1eee7;
+  --cp-field: #ffffff;
+  --cp-tint: #efebe3;
+  --cp-volt: #ffcf1a;
+  --cp-volt-soft: #fff1b8;
+  --cp-volt-hover: #fff8db;
+  --cp-go: #1f7a4a;
+  --cp-go-bg: #e3f2e8;
+  --cp-stop: #b53a26;
+  --cp-stop-bg: #f8e4df;
+  /* landing "Tools" band only (dark section on an otherwise light page) */
+  --cp-dark-bg: #14120f;
+  --cp-dark-muted: #b5afa5;
+  --cp-dark-line: #3a3631;
+
+  /* type (Typography table) */
+  --cp-font-display: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --cp-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
+  --cp-text-display: clamp(52px, 8.5vw, 120px);
+  --cp-tracking-display: -0.05em;
+  --cp-leading-display: 0.92;
+  --cp-text-h1: 44px;
+  --cp-tracking-h1: -0.035em;
+  --cp-leading-h1: 1.05;
+  --cp-text-h2: 22px;
+  --cp-tracking-h2: -0.015em;
+  --cp-leading-h2: 1.2;
+  --cp-tracking-eyebrow: 0.06em;
+  --cp-tracking-badge: 0.05em;
+
+  /* spacing scale */
+  --cp-space-1: 4px;
+  --cp-space-2: 8px;
+  --cp-space-3: 12px;
+  --cp-space-4: 16px;
+  --cp-space-5: 20px;
+  --cp-space-6: 24px;
+  --cp-space-7: 28px;
+  --cp-space-8: 32px;
+  --cp-space-9: 40px;
+  --cp-space-10: 48px;
+  --cp-space-11: 56px;
+  --cp-space-12: 96px;
+
+  /* radius scale */
+  --cp-radius-chip: 6px;
+  --cp-radius-thumb: 10px;
+  --cp-radius-input: 12px;
+  --cp-radius-select: 16px;
+  --cp-radius-card: 20px;
+  --cp-radius-pill: 999px;
+
+  /* shadow (used nowhere else per spec) */
+  --cp-shadow-button: 0 2px 0 #14120f;
+  --cp-shadow-segment: 0 1px 2px rgb(20 18 15 / 0.12);
+
+  /* motion: Settle / Rise / Strike, the only three curves in the system */
+  --cp-ease-settle: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --cp-dur-settle: 180ms;
+  --cp-dur-rise: 320ms;
+  --cp-dur-strike: 600ms;
 }

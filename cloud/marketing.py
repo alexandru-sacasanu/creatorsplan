@@ -71,14 +71,10 @@ def _page(title, body, status=200):
 async def _opt_out(u: str, t: str):
     if not u or not t or not settings.jwt_secret:
         return _page("That link didn't work",
-                     "The unsubscribe link is incomplete. Email "
-                     "<a href='mailto:info@openshorts.app'>info@openshorts.app</a> "
-                     "and we'll do it by hand.", status=400)
+                     "The unsubscribe link is incomplete.", status=400)
     if not hmac.compare_digest(t, unsubscribe_token(u)):
         return _page("That link didn't work",
-                     "We couldn't verify this unsubscribe link. Email "
-                     "<a href='mailto:info@openshorts.app'>info@openshorts.app</a> "
-                     "and we'll do it by hand.", status=400)
+                     "We couldn't verify this unsubscribe link.", status=400)
     try:
         async with database.session() as s:
             async with s.begin():
