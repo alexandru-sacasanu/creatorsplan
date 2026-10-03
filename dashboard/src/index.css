@@ -450,6 +450,25 @@
 }
 
 /* Custom Animations */
+/* Landing hero (Landing Page.dc.html): three shorts lift on a 6s loop, their
+   timeline segments light up and an ink playhead scans. Strike is brand only:
+   the logo's bolt drops in once on mount. All four stop under the global
+   prefers-reduced-motion rule below. */
+.cp-highlight { background: var(--cp-volt); padding: 0 0.12em; border-radius: 0.12em; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.cp-lift { animation: cpLift 6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite; }
+.cp-mark { animation: cpMark 6s infinite; }
+.cp-scan { animation: cpScan 6s linear infinite; }
+.cp-strike { animation: cpStrike 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 200ms both; }
+
+@keyframes cpScan { 0% { left: 0%; } 100% { left: 100%; } }
+@keyframes cpLift {
+  0%, 18% { transform: translateY(24px); opacity: 0; }
+  30%, 82% { transform: none; opacity: 1; }
+  100% { transform: translateY(-8px); opacity: 0; }
+}
+@keyframes cpMark { 0%, 10% { opacity: 0; } 22%, 86% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes cpStrike { 0% { transform: translateY(-6px); opacity: 0; } 60% { transform: none; opacity: 1; } 100% { opacity: 1; } }
+
 @keyframes cpRise {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
