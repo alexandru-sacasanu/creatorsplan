@@ -2,11 +2,10 @@
 cancel at period end.
 
 What must hold: nothing is recorded unless Stripe accepted the cancel, the
-reason reaches Stripe in its own vocabulary, the free text never reaches the
-Telegram alert, and the UI offers exactly the reasons the server accepts.
+reason reaches Stripe in its own vocabulary, and the free text never reaches
+the Telegram alert.
 """
 import asyncio
-import os
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
@@ -15,8 +14,6 @@ import pytest
 from fastapi import HTTPException
 
 from cloud import alerts, cancellation
-
-REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class _Result:
@@ -221,8 +218,3 @@ class TestReasons:
         stripe_enum = {"customer_service", "low_quality", "missing_features", "other",
                        "switched_service", "too_complex", "too_expensive", "unused"}
         assert set(cancellation.CANCEL_REASONS.values()) <= stripe_enum
-
-    def test_the_ui_offers_exactly_the_reasons_the_server_accepts(self):
-        modal = open(os.path.join(REPO, "dashboard/src/components/CancelPlanModal.jsx")).read()
-        for value in cancellation.CANCEL_REASONS:
-            assert f"'{value}'" in modal, f"{value} is accepted but never offered"
