@@ -474,6 +474,29 @@
   to { opacity: 1; transform: none; }
 }
 
+/* Landing loader (components/landing/LogoLoader.jsx): the Short Frame draws
+   (0-700ms), fills volt (600-950ms), then the bolt drops in with a bounce
+   (900-1550ms), inside the 1.6s minimum the loader stays up. */
+.cp-loader { transition: opacity 450ms var(--cp-ease-settle); }
+.cp-loader-out { opacity: 0; pointer-events: none; }
+.cp-loader-frame { stroke-dasharray: 1; stroke-dashoffset: 1; animation: cpDraw 700ms cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+.cp-loader-fill { opacity: 0; animation: cpFill 350ms ease-out 600ms forwards; }
+.cp-loader-bolt { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; animation: cpBoltDrop 650ms ease-in 900ms forwards; }
+/* The round scroll-down arrow nudges downward every few seconds. */
+.cp-nudge { animation: cpNudge 2.4s ease-in-out 1s infinite; }
+
+@keyframes cpDraw { to { stroke-dashoffset: 0; } }
+@keyframes cpFill { to { opacity: 1; } }
+@keyframes cpBoltDrop {
+  0% { opacity: 0; transform: translateY(-140%); }
+  45% { opacity: 1; transform: translateY(0) scaleY(1); animation-timing-function: ease-out; }
+  60% { transform: translateY(0) scaleY(0.88); animation-timing-function: ease-out; }
+  75% { transform: translateY(-14%) scaleY(1.02); animation-timing-function: ease-in; }
+  88% { transform: translateY(0) scaleY(0.97); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes cpNudge { 0%, 70%, 100% { transform: none; } 80% { transform: translateY(5px); } 90% { transform: translateY(-1px); } }
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
