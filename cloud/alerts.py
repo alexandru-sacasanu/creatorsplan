@@ -132,7 +132,7 @@ async def send_admin_alert(subject: str, body: str):
                   + ("" if to else "  (set ADMIN_EMAIL + SMTP_* or TELEGRAM_* to receive these)"))
         return
     html = f"<pre style='font:13px/1.5 monospace;white-space:pre-wrap'>{body}</pre>"
-    await send_email(to, f"[OpenShorts] {subject}", html)
+    await send_email(to, f"[creatorsplan] {subject}", html)
 
 
 async def record_job_outcome(ok: bool, error_text: str = ""):

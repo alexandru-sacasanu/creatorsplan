@@ -1398,7 +1398,7 @@ def watermark_filter(vw, vh, video="[0:v]", logo="[1:v]", out=""):
 
 
 def apply_watermark(video_path, output_path=None):
-    """Burn the OpenShorts watermark into a finished clip (free plan).
+    """Burn the creatorsplan watermark into a finished clip (free plan).
 
     One re-encode pass over the final file so every output format (TRACK,
     GENERAL, horizontal passthrough) gets the mark. In place by default; with

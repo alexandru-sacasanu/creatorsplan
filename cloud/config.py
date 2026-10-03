@@ -230,7 +230,7 @@ class Settings:
     @property
     def email_from(self) -> str:
         # Namecheap requires the From to be the authenticated mailbox.
-        return os.environ.get("EMAIL_FROM") or (f"OpenShorts <{self.smtp_user}>" if self.smtp_user else "OpenShorts")
+        return os.environ.get("EMAIL_FROM") or (f"creatorsplan <{self.smtp_user}>" if self.smtp_user else "creatorsplan")
 
     @property
     def admin_email(self) -> str:

@@ -26,7 +26,7 @@ RESOURCES = [
     {
         "uri": CLIP_PICKER_URI,
         "name": "clip-picker",
-        "title": "OpenShorts clip picker",
+        "title": "creatorsplan clip picker",
         "description": (
             "Interactive picker for a job's finished clips: preview each 9:16 "
             "clip, select the keepers and publish them to TikTok, Instagram or "
@@ -71,7 +71,7 @@ button:disabled{opacity:.4;cursor:default}
 </style>
 </head>
 <body>
-<h1 id="hd">OpenShorts clips</h1>
+<h1 id="hd">creatorsplan clips</h1>
 <div class="grid" id="grid"><span class="empty">Waiting for clip data…</span></div>
 <div class="bar" id="bar" hidden>
   <span class="chip on" data-p="tiktok">TikTok</span>

@@ -7,7 +7,7 @@
 services:
   db:
     image: postgres:16-alpine
-    container_name: openshorts-db
+    container_name: creatorsplan-db
     environment:
       - POSTGRES_USER=openshorts
       # Fail the deploy loudly if unset, rather than silently using a weak default.
