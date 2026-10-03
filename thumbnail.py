@@ -38,6 +38,10 @@ RETRY_DELAYS = (2, 5, 10)
 # skip it for this long: "Suggest titles" makes two calls back to back, and a
 # model that just failed for 17s will not be back for the second one.
 TEXT_MODEL_COOLDOWN_SECONDS = 300
+# A spent quota on TEXT_MODEL (the free tier allows gemini-3.7-flash 20 calls a
+# day, and "Suggest titles" spends two) will not come back for hours, so the
+# text calls stay on FALLBACK_TEXT_MODEL for longer before trying it again.
+TEXT_MODEL_QUOTA_COOLDOWN_SECONDS = 3600
 _text_model_down_until = 0.0
 
 
@@ -61,8 +65,10 @@ def _generate(client, *, model, **kwargs):
     Studio requests are interactive, so the backoff is short (2s, 5s, 10s).
     A text call still failing with a transient error after that runs on
     FALLBACK_TEXT_MODEL, and so does every text call for the next
-    TEXT_MODEL_COOLDOWN_SECONDS. Anything else (a bad key, a blocked prompt)
-    raises at once, as before."""
+    TEXT_MODEL_COOLDOWN_SECONDS. A text call whose quota is spent (daily
+    limit, or none at all) goes to FALLBACK_TEXT_MODEL at once, for
+    TEXT_MODEL_QUOTA_COOLDOWN_SECONDS. Anything else (a bad key, a blocked
+    prompt) raises at once, as before."""
     global _text_model_down_until
     can_fall_back = (model == TEXT_MODEL and FALLBACK_TEXT_MODEL
                      and FALLBACK_TEXT_MODEL != TEXT_MODEL)
@@ -72,6 +78,11 @@ def _generate(client, *, model, **kwargs):
         try:
             return client.models.generate_content(model=model, **kwargs)
         except Exception as e:
+            if can_fall_back and _quota_is_exhausted(str(e)):
+                _text_model_down_until = time.time() + TEXT_MODEL_QUOTA_COOLDOWN_SECONDS
+                print(f"⚠️ [Thumbnail] {model} quota spent; using {FALLBACK_TEXT_MODEL} "
+                      f"for the next {TEXT_MODEL_QUOTA_COOLDOWN_SECONDS}s")
+                return client.models.generate_content(model=FALLBACK_TEXT_MODEL, **kwargs)
             if not _is_transient(e):
                 raise
             if delay is None:

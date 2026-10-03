@@ -395,8 +395,9 @@ worse at creative titles. Image model is `GEMINI_IMAGE_MODEL` (default
 `gemini-3.1-flash-image` has a free-tier quota of 0, so on a key without
 billing every thumbnail failed with 429). Every Gemini call in `thumbnail.py`
 goes through `_generate`: transient errors are retried (2s, 5s, 10s), a text
-call that stays overloaded falls back to `GEMINI_MODEL` for 5 minutes, and a
-quota that is spent (`limit: 0`, per-day) fails at once.
+call that stays overloaded falls back to `GEMINI_MODEL` for 5 minutes, a text
+call whose quota is spent (free tier: 20 `gemini-3.7-flash` calls a day) falls back
+at once for an hour, and a spent image quota fails at once.
 
 Thumbnails are `count` **different concepts**, not one prompt repeated: a text
 call designs each (hook text, side for the text, palette, scene prompt), then
