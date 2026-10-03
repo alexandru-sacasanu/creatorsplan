@@ -201,7 +201,7 @@ function VideoCard({ video, copied, onCopy, onOpen }) {
           <Play size={20} className="text-white/80" />
         </div>
         <div className="absolute top-1.5 right-1.5">
-          <span className={`${mode === 'lowcost' ? 'badge-ok' : 'badge-brass'} bg-black/70`}>
+          <span className={`${mode === 'lowcost' ? 'badge-ok' : 'badge-brass'} bg-paper2/90`}>
             {mode === 'lowcost' ? 'LOW COST' : 'PREMIUM'}
           </span>
         </div>

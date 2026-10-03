@@ -90,7 +90,7 @@ export default function GalleryCard({ clip }) {
                     </div>
                 )}
                 <div className="absolute top-2 left-2">
-                    <span className="readout bg-black/70 px-2 py-1 rounded-full">
+                    <span className="readout bg-paper2/90 px-2 py-1 rounded-full">
                         {new Date(clip.created_at).toLocaleDateString()}
                     </span>
                 </div>

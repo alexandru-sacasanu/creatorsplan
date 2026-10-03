@@ -1,35 +1,29 @@
-/* Rebrand v1 (Zeus/night): dark cyan/violet palette — kept live until the
- * creatorsplan v2 rebrand (paper/ink/volt) finishes repainting every
- * component in steps 3-6. See design_handoff_creatorsplan_rebrand/README.md. */
-
 :root {
-  /* paper */
-  --color-paper: #05070c;
-  --color-paper-2: #0b0f1a;
-  --color-paper-3: #0e1422;
+  /* Legacy semantic names (the components still read these), repointed at
+   * the creatorsplan v2 palette below. See tailwind.config.js for the same
+   * mapping on the utility classes. */
+  --color-paper: #f1eee7;
+  --color-paper-2: #fbfaf7;
+  --color-paper-3: #efebe3;
 
-  /* ink */
-  --color-ink: #e9edf6;
-  --color-ink-2: #8891a4;
-  --color-muted: #5b6376;
+  --color-ink: #14120f;
+  --color-ink-2: #6b665e;
+  --color-muted: #6b665e;
 
-  /* rules */
-  --color-rule: rgb(255 255 255 / 0.09);
-  --color-rule-2: rgb(255 255 255 / 0.16);
-  --rule-blueprint: rgb(255 255 255 / 0.04);
+  --color-rule: #e5e0d6;
+  --color-rule-2: #d6d0c4;
+  --rule-blueprint: rgb(20 18 15 / 0.04);
 
-  /* accents */
-  --color-accent: #4dd8ff;
-  --color-accent-ink: #05070c;
-  --color-accent-2: #a78bff;
-  --color-glow: rgb(77 216 255 / 0.5);
-  --color-paper-emit: rgb(77 216 255 / 0.04);
-  --color-focus: #4dd8ff;
+  --color-accent: #14120f;
+  --color-accent-ink: #fbfaf7;
+  --color-accent-2: #6b665e;
+  --color-glow: transparent;
+  --color-paper-emit: transparent;
+  --color-focus: #14120f;
 
-  /* states */
-  --color-ok: #c9f76a;
-  --color-danger: #ff5c7a;
-  --color-warn: #ffcf5c;
+  --color-ok: #1f7a4a;
+  --color-danger: #b53a26;
+  --color-warn: #14120f;
 
   /* type: Hanken Grotesk for all UI/headlines, Geist Mono for metadata only
    * (step numbers, prices, timecodes, eyebrow labels) — see Design tokens >
@@ -40,22 +34,19 @@
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
   --text-display: clamp(3rem, 6vw + 1rem, 6rem);
   --tracking-display: -0.032em;
-  --tracking-micro: 0.10em;
+  --tracking-micro: 0.06em;
 
   /* geometry */
-  --radius-card: 12px;
-  --radius-input: 10px;
+  --radius-card: 20px;
+  --radius-input: 12px;
 
   /* motion */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur-short: 220ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-short: 180ms;
   --dur-reveal: 600ms;
   --dur-pulse: 4s;
 
-  /* ---- creatorsplan v2 design tokens (handoff README) ----
-   * Added now, not yet wired into components or Tailwind defaults: steps
-   * 3-6 restyle buttons, inputs, cards, shell and screens onto these,
-   * at which point the old rebrand-v1 tokens above get removed. */
+  /* ---- creatorsplan v2 design tokens (handoff README) ---- */
 
   /* color */
   --cp-ink: #14120f;

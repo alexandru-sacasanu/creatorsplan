@@ -146,7 +146,7 @@ const ProcessingAnimation = ({ media, isComplete, syncedTime, isSyncedPlaying, s
           justify-between + a truncating left pill degrades instead. */}
       {!isSyncedPlaying && (
           <div className="absolute top-2.5 left-2.5 right-2.5 sm:top-4 sm:left-4 sm:right-4 z-30 flex items-start justify-between gap-2 pointer-events-none">
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/70 readout min-w-0 transition-colors duration-500 ${isComplete ? 'text-ok' : 'text-brass animate-pulse'}`}>
+            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-paper2/90 readout min-w-0 transition-colors duration-500 ${isComplete ? 'text-ok' : 'text-brass animate-pulse'}`}>
               {isComplete
                 ? <CheckCircle size={14} className="shrink-0" />
                 : <Scan size={14} className="shrink-0" />}
@@ -155,7 +155,7 @@ const ProcessingAnimation = ({ media, isComplete, syncedTime, isSyncedPlaying, s
             {/* Carries nothing the left pill doesn't; it is the first thing to
                 go when there is no room. */}
             {!isComplete && (
-              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-black/70 rounded-full readout shrink-0">
+              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-paper2/90 rounded-full readout shrink-0">
                 VIRAL_DETECTION: ACTIVE
               </div>
             )}
@@ -178,14 +178,14 @@ const ProcessingAnimation = ({ media, isComplete, syncedTime, isSyncedPlaying, s
 
        {/* Synced Playing Indicator */}
        {isSyncedPlaying && (
-           <div className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 z-30 badge-brass bg-black/70 animate-pulse">
+           <div className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 z-30 badge-brass bg-paper2/90 animate-pulse">
                <Activity size={12} /> Live Sync
            </div>
        )}
 
        {/* Bottom Info Bar */}
       {!isSyncedPlaying && !isComplete && (
-          <div className="hidden sm:flex absolute bottom-0 left-0 right-0 p-4 bg-black/70 z-30 justify-between items-end border-t border-rule">
+          <div className="hidden sm:flex absolute bottom-0 left-0 right-0 p-4 bg-paper2/90 z-30 justify-between items-end border-t border-rule">
               <div className="readout text-brass space-y-1">
                  <div className="flex items-center gap-2"><Activity size={10} className="animate-pulse" /> {'>'} ANALYSIS_THREAD_01: ACTIVE</div>
                  <div className="flex items-center gap-2"><Radio size={10} /> {'>'} AUDIO_TRANSCRIPT: PROCESSING</div>

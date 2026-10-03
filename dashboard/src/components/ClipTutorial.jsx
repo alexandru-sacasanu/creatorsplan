@@ -183,7 +183,7 @@ export default function ClipTutorial({ phase, jobStatus, errorText, onStart, onS
 
     return (
       <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-label="Clip Generator tutorial">
-        {!hole && <div className="absolute inset-0 bg-black/55" />}
+        {!hole && <div className="absolute inset-0 bg-ink/45" />}
         {hole && (
           <div
             className="absolute rounded-input pointer-events-none border border-brass/70"

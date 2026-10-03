@@ -13,7 +13,7 @@
   }
 
   body {
-    @apply bg-paper text-ink2 antialiased;
+    @apply bg-cp-canvas text-cp-ink antialiased;
     font-family: var(--font-body);
     font-variant-numeric: tabular-nums;
     /* A single stray wide child (a log line, a long URL) used to make the whole
@@ -69,24 +69,43 @@
     border-color: var(--cp-ink);
   }
 
-  /* mono UPPERCASE micro label — the only uppercase surface */
-  .eyebrow {
-    font-family: var(--font-mono);
-    font-size: 11px;
+  /* mono UPPERCASE label (Geist Mono 12/500, 0.06em) — metadata only */
+  .eyebrow,
+  .cp-eyebrow {
+    font-family: var(--cp-font-mono);
+    font-size: 12px;
     font-weight: 500;
-    letter-spacing: var(--tracking-micro);
+    letter-spacing: var(--cp-tracking-eyebrow);
     text-transform: uppercase;
-    color: var(--color-ink);
-    opacity: 0.55;
+    color: var(--cp-ink-2);
+  }
+
+  /* Screen H1 (44px/600, -0.035em) and section H2 (22px/600, -0.015em) */
+  .cp-h1 {
+    font-family: var(--cp-font-display);
+    font-size: clamp(32px, 6vw, var(--cp-text-h1));
+    font-weight: 600;
+    letter-spacing: var(--cp-tracking-h1);
+    line-height: var(--cp-leading-h1);
+    color: var(--cp-ink);
+  }
+  .cp-h2 {
+    font-family: var(--cp-font-display);
+    font-size: var(--cp-text-h2);
+    font-weight: 600;
+    letter-spacing: var(--cp-tracking-h2);
+    line-height: var(--cp-leading-h2);
+    color: var(--cp-ink);
   }
 
   /* mono value chip for machine data: 00:42 · 9:16 · $0.65 */
   .readout {
-    font-family: var(--font-mono);
-    font-size: 10.5px;
-    letter-spacing: var(--tracking-micro);
+    font-family: var(--cp-font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: var(--cp-tracking-badge);
     text-transform: uppercase;
-    color: var(--color-muted);
+    color: var(--cp-ink-2);
   }
 
   .input-field {
@@ -318,7 +337,7 @@
      much on a small bright screen, and 10.5px mono labels turn to texture. */
   @media (max-width: 639px) {
     .readout { font-size: 11.5px; letter-spacing: 0.06em; }
-    .eyebrow { font-size: 11.5px; letter-spacing: 0.08em; opacity: 0.7; }
+    .eyebrow { font-size: 11.5px; }
   }
 }
 

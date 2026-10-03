@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Upload, Sparkles, Youtube, Instagram, Share2, ChevronDown, Check, Activity, LayoutDashboard, Settings, Plus, History, X, Terminal, Shield, LayoutGrid, Image, Globe, RotateCcw, Calendar, AlertTriangle, KeyRound, Bot, Users, Smartphone, ExternalLink, Copy, CheckCircle2, Loader2, Download, Menu, Lock, Rocket } from 'lucide-react';
+import { Upload, Sparkles, Youtube, Instagram, Share2, ChevronDown, Check, Activity, LayoutDashboard, Settings, Plus, History, X, Terminal, Shield, LayoutGrid, Image, Globe, RotateCcw, Calendar, AlertTriangle, KeyRound, Bot, Users, Smartphone, ExternalLink, Copy, CheckCircle2, Loader2, Download, Menu, Lock, Rocket, Clapperboard, SquareUser, SlidersHorizontal } from 'lucide-react';
 import KeyInput from './components/KeyInput';
 import MediaInput from './components/MediaInput';
 import McpConnectCard from './components/McpConnectCard';
@@ -12,7 +12,7 @@ import UGCGallery from './components/UGCGallery';
 import ScheduleWeekModal from './components/ScheduleWeekModal';
 import ClipEditor from './components/ClipEditor';
 import ReframeEditor from './components/ReframeEditor';
-import UsageMeter from './components/UsageMeter';
+import PlanCard from './components/PlanCard';
 import TopUpModal from './components/TopUpModal';
 import WatermarkModal, { watermarkNoticeDismissed } from './components/WatermarkModal';
 import { getApiUrl } from './config';
@@ -1193,16 +1193,18 @@ function App() {
   // drawer, and the bottom tab bar. `short` is the tab-bar label — the full one
   // wraps to two lines in a 5-up bar on a 360px phone.
   const navItems = [
-    { id: 'dashboard', ord: '01', icon: LayoutDashboard, label: 'Clip Generator', short: 'clips', primary: true },
+    { id: 'dashboard', group: 'create', icon: Clapperboard, label: 'Clip generator', short: 'clips', primary: true },
     // Cloud only: it runs on the managed pipeline and the Upload-Post connection.
-    ...(billingEnabled ? [{ id: 'autopilot', ord: '02', icon: Rocket, label: 'Autopilot', short: 'autopilot', isNew: true }] : []),
-    { id: 'saasshorts', ord: '03', icon: Sparkles, label: 'AI Shorts', short: 'ai shorts', byok: true, primary: true },
-    { id: 'ai-agent', ord: '04', icon: Bot, label: 'AI Agent', short: 'agent', byok: true },
-    { id: 'ugc-gallery', ord: '05', icon: LayoutGrid, label: 'UGC Gallery', short: 'gallery', primary: true },
-    { id: 'thumbnails', ord: '06', icon: Image, label: 'YouTube Studio', short: 'studio', primary: true },
-    ...(billingEnabled && isSignedIn ? [{ id: 'history', ord: '07', icon: History, label: 'History', short: 'history' }] : []),
-    { id: 'settings', ord: '08', icon: Settings, label: 'Settings', short: 'settings' },
+    ...(billingEnabled ? [{ id: 'autopilot', group: 'create', icon: Rocket, label: 'Autopilot', short: 'autopilot', isNew: true }] : []),
+    { id: 'saasshorts', group: 'create', icon: SquareUser, label: 'AI shorts', short: 'ai shorts', byok: true, primary: true },
+    { id: 'thumbnails', group: 'create', icon: Youtube, label: 'YouTube studio', short: 'studio', primary: true },
+    { id: 'ugc-gallery', group: 'library', icon: LayoutDashboard, label: 'Gallery', short: 'gallery', primary: true },
+    { id: 'ai-agent', group: 'library', icon: Bot, label: 'Agents', short: 'agents', byok: true },
+    ...(billingEnabled && isSignedIn ? [{ id: 'history', group: 'library', icon: History, label: 'History', short: 'history' }] : []),
+    { id: 'settings', group: 'footer', icon: SlidersHorizontal, label: 'Settings', short: 'settings' },
   ];
+  const NAV_GROUPS = [{ id: 'create', label: 'CREATE' }, { id: 'library', label: 'LIBRARY' }];
+  const settingsNav = navItems.find((n) => n.id === 'settings');
   const activeNav = navItems.find((n) => n.id === activeTab);
 
   // Escape closes the mobile drawer. The shell itself is overflow-hidden, so
@@ -1221,60 +1223,81 @@ function App() {
   };
   const tabLocked = (id) => tutorialLock && id !== 'dashboard';
 
-  // Shared footer links (pricing) — same list in the desktop rail and the
-  // mobile drawer, so they can never drift apart.
-  const NavFooterLinks = ({ collapsed = false }) => (
+  // The plan card does what the header's minutes meter did: free accounts get
+  // the upgrade modal, paid ones the account page.
+  const openPlan = () => {
+    if (plan === 'free') { setTopUpInfo({ context: 'upsell' }); setShowTopUp(true); }
+    else { window.location.hash = '#/account'; }
+  };
+
+  // One nav row, shared by the desktop rail and the mobile drawer. `rail`
+  // hides the label and meta at md (icon-only rail) and shows them from lg.
+  const NavRow = ({ item, rail = false, trailing = null }) => {
+    const NavIcon = item.icon;
+    const isActive = activeTab === item.id;
+    const locked = tabLocked(item.id);
+    const label = rail ? 'hidden lg:block' : '';
+    return (
+      <button
+        data-tutorial={rail && item.id === 'dashboard' ? 'nav-clips' : undefined}
+        onClick={() => goToTab(item.id)}
+        title={locked ? 'Finish your first clips to unlock' : (rail ? item.label : undefined)}
+        disabled={locked}
+        aria-current={isActive ? 'page' : undefined}
+        className={`cp-nav-item ${rail ? 'justify-center lg:justify-start' : ''}`}
+      >
+        <NavIcon size={18} strokeWidth={1.8} className="cp-nav-icon" />
+        <span className={`${label} flex-1 truncate`}>{item.label}</span>
+        {locked
+          ? <Lock size={12} className={`shrink-0 ${label}`} />
+          : item.byok ? <span className={`cp-nav-meta ${label}`}>BYOK</span>
+            : item.isNew ? <span className={`cp-nav-meta ${label}`}>NEW</span> : null}
+        {trailing}
+      </button>
+    );
+  };
+
+  // Logo, CREATE / LIBRARY groups, then the plan card, pricing and Settings
+  // pinned to the bottom. Shared by the desktop rail and the mobile drawer.
+  const NavBody = ({ rail = false }) => (
     <>
-      {billingEnabled && (
-        <a
-          href="#/pricing"
-          className="flex items-center gap-2 px-3 py-2 text-xs lowercase text-cp-ink-2 hover:text-cp-ink transition-colors"
-        >
-          <Sparkles size={14} className="shrink-0" />
-          <span className={collapsed ? 'hidden lg:block truncate' : 'truncate'}>plans &amp; pricing</span>
-        </a>
-      )}
+      <nav className="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-6">
+        {NAV_GROUPS.map((g) => (
+          <div key={g.id} className="flex flex-col gap-0.5">
+            <p className={`px-3 pb-2 font-cp-mono text-[11px] font-medium tracking-[0.08em] text-cp-ink-3 ${rail ? 'hidden lg:block' : ''}`}>{g.label}</p>
+            {navItems.filter((n) => n.group === g.id).map((item) => <NavRow key={item.id} item={item} rail={rail} />)}
+          </div>
+        ))}
+      </nav>
+
+      <div className="flex flex-col gap-3 pt-4">
+        {billingEnabled && isManaged && <div className={rail ? 'hidden lg:block' : ''}><PlanCard onClick={openPlan} /></div>}
+        {billingEnabled && !isManaged && (
+          <a
+            href="#/pricing"
+            className={`px-3 text-sm text-cp-ink-2 underline underline-offset-[3px] hover:text-cp-ink transition-colors ${rail ? 'hidden lg:block' : ''}`}
+          >
+            Plans and pricing
+          </a>
+        )}
+        <div className="flex items-center gap-1">
+          <div className="flex-1 min-w-0"><NavRow item={settingsNav} rail={rail} /></div>
+          {billingEnabled && isSignedIn && <div className={rail ? 'hidden lg:block' : ''}><ProfileMenu placement="up" /></div>}
+        </div>
+      </div>
     </>
   );
 
-  // Desktop rail: icon-only from md, labelled from lg. Below md it is gone
-  // entirely — an unlabelled 80px rail ate a fifth of a phone screen.
+  // Desktop rail: icon-only from md, 248px and labelled from lg. Below md it
+  // is gone entirely — an unlabelled 80px rail ate a fifth of a phone screen.
   const Sidebar = () => (
-    <div className="hidden md:flex w-20 lg:w-64 bg-cp-paper border-r border-cp-line flex-col h-full shrink-0 transition-all duration-300">
-      <div className="p-6 flex items-center gap-[7px]">
+    <aside className="hidden md:flex w-20 lg:w-[248px] bg-cp-paper border-r border-cp-line flex-col h-full shrink-0 px-3.5 py-6">
+      <div className="flex items-center justify-center lg:justify-start gap-[7px] px-3 pb-7">
         <ShortFrameLogo width={15} height={25} className="shrink-0" />
         <span className="font-display font-bold lowercase text-[19px] tracking-[-0.042em] text-cp-ink hidden lg:block">creatorsplan</span>
       </div>
-
-      <nav className="flex-1 px-4 py-4 space-y-1">
-        {navItems.map((item) => {
-          const NavIcon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              data-tutorial={item.id === 'dashboard' ? 'nav-clips' : undefined}
-              onClick={() => goToTab(item.id)}
-              title={tabLocked(item.id) ? 'Finish your first clips to unlock' : item.label}
-              disabled={tabLocked(item.id)}
-              aria-current={isActive ? 'page' : undefined}
-              className="cp-nav-item justify-center lg:justify-start"
-            >
-              <NavIcon size={18} strokeWidth={1.8} className="cp-nav-icon" />
-              <span className="hidden lg:block flex-1 truncate">{item.label}</span>
-              {tabLocked(item.id)
-                ? <Lock size={12} className="shrink-0 hidden lg:block" />
-                : item.byok ? <span className="cp-nav-meta hidden lg:block">BYOK</span>
-                  : item.isNew ? <span className="cp-nav-meta hidden lg:block">NEW</span> : null}
-            </button>
-          );
-        })}
-      </nav>
-
-      <div className="p-4 border-t border-cp-line space-y-1">
-        <NavFooterLinks collapsed />
-      </div>
-    </div>
+      <NavBody rail />
+    </aside>
   );
 
   // Mobile drawer: the complete nav, reachable from the header's menu button.
@@ -1286,12 +1309,12 @@ function App() {
       aria-label="Navigation"
     >
       <div
-        className="absolute inset-0 bg-black/60 animate-fade"
+        className="absolute inset-0 bg-ink/40 animate-fade"
         onClick={() => setNavOpen(false)}
         aria-hidden="true"
       />
-      <div className="relative w-[17rem] max-w-[82vw] h-full bg-cp-paper border-r border-cp-line flex flex-col animate-slide-in-left">
-        <div className="flex items-center justify-between px-5 h-14 border-b border-cp-line shrink-0">
+      <div className="relative w-[17rem] max-w-[82vw] h-full bg-cp-paper border-r border-cp-line flex flex-col px-3.5 pt-3 pb-4 safe-bottom animate-slide-in-left">
+        <div className="flex items-center justify-between px-3 h-12 mb-4 shrink-0">
           <div className="flex items-center gap-[7px]">
             <ShortFrameLogo width={15} height={25} className="shrink-0" />
             <span className="font-display font-bold lowercase text-[19px] tracking-[-0.042em] text-cp-ink">creatorsplan</span>
@@ -1304,34 +1327,7 @@ function App() {
             <X size={18} />
           </button>
         </div>
-
-        <nav className="flex-1 overflow-y-auto custom-scrollbar px-3 py-3 space-y-1">
-          {navItems.map((item) => {
-            const NavIcon = item.icon;
-            const isActive = activeTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => goToTab(item.id)}
-                disabled={tabLocked(item.id)}
-                aria-current={isActive ? 'page' : undefined}
-                title={tabLocked(item.id) ? 'Finish your first clips to unlock' : undefined}
-                className="cp-nav-item"
-              >
-                <NavIcon size={18} strokeWidth={1.8} className="cp-nav-icon" />
-                <span className="flex-1 truncate">{item.label}</span>
-                {tabLocked(item.id)
-                  ? <Lock size={12} className="shrink-0" />
-                  : item.byok ? <span className="cp-nav-meta shrink-0">BYOK</span>
-                    : item.isNew ? <span className="cp-nav-meta shrink-0">NEW</span> : null}
-              </button>
-            );
-          })}
-        </nav>
-
-        <div className="px-3 py-3 border-t border-cp-line space-y-0.5 safe-bottom shrink-0">
-          <NavFooterLinks />
-        </div>
+        <NavBody />
       </div>
     </div>
   );
@@ -1381,25 +1377,25 @@ function App() {
     /* h-dvh where supported: on mobile Safari/Chrome `100vh` is the tallest the
        viewport ever gets, so a h-screen shell hides its own bottom bar behind
        the browser chrome until the user scrolls. */
-    <div className="flex h-screen supports-[height:100dvh]:h-[100dvh] bg-paper overflow-hidden">
+    <div className="flex h-screen supports-[height:100dvh]:h-[100dvh] bg-cp-canvas overflow-hidden">
       <Sidebar />
       {navOpen && <MobileNavDrawer />}
 
       <main className="flex-1 min-w-0 flex flex-col h-full overflow-hidden relative">
         {/* Top Header */}
-        <header className="h-14 border-b border-rule bg-paper flex items-center justify-between gap-2 px-3 sm:px-6 shrink-0 z-10">
+        <header className="h-14 border-b border-cp-line md:border-transparent bg-cp-canvas flex items-center justify-between gap-2 px-3 sm:px-6 md:px-10 shrink-0 z-10">
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             {/* Mobile: the drawer handle, and the section name the icon rail
                 used to carry. Without it a phone has no "where am I". */}
             <button
               onClick={() => setNavOpen(true)}
               aria-label="open navigation"
-              className="md:hidden -ml-1 p-2 rounded-input text-muted active:bg-paper3 transition-colors shrink-0"
+              className="md:hidden -ml-1 p-2 rounded-cp-input text-cp-ink active:bg-cp-tint transition-colors shrink-0"
             >
               <Menu size={20} />
             </button>
-            <span data-tutorial="nav-clips" className="md:hidden font-display lowercase text-base text-ink truncate">
-              {activeNav?.label || 'openshorts'}
+            <span data-tutorial="nav-clips" className="md:hidden text-base font-semibold text-cp-ink truncate">
+              {activeNav?.label || 'creatorsplan'}
             </span>
             {status !== 'idle' && (
               <button
@@ -1423,15 +1419,6 @@ function App() {
               />
             )}
 
-            {/* Cloud: minutes meter + account/sign-in. For free users the meter
-                opens the upgrade modal — otherwise the only path to a plan is
-                failing against the quota wall. */}
-            {billingEnabled && isManaged && (
-              <UsageMeter onClick={() => {
-                if (plan === 'free') { setTopUpInfo({ context: 'upsell' }); setShowTopUp(true); }
-                else { window.location.hash = '#/account'; }
-              }} />
-            )}
             {billingEnabled && isSignedIn && !isManaged && (
               <button onClick={() => setShowPlanChoice(true)}
                 className="btn-primary px-4 py-2 text-xs">
@@ -1444,7 +1431,9 @@ function App() {
                 Sign in
               </button>
             )}
-            {billingEnabled && isSignedIn && <ProfileMenu />}
+            {/* The rail carries the avatar from lg; the icon-only rail and
+                phones keep it up here. */}
+            {billingEnabled && isSignedIn && <div className="lg:hidden"><ProfileMenu /></div>}
 
             {/* Hidden below sm: the standing banner underneath already says the
                 same thing, and two warnings in a 360px header is just noise. */}
@@ -1470,7 +1459,7 @@ function App() {
 
         {/* Persistent Missing Keys Banner — visible on every screen */}
         {keysMissing && activeTab !== 'settings' && (
-          <div className="mx-3 sm:mx-6 mt-3 px-3.5 sm:px-4 py-3 bg-paper2 border border-rule rounded-card flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 shrink-0 animate-fade">
+          <div className="mx-3 sm:mx-6 md:mx-10 xl:mx-auto xl:w-[880px] mt-3 px-3.5 sm:px-4 py-3 bg-paper2 border border-rule rounded-card flex flex-wrap items-center justify-between gap-2.5 sm:gap-4 shrink-0 animate-fade">
             <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 text-sm text-ink2 min-w-0 flex-1">
               <KeyRound size={16} className="shrink-0 text-warn mt-0.5 sm:mt-0" />
               <div className="min-w-0">
@@ -1495,7 +1484,7 @@ function App() {
 
         {/* Session Recovery Banner */}
         {sessionRecovered && (
-          <div className="mx-3 sm:mx-6 mt-2 px-3.5 sm:px-4 py-3 bg-paper2 border border-rule rounded-card flex items-start justify-between gap-3 animate-fade shrink-0">
+          <div className="mx-3 sm:mx-6 md:mx-10 xl:mx-auto xl:w-[880px] mt-2 px-3.5 sm:px-4 py-3 bg-paper2 border border-rule rounded-card flex items-start justify-between gap-3 animate-fade shrink-0">
             <div className="flex items-start sm:items-center gap-2 text-sm text-ink2 flex-wrap min-w-0">
               <RotateCcw size={16} className="text-brass shrink-0 mt-0.5 sm:mt-0" />
               <span className="font-medium">Session recovered</span>

@@ -7,30 +7,30 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Rebrand palette — values mirror tokens.css (kept literal so
-        // Tailwind alpha modifiers like bg-brass/10 compile)
-        paper: "rgb(5 7 12 / <alpha-value>)",
-        paper2: "rgb(11 15 26 / <alpha-value>)",
-        paper3: "rgb(14 20 34 / <alpha-value>)",
-        ink: "rgb(233 237 246 / <alpha-value>)",
-        ink2: "rgb(136 145 164 / <alpha-value>)",
-        muted: "rgb(91 99 118 / <alpha-value>)",
-        brass: "rgb(77 216 255 / <alpha-value>)",
-        brassink: "rgb(5 7 12 / <alpha-value>)",
-        coral: "rgb(167 139 255 / <alpha-value>)",
-        ok: "rgb(201 247 106 / <alpha-value>)",
-        warn: "rgb(255 207 92 / <alpha-value>)",
-        danger: "rgb(255 92 122 / <alpha-value>)",
-        // legacy aliases so untouched files degrade gracefully
-        background: "rgb(5 7 12 / <alpha-value>)",
-        surface: "rgb(11 15 26 / <alpha-value>)",
-        primary: "rgb(77 216 255 / <alpha-value>)",
-        accent: "rgb(167 139 255 / <alpha-value>)",
+        // Legacy semantic keys, repointed at the creatorsplan v2 palette so
+        // every screen moves to paper/ink/volt at once (kept literal so alpha
+        // modifiers like bg-brass/10 compile). paper = app canvas, paper2 =
+        // cards and panels, paper3 = tint (hover, tracks, chips). `brass` was
+        // the accent; it maps to ink, never volt: volt is never a text color
+        // and appears once per view, through .btn-primary.
+        paper: "rgb(241 238 231 / <alpha-value>)",
+        paper2: "rgb(251 250 247 / <alpha-value>)",
+        paper3: "rgb(239 235 227 / <alpha-value>)",
+        ink: "rgb(20 18 15 / <alpha-value>)",
+        ink2: "rgb(107 102 94 / <alpha-value>)",
+        muted: "rgb(107 102 94 / <alpha-value>)",
+        brass: "rgb(20 18 15 / <alpha-value>)",
+        brassink: "rgb(251 250 247 / <alpha-value>)",
+        coral: "rgb(181 58 38 / <alpha-value>)",
+        ok: "rgb(31 122 74 / <alpha-value>)",
+        warn: "rgb(20 18 15 / <alpha-value>)",
+        danger: "rgb(181 58 38 / <alpha-value>)",
+        background: "rgb(241 238 231 / <alpha-value>)",
+        surface: "rgb(251 250 247 / <alpha-value>)",
+        primary: "rgb(20 18 15 / <alpha-value>)",
+        accent: "rgb(20 18 15 / <alpha-value>)",
 
-        // creatorsplan v2 (design_handoff_creatorsplan_rebrand) — new `cp-*`
-        // namespace so steps 3-6 can restyle onto bg-cp-volt, text-cp-ink,
-        // border-cp-line etc. without touching the keys above until a
-        // component is actually migrated.
+        // creatorsplan v2 tokens by name (design_handoff_creatorsplan_rebrand).
         "cp-ink": "var(--cp-ink)",
         "cp-ink-2": "var(--cp-ink-2)",
         "cp-ink-3": "var(--cp-ink-3)",
@@ -60,8 +60,8 @@ export default {
         "cp-mono": "var(--cp-font-mono)",
       },
       borderColor: {
-        rule: "var(--color-rule)",
-        rule2: "var(--color-rule-2)",
+        rule: "var(--cp-line)",
+        rule2: "var(--cp-line-strong)",
       },
       borderRadius: {
         card: "var(--radius-card)",

@@ -794,7 +794,7 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
                     {/* Stays the clip's own number, not its rank: the cards are
                         ordered by score, but this is what the downloaded file
                         is called (clip-N.mp4) and what every api call indexes. */}
-                    <span className="bg-black/70 text-ink font-mono text-micro uppercase px-2 py-1 rounded-full">
+                    <span className="bg-paper2/90 text-ink font-mono text-micro uppercase px-2 py-1 rounded-full">
                         Clip {index + 1}
                     </span>
                     {/* A bare number on a thumbnail reads as a duration, a
@@ -802,7 +802,7 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
                         its scale, or it is decoration. */}
                     {Number.isFinite(clip.predicted_score) && (
                         <span
-                            className="bg-black/70 font-mono text-micro uppercase px-2 py-1 rounded-full flex items-center gap-1"
+                            className="bg-paper2/90 font-mono text-micro uppercase px-2 py-1 rounded-full flex items-center gap-1"
                             title="openshorts' prediction of how well this clip will perform, from 0 to 100"
                         >
                             <TrendingUp size={11} className="shrink-0 text-muted" />
@@ -821,7 +821,7 @@ export default function ResultCard({ clip, index, jobId, durable, uploadPostKey,
 
                 {/* Auto Edit Overlay if Processing */}
                 {isEditing && (
-                    <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-10 p-4 text-center">
+                    <div className="absolute inset-0 bg-paper2/90 flex flex-col items-center justify-center z-10 p-4 text-center">
                         <Loader2 size={28} className="text-brass animate-spin mb-3" />
                         <span className="text-xs text-ink lowercase">ai magic in progress…</span>
                         <span className="readout mt-1.5">APPLYING VIRAL EDITS · ZOOMS</span>

@@ -991,7 +991,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                           </div>
                         )}
                         {!uploadedActorPreview.serverUrl && (
-                          <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                          <div className="absolute inset-0 bg-paper2/90 flex items-center justify-center">
                             <Loader2 size={12} className="animate-spin text-ink" />
                           </div>
                         )}
@@ -1061,7 +1061,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                               <Check size={12} className="text-brassink" />
                             </div>
                           )}
-                          <span className="absolute bottom-1.5 left-1.5 readout bg-black/70 text-ink2 px-1.5 py-0.5 rounded-full">
+                          <span className="absolute bottom-1.5 left-1.5 readout bg-paper2/90 text-ink2 px-1.5 py-0.5 rounded-full">
                             New {i+1}
                           </span>
                         </button>
