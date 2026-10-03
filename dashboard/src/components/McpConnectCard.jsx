@@ -83,6 +83,7 @@ export default function McpConnectCard({ cloud = true, compact = false }) {
   const clients = buildClients({ cloud, url });
   const [active, setActive] = useState(clients[0].id);
   const [copied, setCopied] = useState(false);
+  const [urlCopied, setUrlCopied] = useState(false);
   const current = clients.find((c) => c.id === active) || clients[0];
 
   const copy = useCallback(() => {
@@ -92,18 +93,33 @@ export default function McpConnectCard({ cloud = true, compact = false }) {
     }).catch(() => {});
   }, [current]);
 
+  const copyUrl = useCallback(() => {
+    navigator.clipboard?.writeText(url).then(() => {
+      setUrlCopied(true);
+      setTimeout(() => setUrlCopied(false), 1400);
+    }).catch(() => {});
+  }, [url]);
+
   return (
     <div className="card p-6" id="connect-agent">
-      <h3 className="font-display lowercase text-lg text-ink mb-1 flex items-center gap-2">
-        <Plug size={16} className="text-brass" /> Connect an agent
+      <h3 className="text-lg font-semibold text-cp-ink mb-1 flex items-center gap-2">
+        <Plug size={16} /> Connect an agent
       </h3>
-      <p className="text-muted text-sm mb-4">
+      <p className="text-cp-ink-2 text-sm mb-5">
         Let Claude, ChatGPT, Cursor or n8n clip and publish for you through the built-in MCP server:
         8 tools (process a video or upload one, check a job, list clips, add subtitles, recut, publish, quota).
         {cloud
           ? ' claude.ai and ChatGPT connect with one URL and a sign-in; CLI clients use an API key.'
           : ' This install runs without accounts, so no key is needed.'}
       </p>
+
+      <p className="cp-label mb-2">MCP endpoint</p>
+      <div className="flex gap-2 mb-6">
+        <code className="flex-1 min-w-0 truncate font-cp-mono text-[13px] text-cp-ink bg-cp-field border border-cp-line-strong rounded-cp-input px-4 h-12 flex items-center">{url}</code>
+        <button onClick={copyUrl} className="btn-ghost px-4 shrink-0" aria-label="copy the MCP endpoint">
+          {urlCopied ? <Check size={14} /> : <Copy size={14} />} {urlCopied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
 
       <div className="flex flex-wrap gap-1.5 mb-4" role="tablist" aria-label="client">
         {clients.map((c) => (
@@ -112,8 +128,8 @@ export default function McpConnectCard({ cloud = true, compact = false }) {
             role="tab"
             aria-selected={c.id === active}
             onClick={() => { setActive(c.id); setCopied(false); }}
-            className={`px-3 py-1.5 rounded-input text-xs border transition-colors ${
-              c.id === active ? 'border-brass text-ink bg-brass/10' : 'border-rule text-muted hover:text-ink'}`}
+            className={`h-9 px-3.5 rounded-cp-pill text-[13px] font-semibold transition-colors duration-[var(--cp-dur-settle)] ${
+              c.id === active ? 'bg-cp-ink text-cp-paper' : 'bg-cp-tint text-cp-ink-2 hover:text-cp-ink'}`}
           >
             {c.label}
           </button>
@@ -127,7 +143,7 @@ export default function McpConnectCard({ cloud = true, compact = false }) {
       )}
 
       <div className="relative">
-        <pre className={`font-mono text-ink2 whitespace-pre-wrap break-all rounded-card border border-rule bg-paper p-3 pr-20 text-xs ${compact ? '' : 'leading-relaxed'}`}>
+        <pre className={`font-cp-mono text-cp-ink whitespace-pre-wrap break-all rounded-cp-input border border-cp-line bg-cp-field p-4 pr-24 text-xs ${compact ? '' : 'leading-relaxed'}`}>
           {current.snippet}
         </pre>
         <button onClick={copy} className="btn-ghost absolute top-2 right-2 px-2.5 py-1 text-xs" aria-label="copy">

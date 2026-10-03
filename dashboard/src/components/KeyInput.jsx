@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Key, Eye, EyeOff, Check } from 'lucide-react';
+import { Eye, EyeOff, Check } from 'lucide-react';
 
 export default function KeyInput({ onKeySet, savedKey }) {
     const [key, setKey] = useState(savedKey || '');
@@ -18,17 +18,13 @@ export default function KeyInput({ onKeySet, savedKey }) {
     };
 
     return (
-        <div className="card p-4 sm:p-6 mb-8 animate-fade">
-            <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-paper3 rounded-input text-brass">
-                    <Key size={18} />
-                </div>
-                <h2 className="font-display lowercase text-lg text-ink">Gemini API Key</h2>
-            </div>
+        <div className="space-y-2">
+            <label htmlFor="gemini-key" className="cp-label block">Gemini API key</label>
 
             <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative sm:flex-1">
                     <input
+                        id="gemini-key"
                         type={isVisible ? "text" : "password"}
                         value={key}
                         onChange={(e) => {
@@ -36,11 +32,12 @@ export default function KeyInput({ onKeySet, savedKey }) {
                             setIsSaved(false);
                         }}
                         placeholder="AIzaSy..."
-                        className="input-field pr-12 font-mono"
+                        className="input-field pr-12 font-cp-mono"
                     />
                     <button
                         onClick={() => setIsVisible(!isVisible)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-ink transition-colors"
+                        aria-label={isVisible ? "hide key" : "show key"}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-cp-ink-2 hover:text-cp-ink transition-colors"
                     >
                         {isVisible ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -48,21 +45,20 @@ export default function KeyInput({ onKeySet, savedKey }) {
                 <button
                     onClick={handleSave}
                     disabled={!key || isSaved}
-                    className={isSaved ? 'badge-ok px-4 cursor-default' : 'btn-primary'}
+                    className={isSaved ? 'badge-ok px-4 self-center cursor-default' : 'btn-quiet px-5 shrink-0'}
                 >
-                    {isSaved ? <><Check size={14} /> Ready</> : 'Set Key'}
+                    {isSaved ? <><Check size={14} /> ready</> : 'Save key'}
                 </button>
             </div>
-            <p className="mt-3 text-xs text-muted">
-                Your key is stored locally in your browser for convenience.
-                <br />
+            <p className="cp-help">
+                Stored in your browser.{' '}
                 <a
                     href="https://aistudio.google.com/app/apikey"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brass hover:underline mt-1 inline-block"
+                    className="text-cp-ink underline underline-offset-[3px]"
                 >
-                    Get your free Gemini API Key here →
+                    Get a free Gemini key →
                 </a>
             </p>
         </div>

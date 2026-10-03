@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { ArrowRight, Zap } from 'lucide-react';
 
 // Slim, non-blocking banner shown above a tool when a hosted user has no
 // entitlement. Google-authed users get the free plan automatically, so this
@@ -8,7 +8,7 @@ export default function TrialGate({ toolName = 'this' }) {
   return (
     <div className="card mx-3 sm:mx-6 md:mx-10 xl:mx-auto xl:w-[880px] mt-3 px-3.5 sm:px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 shrink-0 animate-fade">
       <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 text-sm min-w-0">
-        <Sparkles size={16} className="shrink-0 text-brass mt-0.5 sm:mt-0" />
+        <Zap size={16} className="shrink-0 text-cp-ink mt-0.5 sm:mt-0" />
         <div className="text-ink2 lowercase leading-relaxed min-w-0">
           <span className="font-medium text-ink">Preview mode.</span>{' '}
           Sign in with <span className="font-medium text-ink">Google</span> to use {toolName} free —

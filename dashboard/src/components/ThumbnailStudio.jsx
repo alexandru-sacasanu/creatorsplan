@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Upload, Image, Loader2, Send, Check, Download, ArrowRight, ArrowLeft, Sparkles, Video, Type, X, Plus, MessageSquare, FileText, Youtube, AlertCircle, Settings } from 'lucide-react';
+import { Upload, Image, Loader2, Send, Check, Download, ArrowRight, ArrowLeft, Video, Type, X, Plus, MessageSquare, FileText, Youtube, AlertCircle, Settings } from 'lucide-react';
 import { getApiUrl } from '../config';
 import { apiFetch } from '../lib/api';
 import StepIndicator from './ui/StepIndicator';
+import { Screen, ScreenHeader } from './ui/Screen';
 import SegmentedControl from './ui/SegmentedControl';
 
 const STEPS = ['Input', 'Titles', 'Generate', 'Description', 'Publish'];
@@ -26,12 +27,12 @@ function DragDropZone({ label, accept, onFile, file, onClear, icon }) {
 
   if (file) {
     return (
-      <div className="relative border border-rule2 rounded-card p-3 bg-paper3">
+      <div className="relative cp-rise rounded-cp-select border-[1.5px] border-cp-ink bg-cp-volt-soft p-3">
         <div className="flex items-center gap-3">
           {file.type?.startsWith('image/') ? (
             <img src={URL.createObjectURL(file)} className="w-12 h-12 rounded-input object-cover" alt="" />
           ) : (
-            <div className="w-12 h-12 rounded-input bg-paper2 border border-rule flex items-center justify-center">
+            <div className="w-12 h-12 rounded-lg cp-placeholder flex items-center justify-center">
               <Icon size={18} className="text-muted" />
             </div>
           )}
@@ -39,8 +40,8 @@ function DragDropZone({ label, accept, onFile, file, onClear, icon }) {
             <p className="text-sm text-ink truncate">{file.name}</p>
             <p className="readout mt-0.5">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
           </div>
-          <button onClick={onClear} className="text-muted hover:text-ink transition-colors">
-            <X size={16} />
+          <button onClick={onClear} className="btn-text text-cp-ink-2 shrink-0">
+            Remove
           </button>
         </div>
       </div>
@@ -53,12 +54,11 @@ function DragDropZone({ label, accept, onFile, file, onClear, icon }) {
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={() => setIsDragging(false)}
-      className={`border-2 border-dashed rounded-card p-6 text-center cursor-pointer transition-colors duration-200 ${isDragging ? 'border-brass bg-paper3' : 'border-rule2 hover:border-brass'
-        }`}
+      className={`cp-dropzone ${isDragging ? 'is-over' : ''} px-5 py-8 flex flex-col items-center gap-2.5 text-center cursor-pointer`}
     >
-      <Icon size={18} className="mx-auto text-muted mb-2" />
-      <p className="text-sm text-ink2 lowercase">{label}</p>
-      <p className="text-xs text-muted mt-1 lowercase">Drop or click to upload</p>
+      <span className="cp-drop-icon"><Icon size={20} /></span>
+      <p className="text-[15px] font-semibold text-cp-ink">{label}</p>
+      <p className="font-cp-mono text-xs font-medium tracking-[0.05em] text-cp-ink-2">DROP OR CLICK TO UPLOAD</p>
       <input
         ref={inputRef}
         type="file"
@@ -466,26 +466,17 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
   };
 
   return (
-    <div className="h-full overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8 animate-fade">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex items-end justify-between mb-2">
-          <div>
-            <p className="eyebrow mb-2">06 · YOUTUBE STUDIO</p>
-            <h1 className="font-display lowercase text-2xl text-ink flex items-center gap-3">
-              <span className="w-10 h-10 rounded-card bg-paper3 flex items-center justify-center">
-                <Image size={18} className="text-brass" />
-              </span>
-              YouTube Studio
-            </h1>
-          </div>
-          {step > 0 && (
-            <button onClick={handleReset} className="text-xs lowercase text-muted hover:text-ink transition-colors flex items-center gap-1">
-              <Plus size={12} /> New Project
+    <Screen>
+        <ScreenHeader
+          eyebrow="03 · YOUTUBE STUDIO"
+          title="Package a video for YouTube"
+          subtitle="Title, thumbnail and description in one pass, then publish straight to your channel."
+          actions={step > 0 ? (
+            <button onClick={handleReset} className="btn-text">
+              <Plus size={13} /> Package another
             </button>
-          )}
-        </div>
-        <p className="text-sm lowercase text-muted mb-6">Generate viral titles, AI thumbnails, descriptions and publish directly to YouTube</p>
+          ) : null}
+        />
 
         <div className="mb-8">
           <StepIndicator steps={STEPS} current={step} />
@@ -493,10 +484,10 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
 
         {/* Gemini API Key Warning (self-host BYOK only; managed uses server key) */}
         {needsKey && (
-          <div className="mb-6 p-5 bg-warn/10 rounded-card flex items-start gap-3">
-            <AlertCircle size={18} className="text-warn shrink-0 mt-0.5" />
+          <div className="mb-6 p-5 bg-cp-stop-bg rounded-cp-select flex items-start gap-3">
+            <AlertCircle size={18} className="text-cp-stop shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-warn lowercase">Gemini API Key Required</p>
+              <p className="text-sm font-semibold text-cp-stop">Gemini API key required</p>
               <p className="text-xs text-muted mt-1">YouTube Studio requires a Google Gemini API key to function. Please configure it in the <strong>Settings</strong> tab before using this feature. Gemini's free tier includes 1,500 requests per day.</p>
             </div>
           </div>
@@ -506,19 +497,15 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
         {step === 0 && (
           <div className={`grid md:grid-cols-2 gap-6 ${needsKey ? 'opacity-50 pointer-events-none select-none' : ''}`}>
             {/* Mode A: Video Analysis */}
-            <div className="card card-hover p-6 space-y-4">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 rounded-input bg-paper3 flex items-center justify-center">
-                  <Video size={16} className="text-brass" />
-                </div>
-                <div>
-                  <p className="eyebrow">A · ANALYZE VIDEO</p>
-                  <p className="text-xs text-muted mt-0.5">AI suggests viral titles from your content</p>
-                </div>
+            <div className="card p-6 space-y-4">
+              <div className="flex flex-col gap-1.5 mb-1">
+                <p className="eyebrow">OPTION A</p>
+                <h2 className="text-lg font-semibold text-cp-ink">Start from the video</h2>
+                <p className="cp-help">We read the video and suggest titles from what's in it.</p>
               </div>
 
               <DragDropZone
-                label="Upload video file"
+                label="Drop your video"
                 accept="video/*"
                 onFile={(f) => { setVideoFile(f); setMode('video'); handlePreUpload(f); }}
                 file={videoFile}
@@ -542,7 +529,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
               <button
                 onClick={handleAnalyze}
                 disabled={isAnalyzing || !videoFile}
-                className="w-full btn-primary"
+                className="w-full btn-quiet min-h-[48px]"
               >
                 {isAnalyzing ? (
                   <>
@@ -551,23 +538,18 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                   </>
                 ) : (
                   <>
-                    <Sparkles size={16} className="hidden sm:block" />
-                    <span className="whitespace-nowrap">Analyze & Get Titles</span>
+                    <span className="whitespace-nowrap">Suggest titles</span>
                   </>
                 )}
               </button>
             </div>
 
             {/* Mode B: Manual Title */}
-            <div className="card card-hover p-6 space-y-4 flex flex-col">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 rounded-input bg-paper3 flex items-center justify-center">
-                  <Type size={16} className="text-brass" />
-                </div>
-                <div>
-                  <p className="eyebrow">B · WRITE YOUR OWN</p>
-                  <p className="text-xs text-muted mt-0.5">Skip analysis, enter your title directly</p>
-                </div>
+            <div className="card p-6 space-y-4 flex flex-col">
+              <div className="flex flex-col gap-1.5 mb-1">
+                <p className="eyebrow">OPTION B</p>
+                <h2 className="text-lg font-semibold text-cp-ink">I have a title</h2>
+                <p className="cp-help">Skip the suggestions and go straight to the thumbnail.</p>
               </div>
 
               <div className="flex-1 flex flex-col justify-center">
@@ -575,20 +557,22 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                   type="text"
                   value={manualTitle}
                   onChange={(e) => setManualTitle(e.target.value)}
-                  placeholder="Enter your YouTube title..."
-                  className="input-field text-sm mb-4"
+                  placeholder="Your YouTube title"
+                  className="input-field mb-2"
                   maxLength={70}
                 />
-                <p className="readout mb-4">{manualTitle.length} / 70</p>
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <p className="cp-help">Under 60 characters shows in full on mobile</p>
+                  <p className={`font-cp-mono text-xs font-medium shrink-0 ${manualTitle.length > 60 ? 'text-cp-stop' : 'text-cp-ink-2'}`}>{manualTitle.length} / 70</p>
+                </div>
               </div>
 
               <button
                 onClick={handleManualMode}
                 disabled={!manualTitle.trim()}
-                className="w-full btn-ghost disabled:opacity-45 disabled:cursor-not-allowed"
+                className="w-full btn-quiet min-h-[48px]"
               >
-                <ArrowRight size={16} />
-                Use This Title
+                Use this title <ArrowRight size={16} />
               </button>
             </div>
           </div>
@@ -692,23 +676,16 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                       <button
                         key={i}
                         onClick={() => handleSelectTitle(title)}
-                        className={`w-full text-left p-4 rounded-card border transition-colors duration-200 text-sm ${selectedTitle === title
-                          ? 'bg-paper3 border-brass text-ink'
-                          : 'border-rule text-ink2 hover:bg-paper3 hover:border-rule2'
-                          }`}
+                        role="radio"
+                        aria-checked={selectedTitle === title}
+                        className="cp-select-card w-full p-4 text-[15px] flex items-start gap-3"
                       >
-                        <div className="flex items-start gap-3">
-                          <span className={`w-6 h-6 rounded-full border flex items-center justify-center font-mono text-micro shrink-0 mt-0.5 ${selectedTitle === title ? 'bg-brass border-brass text-brassink' :
-                            rec ? 'border-rule2 text-brass' :
-                              'border-rule text-muted'
-                            }`}>
-                            {selectedTitle === title ? <Check size={10} /> : rec ? '★' : i + 1}
-                          </span>
+                          <span className="cp-radio mt-0.5" aria-hidden="true" />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="leading-relaxed">{title}</span>
                               {rec && (
-                                <span className="badge-brass shrink-0">
+                                <span className="cp-badge-ink shrink-0">
                                   {recRank === 0 ? 'TOP PICK' : '2ND PICK'}
                                 </span>
                               )}
@@ -720,7 +697,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                               <p className="readout mt-1.5">thumbnail: {thumbnailTexts[i]}</p>
                             )}
                           </div>
-                        </div>
+                          <span className="font-cp-mono text-xs font-medium text-cp-ink-2 shrink-0 mt-1">{title.length}</span>
                       </button>
                     );
                   })}
@@ -855,7 +832,6 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                   </>
                 ) : (
                   <>
-                    <Sparkles size={16} />
                     Generate Thumbnails
                   </>
                 )}
@@ -944,7 +920,6 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                       </>
                     ) : (
                       <>
-                        <Sparkles size={14} />
                         Regenerate
                       </>
                     )}
@@ -1023,7 +998,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                 <div className="glass-panel p-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <p className="eyebrow flex items-center gap-2">
-                      <Sparkles size={14} className="text-brass" />
+                      <FileText size={14} />
                       AI DESCRIPTION
                     </p>
                     <span className="readout">WITH CHAPTERS</span>
@@ -1236,7 +1211,6 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </Screen>
   );
 }

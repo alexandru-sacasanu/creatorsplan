@@ -32,3 +32,19 @@ export function ScreenHeader({ eyebrow, title, subtitle, actions, children }) {
     </header>
   );
 }
+
+/**
+ * Settings section: `200px | 1fr` with a top border (design handoff >
+ * 06 Settings). Title and description on the left, controls on the right.
+ */
+export function SettingsSection({ title, description, children }) {
+  return (
+    <section className="grid gap-4 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-8 border-t border-cp-line py-8">
+      <div className="flex flex-col gap-1.5">
+        <h2 className="text-[17px] font-semibold text-cp-ink">{title}</h2>
+        {description && <p className="cp-help">{description}</p>}
+      </div>
+      <div className="min-w-0">{children}</div>
+    </section>
+  );
+}

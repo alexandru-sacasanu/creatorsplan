@@ -307,6 +307,95 @@
   .cp-nav-item[aria-current='page'] .cp-nav-meta { color: var(--cp-ink-3); }
   .cp-nav-item:disabled { opacity: 0.4; cursor: not-allowed; background: transparent; }
 
+  /* Field label (14-15px/600). An optional "· optional" hint goes in a
+     .cp-label-hint span; helper text below the field is .cp-help. */
+  .cp-label { font-size: 15px; font-weight: 600; color: var(--cp-ink); }
+  .cp-label-hint { font-weight: 400; color: var(--cp-ink-2); }
+  .cp-help { font-size: 13px; line-height: 1.45; color: var(--cp-ink-2); }
+
+  /* Selection card (format, mode, presenter, hook, title): 1.5px border kept
+     constant so nothing shifts; selected = ink border + volt-soft fill. Set
+     aria-pressed / aria-checked on the button. Glyphs inside take
+     .cp-select-glyph and fill volt when selected. */
+  .cp-select-card {
+    border: 1.5px solid var(--cp-line);
+    border-radius: var(--cp-radius-select);
+    background: transparent;
+    color: var(--cp-ink);
+    text-align: left;
+    transition: background-color 160ms var(--cp-ease-settle), border-color 160ms var(--cp-ease-settle);
+  }
+  .cp-select-card:hover { border-color: var(--cp-line-strong); }
+  .cp-select-card[aria-pressed='true'],
+  .cp-select-card[aria-checked='true'],
+  .cp-select-card.is-selected { border-color: var(--cp-ink); background: var(--cp-volt-soft); }
+  .cp-select-card:disabled { opacity: 0.45; cursor: not-allowed; }
+  .cp-select-glyph { border: 1.5px solid var(--cp-ink); border-radius: 5px; background: transparent; }
+  .cp-select-card[aria-pressed='true'] .cp-select-glyph,
+  .cp-select-card[aria-checked='true'] .cp-select-glyph,
+  .cp-select-card.is-selected .cp-select-glyph { background: var(--cp-volt); }
+
+  /* Radio ring: 18px ring with an 8px ink dot when its card is selected. */
+  .cp-radio {
+    width: 18px; height: 18px; flex: none;
+    border-radius: 999px;
+    border: 1.5px solid var(--cp-line-strong);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: border-color 160ms var(--cp-ease-settle);
+  }
+  .cp-radio::after { content: ''; width: 8px; height: 8px; border-radius: 999px; background: transparent; }
+  [aria-checked='true'] > .cp-radio, .is-selected > .cp-radio, [aria-pressed='true'] > .cp-radio { border-color: var(--cp-ink); }
+  [aria-checked='true'] > .cp-radio::after, .is-selected > .cp-radio::after, [aria-pressed='true'] > .cp-radio::after { background: var(--cp-ink); }
+
+  /* Dropzone: 1.5px dashed ink-3, radius 16; hover is volt-hover + ink. */
+  .cp-dropzone {
+    border: 1.5px dashed var(--cp-ink-3);
+    border-radius: var(--cp-radius-select);
+    transition: background-color 160ms var(--cp-ease-settle), border-color 160ms var(--cp-ease-settle);
+  }
+  .cp-dropzone:hover, .cp-dropzone.is-over { background: var(--cp-volt-hover); border-color: var(--cp-ink); }
+  .cp-dropzone.is-selected { border-style: solid; border-color: var(--cp-ink); background: var(--cp-volt-soft); }
+  .cp-drop-icon {
+    width: 44px; height: 44px; border-radius: 999px;
+    background: var(--cp-ink); color: var(--cp-volt);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+
+  /* Custom checkbox: 20px, radius 6, 1.5px ink; checked = ink with a volt
+     tick. Put .cp-checkbox on a span after an sr-only `peer` checkbox. */
+  .cp-checkbox {
+    width: 20px; height: 20px; flex: none;
+    border-radius: 6px; border: 1.5px solid var(--cp-ink);
+    background: var(--cp-field); color: var(--cp-volt);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background-color 140ms var(--cp-ease-settle);
+  }
+  .cp-checkbox > svg { opacity: 0; }
+  .peer:checked ~ .cp-checkbox { background: var(--cp-ink); }
+  .peer:checked ~ .cp-checkbox > svg { opacity: 1; }
+  .peer:focus-visible ~ .cp-checkbox { box-shadow: 0 0 0 4px var(--cp-volt-soft); }
+
+  /* Progress: tint track, ink fill, fully rounded. Height set per use. */
+  .cp-progress { border-radius: 999px; background: var(--cp-tint); overflow: hidden; }
+  .cp-progress > span { display: block; height: 100%; border-radius: 999px; background: var(--cp-ink); transition: width 200ms linear; }
+
+  /* Striped media placeholder, until a real thumbnail exists. */
+  .cp-placeholder { background: repeating-linear-gradient(135deg, #e5e0d6 0 8px, #ede9e1 8px 16px); }
+
+  /* Badges from the spec: RECOMMENDED (ink fill), BEST QUALITY / BYOK (ink
+     outline). CONNECTED / READY / PUBLISHED use .badge-ok. */
+  .cp-badge-ink, .cp-badge-outline {
+    font-family: var(--cp-font-mono); font-size: 11px; font-weight: 500;
+    letter-spacing: var(--cp-tracking-badge); text-transform: uppercase;
+    border-radius: 999px; padding: 3px 10px; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .cp-badge-ink { background: var(--cp-ink); color: var(--cp-paper); }
+  .cp-badge-outline { border: 1px solid var(--cp-ink); color: var(--cp-ink); }
+
+  /* Rise: screen mount, step-panel change, new results. Stagger lists by
+     setting --cp-i on each item (40-60ms per item). */
+  .cp-rise { animation: cpRise var(--cp-dur-rise) var(--cp-ease-settle) both; animation-delay: calc(var(--cp-i, 0) * 50ms); }
+
   /* narrow phones: tighter pill padding so CTA labels stay on one line */
   @media (max-width: 379px) {
     .btn-primary, .btn-ghost { padding-left: 1rem; padding-right: 1rem; }
@@ -361,6 +450,11 @@
 }
 
 /* Custom Animations */
+@keyframes cpRise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

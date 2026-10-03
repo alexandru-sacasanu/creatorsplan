@@ -89,9 +89,9 @@ const ProcessingAnimation = ({ media, isComplete, syncedTime, isSyncedPlaying, s
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  const containerClasses = `relative w-full aspect-[2/1] sm:aspect-video rounded-card overflow-hidden bg-black border border-rule2 mb-4 sm:mb-8 group animate-fade transition-all duration-500
+  const containerClasses = `relative w-full aspect-[2/1] sm:aspect-video rounded-card overflow-hidden bg-cp-ink border border-cp-line mb-4 sm:mb-6 group animate-fade transition-all duration-500
     ${isComplete && !isSyncedPlaying ? 'grayscale brightness-50' : ''}
-    ${isSyncedPlaying ? 'ring-2 ring-brass ring-offset-2 ring-offset-black' : ''}`;
+    ${isSyncedPlaying ? 'ring-2 ring-cp-ink ring-offset-2 ring-offset-cp-paper' : ''}`;
 
   const getVideoOpacityClass = () => {
     if (isSyncedPlaying) return 'opacity-100'; // Playing: Full visibility
@@ -133,8 +133,7 @@ const ProcessingAnimation = ({ media, isComplete, syncedTime, isSyncedPlaying, s
       {/* Overlays - Hide when synced playing so user sees clean video */}
       {!isSyncedPlaying && !isComplete && (
         <>
-            <div className="hidden sm:block absolute inset-0 bg-[linear-gradient(var(--rule-blueprint)_1px,transparent_1px),linear-gradient(90deg,var(--rule-blueprint)_1px,transparent_1px)] bg-[size:40px_40px] z-10 pointer-events-none"></div>
-            <div className="absolute left-0 w-full h-[2px] bg-brass shadow-[0_0_15px_2px_var(--color-glow)] animate-[scan_2.5s_linear_infinite] z-20 pointer-events-none"></div>
+            <div className="absolute left-0 w-full h-[2px] bg-cp-volt animate-[scan_2.5s_linear_infinite] z-20 pointer-events-none"></div>
             <div className="absolute left-0 w-full h-[15%] bg-[var(--color-paper-emit)] animate-[scan-overlay_2.5s_linear_infinite] z-10 pointer-events-none"></div>
         </>
       )}

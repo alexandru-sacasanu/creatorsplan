@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, CheckCircle2, LayoutDashboard, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, LayoutDashboard } from 'lucide-react';
 import Modal from './ui/Modal';
 
 const TOUR = [
@@ -244,7 +244,7 @@ export default function ClipTutorial({ phase, jobStatus, errorText, onStart, onS
             The other tools are unlocked. Come back to Clip Generator whenever you have another long video.
           </p>
           <button type="button" onClick={onDismissCelebrate} className="btn-primary w-full">
-            <Sparkles size={16} /> See my clips
+            See my clips <ArrowRight size={16} />
           </button>
         </div>
       </Modal>

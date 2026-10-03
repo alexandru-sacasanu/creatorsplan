@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link2, Upload, FileVideo, X, Info, Loader2, ChevronDown } from 'lucide-react';
+import { Link2, Upload, Info, Loader2, ChevronDown, ArrowRight } from 'lucide-react';
 import { track } from '../lib/analytics';
 import { getApiUrl } from '../config';
 
@@ -145,8 +145,14 @@ export default function MediaInput({ onProcess, isProcessing }) {
         }
     };
 
+    const sourceReady = mode === 'url' ? !!url : !!file && !fileTooShort;
+    const generateDisabled = isProcessing || !acknowledged || !sourceReady;
+    const generateHint = !sourceReady
+        ? (mode === 'file' ? (fileTooShort ? 'Pick a longer video' : 'Add a video first') : 'Paste a link first')
+        : !acknowledged ? 'Confirm the rights checkbox' : '';
+
     return (
-        <div className="card p-4 sm:p-6 animate-fade">
+        <div className="card px-5 pb-6 pt-2 sm:px-7 sm:pb-7 text-left">
             <div className="cp-tabs mb-6" role="tablist" data-tutorial="source-tabs">
                 <button
                     type="button"
@@ -156,7 +162,7 @@ export default function MediaInput({ onProcess, isProcessing }) {
                     className="cp-tab"
                 >
                     <Upload size={16} />
-                    Upload File
+                    Upload file
                 </button>
                 {youtubeUrlEnabled && (
                     <button
@@ -167,20 +173,22 @@ export default function MediaInput({ onProcess, isProcessing }) {
                         className="cp-tab"
                     >
                         <Link2 size={16} />
-                        Video URL
+                        Video link
                     </button>
                 )}
             </div>
 
             <form onSubmit={handleSubmit}>
                 {mode === 'url' ? (
-                    <div className="space-y-4" data-tutorial="drop-zone">
+                    <div className="flex flex-col gap-2 cp-rise" data-tutorial="drop-zone">
+                        <label htmlFor="source-url" className="text-sm font-semibold text-cp-ink">YouTube, Vimeo or a direct link</label>
                         <div className="relative">
                             <input
+                                id="source-url"
                                 type="url"
                                 value={url}
                                 onChange={(e) => setUrl(e.target.value)}
-                                placeholder="https://... paste a video link"
+                                placeholder="https://youtube.com/watch?v=…"
                                 className="input-field pr-11"
                                 required
                             />
@@ -189,7 +197,7 @@ export default function MediaInput({ onProcess, isProcessing }) {
                                     type="button"
                                     onClick={() => setShowInfo((v) => !v)}
                                     aria-label="Supported platforms"
-                                    className="p-1.5 text-muted hover:text-brass transition-colors"
+                                    className="p-1.5 text-cp-ink-2 hover:text-cp-ink transition-colors"
                                 >
                                     <Info size={16} />
                                 </button>
@@ -214,101 +222,97 @@ export default function MediaInput({ onProcess, isProcessing }) {
                 ) : (
                     <div
                         data-tutorial="drop-zone"
-                        className={`border-2 border-dashed rounded-card p-6 sm:p-8 text-center transition-colors ${file ? 'border-brass' : 'border-rule2 hover:border-brass'
-                            }`}
                         onDragOver={(e) => e.preventDefault()}
                         onDrop={handleDrop}
                     >
                         {file ? (
-                            <div className="flex items-center justify-center gap-3 text-ok min-w-0">
-                                <FileVideo size={18} className="shrink-0" />
-                                <span className="font-medium truncate">{file.name}</span>
+                            <div className="cp-rise flex items-center gap-4 rounded-cp-select border border-cp-line bg-cp-field p-4 min-w-0">
+                                <div className="cp-placeholder w-[72px] h-11 rounded-lg shrink-0" aria-hidden="true" />
+                                <div className="flex-1 min-w-0 flex flex-col gap-1">
+                                    <span className="text-[15px] font-semibold text-cp-ink truncate">{file.name}</span>
+                                    <span className="font-cp-mono text-xs font-medium text-cp-ink-2">
+                                        {Math.round(file.size / 1e6)} MB
+                                        {fileSeconds != null && ` · ${Math.floor(fileSeconds / 60)}:${String(Math.round(fileSeconds % 60)).padStart(2, '0')}`}
+                                    </span>
+                                </div>
                                 <button
                                     type="button"
                                     onClick={() => setFile(null)}
-                                    className="p-1 text-muted hover:text-ink hover:bg-paper3 rounded-full transition-colors"
+                                    className="btn-text text-cp-ink-2 shrink-0"
                                 >
-                                    <X size={16} />
+                                    Remove
                                 </button>
                             </div>
                         ) : null}
                         {file && fileTooShort ? (
-                            <p className="text-danger text-sm mt-3" role="alert">
+                            <p className="text-cp-stop text-sm mt-3" role="alert">
                                 This video is {Math.round(fileSeconds)}s long. Clip generation needs at least {MIN_SOURCE_SECONDS}s
                                 of footage to cut from: it already is a short. Pick a longer video.
                             </p>
                         ) : null}
                         {!file && (
-                            <label className="cursor-pointer block">
+                            <label className="cp-dropzone cursor-pointer flex flex-col items-center gap-2.5 px-6 py-11 text-center">
                                 <input
                                     type="file"
                                     accept="video/*"
                                     onChange={(e) => setFile(e.target.files?.[0] || null)}
                                     className="hidden"
                                 />
-                                <Upload className="mx-auto mb-3 text-muted" size={18} />
-                                <p className="text-ink2 lowercase">Click to upload or drag and drop</p>
-                                <p className="readout mt-2">MP4, MOV up to 500MB · at least {MIN_SOURCE_SECONDS}s long</p>
+                                <span className="cp-drop-icon"><Upload size={20} /></span>
+                                <span className="text-[17px] font-semibold text-cp-ink">Drop a video here, or browse</span>
+                                <span className="font-cp-mono text-xs font-medium tracking-[0.05em] text-cp-ink-2">MP4, MOV · UP TO 500MB · AT LEAST {MIN_SOURCE_SECONDS}S</span>
                             </label>
                         )}
                     </div>
                 )}
 
                 {/* Output format selector */}
-                <div className="mt-5" data-tutorial="output-format">
-                    <p className="eyebrow mb-2">Output format</p>
-                    <div className="grid grid-cols-3 gap-2">
+                <div className="mt-6 flex flex-col gap-3" data-tutorial="output-format">
+                    <p className="cp-label">Output format</p>
+                    <div className="grid grid-cols-3 gap-2 sm:gap-3">
                         {[
-                            { value: 'vertical', label: '9:16', hint: 'Shorts · Reels · TikTok', w: 18, h: 32 },
+                            { value: 'vertical', label: '9:16', hint: 'Shorts · Reels · TikTok', w: 20, h: 34 },
                             { value: 'square', label: '1:1', hint: 'Feed posts', w: 28, h: 28 },
-                            { value: 'horizontal', label: '16:9', hint: 'Keep landscape · YouTube', w: 36, h: 20 },
-                        ].map((f) => {
-                            const active = outputFormat === f.value;
-                            return (
-                                <button
-                                    key={f.value}
-                                    type="button"
-                                    onClick={() => setOutputFormat(f.value)}
-                                    className={`py-3 px-2 rounded-input border flex flex-col items-center gap-2 transition-colors
-                                        ${active ? 'border-[color:var(--color-accent)] text-ink' : 'border-rule2 text-muted hover:border-[color:var(--color-accent)]'}`}
-                                >
-                                    {/* Aspect-ratio glyph */}
-                                    <span
-                                        className="rounded-[3px] border-2 transition-colors"
-                                        style={{
-                                            width: `${f.w}px`,
-                                            height: `${f.h}px`,
-                                            borderColor: active ? 'var(--color-accent)' : 'var(--color-rule-2)',
-                                            backgroundColor: active ? 'color-mix(in srgb, var(--color-accent) 22%, transparent)' : 'transparent',
-                                        }}
-                                    />
-                                    <span className="block font-mono text-sm leading-none">{f.label}</span>
-                                    <span className="block text-[11px] sm:text-[10px] leading-tight text-center text-muted">{f.hint}</span>
-                                </button>
-                            );
-                        })}
+                            { value: 'horizontal', label: '16:9', hint: 'Keep landscape · YouTube', w: 40, h: 23 },
+                        ].map((f) => (
+                            <button
+                                key={f.value}
+                                type="button"
+                                aria-pressed={outputFormat === f.value}
+                                onClick={() => setOutputFormat(f.value)}
+                                className="cp-select-card py-5 px-2 sm:px-3 flex flex-col items-center gap-2.5 text-center"
+                            >
+                                {/* Aspect-ratio glyph, centred in a 34px box so the labels line up */}
+                                <span className="h-[34px] flex items-center">
+                                    <span className="cp-select-glyph block" style={{ width: `${f.w}px`, height: `${f.h}px` }} />
+                                </span>
+                                <span className="block text-base font-semibold leading-none">{f.label}</span>
+                                <span className="block text-xs sm:text-[13px] leading-tight text-cp-ink-2">{f.hint}</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
 
                 {/* Advanced generation controls — collapsed by default; blank = AI decides */}
-                <div className="mt-4">
+                <div className="mt-6">
                     <button
                         type="button"
                         onClick={() => setShowAdvanced((v) => !v)}
-                        className="flex items-center gap-1.5 text-xs text-muted hover:text-ink2 lowercase transition-colors"
+                        aria-expanded={showAdvanced}
+                        className="flex items-center gap-1.5 text-[15px] font-semibold text-cp-ink"
                     >
-                        <ChevronDown size={14} className={`transition-transform ${showAdvanced ? 'rotate-180' : ''}`} />
-                        advanced options
+                        <ChevronDown size={16} className={`transition-transform duration-200 ease-cp-settle ${showAdvanced ? '' : '-rotate-90'}`} />
+                        Advanced options
                         {(targetClips || clipMinSeconds || clipMaxSeconds || !autoHook) && (
-                            <span className="text-brass">·</span>
+                            <span className="text-cp-ink-2">·</span>
                         )}
                     </button>
                     {showAdvanced && (
                         /* Stacked on a phone: three number fields side by side leaves
                            ~100px each, which crushes both label and value. */
-                        <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-2 animate-fade">
+                        <div className="mt-4 sm:pl-[22px] grid grid-cols-1 sm:grid-cols-3 gap-3 cp-rise">
                             <div>
-                                <p className="eyebrow mb-1.5">clips to aim for</p>
+                                <p className="text-[13px] text-cp-ink-2 mb-2">Clips to aim for</p>
                                 <input
                                     type="number" min="1" max="15" step="1"
                                     value={targetClips}
@@ -318,7 +322,7 @@ export default function MediaInput({ onProcess, isProcessing }) {
                                 />
                             </div>
                             <div>
-                                <p className="eyebrow mb-1.5">min length (s)</p>
+                                <p className="text-[13px] text-cp-ink-2 mb-2">Min length (s)</p>
                                 <input
                                     type="number" min="5" max="175" step="1"
                                     value={clipMinSeconds}
@@ -328,7 +332,7 @@ export default function MediaInput({ onProcess, isProcessing }) {
                                 />
                             </div>
                             <div>
-                                <p className="eyebrow mb-1.5">max length (s)</p>
+                                <p className="text-[13px] text-cp-ink-2 mb-2">Max length (s)</p>
                                 <input
                                     type="number" min="10" max="180" step="1"
                                     value={clipMaxSeconds}
@@ -361,7 +365,7 @@ export default function MediaInput({ onProcess, isProcessing }) {
                                         type="checkbox"
                                         checked={autoHook}
                                         onChange={(e) => setAutoHook(e.target.checked)}
-                                        className="w-4 h-4 shrink-0 accent-[var(--color-accent)] cursor-pointer"
+                                        className="w-4 h-4 shrink-0 accent-[#14120F] cursor-pointer"
                                     />
                                     auto hook titles on clips
                                 </label>
@@ -391,35 +395,46 @@ export default function MediaInput({ onProcess, isProcessing }) {
                     )}
                 </div>
 
-                <label className="flex items-start gap-2.5 mt-5 text-left text-[13px] sm:text-xs leading-relaxed text-muted cursor-pointer select-none">
-                    <input
-                        type="checkbox"
-                        checked={acknowledged}
-                        onChange={(e) => setAcknowledged(e.target.checked)}
-                        className="mt-0.5 w-4 h-4 shrink-0 accent-[var(--color-accent)] cursor-pointer"
-                    />
-                    <span>
-                        I confirm I own this content or have the rights to process it. I am responsible for any content I submit. See our <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-ink2 underline underline-offset-2 hover:text-brass transition-colors" onClick={(e) => e.stopPropagation()}>Terms</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-ink2 underline underline-offset-2 hover:text-brass transition-colors" onClick={(e) => e.stopPropagation()}>Privacy Policy</a>.
-                    </span>
-                </label>
+                <div className="h-px bg-cp-line mt-6 mb-5" />
+                <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+                    <label className="flex items-start gap-2.5 max-w-[440px] text-left text-sm leading-[1.45] text-cp-ink-2 cursor-pointer select-none">
+                        <input
+                            type="checkbox"
+                            checked={acknowledged}
+                            onChange={(e) => setAcknowledged(e.target.checked)}
+                            className="sr-only peer"
+                        />
+                        <span className="cp-checkbox" aria-hidden="true">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7" /></svg>
+                        </span>
+                        <span>
+                            I own this video or have the rights to edit and publish it. See our <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-cp-ink underline underline-offset-[3px]" onClick={(e) => e.stopPropagation()}>Terms</a> and <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-cp-ink underline underline-offset-[3px]" onClick={(e) => e.stopPropagation()}>Privacy Policy</a>.
+                        </span>
+                    </label>
 
-                <button
-                    type="submit"
-                    data-tutorial="generate"
-                    disabled={isProcessing || !acknowledged || (mode === 'url' && !url) || (mode === 'file' && (!file || fileTooShort))}
-                    className="w-full btn-primary mt-4"
-                >
-                    {isProcessing ? (
-                        <>
-                            <Loader2 size={16} className="animate-spin" />
-                            Processing Video...
-                        </>
-                    ) : (
-                        <>
-                            Generate Clips
-                        </>
-                    )}
-                </button>
+                    <div className="flex items-center gap-3.5 w-full sm:w-auto">
+                        {!isProcessing && generateHint && (
+                            <span className="hidden sm:inline text-[13px] text-cp-ink-2">{generateHint}</span>
+                        )}
+                        <button
+                            type="submit"
+                            data-tutorial="generate"
+                            disabled={generateDisabled}
+                            className="btn-primary w-full sm:w-auto px-[26px] text-base"
+                        >
+                            {isProcessing ? (
+                                <>
+                                    <Loader2 size={16} className="animate-spin" />
+                                    Processing video…
+                                </>
+                            ) : (
+                                <>
+                                    Generate clips <ArrowRight size={16} />
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
             </form>
         </div>
     );

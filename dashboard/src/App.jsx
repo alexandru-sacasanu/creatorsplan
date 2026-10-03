@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Upload, Sparkles, Youtube, Instagram, Share2, ChevronDown, Check, Activity, LayoutDashboard, Settings, Plus, History, X, Terminal, Shield, LayoutGrid, Image, Globe, RotateCcw, Calendar, AlertTriangle, KeyRound, Bot, Users, Smartphone, ExternalLink, Copy, CheckCircle2, Loader2, Download, Menu, Lock, Rocket, Clapperboard, SquareUser, SlidersHorizontal } from 'lucide-react';
+import { Upload, Youtube, Instagram, Share2, ChevronDown, Check, Activity, LayoutDashboard, Settings, Plus, History, X, Terminal, Shield, LayoutGrid, Image, Globe, RotateCcw, Calendar, AlertTriangle, KeyRound, Bot, Users, Smartphone, ExternalLink, Copy, CheckCircle2, Loader2, Download, Menu, Lock, Rocket, Clapperboard, SquareUser, SlidersHorizontal, CreditCard } from 'lucide-react';
 import KeyInput from './components/KeyInput';
 import MediaInput from './components/MediaInput';
 import McpConnectCard from './components/McpConnectCard';
@@ -28,6 +28,7 @@ import AutopilotTab from './components/AutopilotTab';
 import ProfileMenu from './components/ProfileMenu';
 import ShortFrameLogo from './components/ShortFrameLogo';
 import Modal from './components/ui/Modal';
+import { Screen, ScreenHeader, SettingsSection } from './components/ui/Screen';
 import { useAuth } from './contexts/AuthContext';
 import { apiFetch, apiJson, QuotaError } from './lib/api';
 import { track } from './lib/analytics';
@@ -1511,236 +1512,163 @@ function App() {
 
           {/* View: Settings */}
           {activeTab === 'settings' && (
-            <div className="h-full overflow-y-auto p-4 sm:p-8 max-w-2xl mx-auto animate-fade">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">
-                <div>
-                  <p className="eyebrow mb-1.5">08 · SETTINGS</p>
-                  <h1 className="font-display lowercase text-2xl text-ink">Settings</h1>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted mt-1">
-                  <Shield size={12} className="text-ok shrink-0" /> Privacy: keys only live in your browser (sent to backend just to process)
-                </div>
-              </div>
-              {/* Self-hosted installs have no account page, so the agent
-                  how-to lives here; cloud users get it (with OAuth) in Account. */}
-              {!billingEnabled && <div className="mb-6"><McpConnectCard cloud={false} /></div>}
-              {isManaged ? (
-                <div className="card p-6 mb-2">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-input bg-paper3 flex items-center justify-center shrink-0">
-                        <Shield size={16} className="text-brass" />
+            <Screen>
+              <ScreenHeader
+                eyebrow="06 · SETTINGS"
+                title="Settings"
+                subtitle="Your plan, your keys and where your clips get published."
+              >
+                <p className="flex items-center gap-2 text-sm text-cp-ink-2">
+                  <Shield size={14} className="text-cp-go shrink-0" /> Keys only live in your browser. They're sent to the backend just to process a job.
+                </p>
+              </ScreenHeader>
+
+              {/* Plan (cloud) or the Gemini + Upload-Post keys (self-host). */}
+              <SettingsSection
+                title={billingEnabled ? 'Your plan' : 'Core keys'}
+                description={billingEnabled
+                  ? 'Clip generator and YouTube studio run on our keys. Nothing to set up.'
+                  : 'The clip generator and YouTube studio run on Gemini. Publishing goes through Upload-Post.'}
+              >
+                {isManaged ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-[15px] font-semibold text-cp-ink">Included in your plan</p>
+                      <span className="badge-ok">managed</span>
+                    </div>
+                    <p className="cp-help">
+                      Your plan covers the clip generator and YouTube studio, fully managed: no API keys needed.
+                      AI shorts and dubbing use your own fal.ai and ElevenLabs keys (below). Connect your social
+                      accounts to publish directly.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <button onClick={handleConnectSocials} className="btn-quiet px-5">
+                        <Share2 size={16} /> Connect social accounts
+                      </button>
+                      <button onClick={handleOpenCalendar} className="btn-ghost px-5">
+                        <Calendar size={16} /> Content calendar
+                      </button>
+                    </div>
+                  </div>
+                ) : billingEnabled ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-[15px] font-semibold text-cp-ink">Choose your plan</p>
+                      <span className="badge-ok">free plan available</span>
+                    </div>
+                    <p className="cp-help">
+                      Make shorts with zero setup and no API keys. Start free with 20 min a month, or go paid from $12/mo. Cancel anytime.
+                    </p>
+                    <button onClick={() => setShowPlanChoice(true)} className="btn-quiet px-5">
+                      Choose a plan
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <KeyInput onKeySet={setApiKey} savedKey={apiKey} />
+
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <label htmlFor="upload-post-key" className="cp-label">Upload-Post API key</label>
+                        <span className="cp-badge-outline">required</span>
                       </div>
-                      <h2 className="text-base font-medium text-ink lowercase">Included in your plan</h2>
-                    </div>
-                    <span className="badge-ok">Managed</span>
-                  </div>
-                  <p className="text-xs text-muted mb-5 leading-relaxed">
-                    Your plan includes the <strong>Clip Generator</strong> and <strong>YouTube Studio</strong>,
-                    fully managed — no API keys required. AI Shorts &amp; dubbing use your own fal.ai / ElevenLabs
-                    keys (below). Connect your social accounts to publish directly.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <button onClick={handleConnectSocials} className="btn-primary py-2 px-4 text-sm">
-                      <Share2 size={16} /> Connect social accounts
-                    </button>
-                    <button onClick={handleOpenCalendar} className="btn-quiet py-2 px-4 text-sm">
-                      <Calendar size={16} /> Content calendar
-                    </button>
-                  </div>
-                </div>
-              ) : billingEnabled ? (
-                <div className="card p-6 mb-2">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-input bg-paper3 flex items-center justify-center shrink-0">
-                        <Sparkles size={16} className="text-brass" />
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          id="upload-post-key"
+                          type="password"
+                          value={uploadPostKey}
+                          onChange={(e) => setUploadPostKey(e.target.value)}
+                          className="input-field font-cp-mono"
+                          placeholder="ey..."
+                        />
+                        <button onClick={fetchUserProfiles} className="btn-quiet px-5 shrink-0">
+                          Connect
+                        </button>
                       </div>
-                      <h2 className="text-base font-medium text-ink lowercase">Choose your plan</h2>
+                      <p className="cp-help">
+                        Publishes your clips to TikTok, Instagram Reels and YouTube Shorts. Has a free tier, no card needed:{' '}
+                        <a href="https://app.upload-post.com/login" target="_blank" rel="noopener noreferrer" className="text-cp-ink underline underline-offset-[3px]">sign up</a>,{' '}
+                        <a href="https://app.upload-post.com/manage-users" target="_blank" rel="noopener noreferrer" className="text-cp-ink underline underline-offset-[3px]">connect a profile</a>, then{' '}
+                        <a href="https://app.upload-post.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-cp-ink underline underline-offset-[3px]">create a key</a>.
+                      </p>
                     </div>
-                    <span className="badge-ok">Free plan available</span>
                   </div>
-                  <p className="text-xs text-muted mb-5 leading-relaxed">
-                    Generate shorts with zero setup — no API keys needed. Start free with 20 min/month, or go paid from $12/mo. Cancel anytime.
-                  </p>
-                  <button onClick={() => setShowPlanChoice(true)} className="btn-primary py-2 px-4 text-sm">
-                    <Sparkles size={16} /> Choose a plan
-                  </button>
-                </div>
-              ) : (
-                <>
-              <KeyInput onKeySet={setApiKey} savedKey={apiKey} />
+                )}
+              </SettingsSection>
 
-              <div className="card p-4 sm:p-6 mt-8">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-input bg-paper3 flex items-center justify-center shrink-0">
-                      <Share2 size={16} className="text-brass" />
+              <SettingsSection
+                title="Your keys"
+                description="AI shorts and dubbing run on your own accounts. We never mark up usage."
+              >
+                <div className="rounded-cp-select border border-cp-line bg-cp-field divide-y divide-cp-line">
+                  <div className="p-5 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <label htmlFor="fal-key" className="cp-label">fal.ai</label>
+                      <span className="readout">AI shorts · ~$0.65-2 / video</span>
                     </div>
-                    <h2 className="text-base font-medium text-ink lowercase">Social Integration</h2>
-                  </div>
-                  <span className="badge-warn">Required</span>
-                </div>
-                <p className="text-xs text-muted mb-6 leading-relaxed">
-                  Required to publish your clips to TikTok, Instagram Reels, and YouTube Shorts via <strong>Upload-Post</strong>.
-                  Includes a <strong>free tier</strong> (no credit card required).
-                </p>
-                <div className="space-y-4">
-                  <label className="block text-sm text-muted">Upload-Post API Key</label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input
-                      type="password"
-                      value={uploadPostKey}
-                      onChange={(e) => setUploadPostKey(e.target.value)}
-                      className="input-field"
-                      placeholder="ey..."
-                    />
-                    <button onClick={fetchUserProfiles} className="btn-quiet py-2 px-4 text-sm">
-                      Connect
-                    </button>
-                  </div>
-                  <div className="text-xs text-muted leading-relaxed">
-                    Connect your Upload-Post account to enable one-click publishing.
-                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <a href="https://app.upload-post.com/login" target="_blank" rel="noopener noreferrer" className="p-2 border border-rule rounded-input hover:bg-paper3 transition-colors flex flex-col gap-1">
-                        <span className="text-ink2 font-medium">1. Login</span>
-                        <span className="text-xs text-muted">Register account</span>
-                      </a>
-                      <a href="https://app.upload-post.com/manage-users" target="_blank" rel="noopener noreferrer" className="p-2 border border-rule rounded-input hover:bg-paper3 transition-colors flex flex-col gap-1">
-                        <span className="text-ink2 font-medium">2. Profiles</span>
-                        <span className="text-xs text-muted">Create & Connect</span>
-                      </a>
-                      <a href="https://app.upload-post.com/api-keys" target="_blank" rel="noopener noreferrer" className="p-2 border border-rule rounded-input hover:bg-paper3 transition-colors flex flex-col gap-1">
-                        <span className="text-ink2 font-medium">3. API Key</span>
-                        <span className="text-xs text-muted">Generate key</span>
-                      </a>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <input
+                        id="fal-key"
+                        type="password"
+                        value={falKey}
+                        onChange={(e) => setFalKey(e.target.value)}
+                        className="input-field font-cp-mono"
+                        placeholder="fal_..."
+                      />
+                      <button
+                        onClick={() => {
+                          if (falKey) {
+                            localStorage.setItem('falKey_v1', encrypt(falKey));
+                            setFalSaved(true);
+                            setTimeout(() => setFalSaved(false), 2000);
+                          }
+                        }}
+                        className={falSaved ? 'badge-ok px-4 self-center' : 'btn-ghost px-5 shrink-0'}
+                      >
+                        {falSaved ? <><Check size={12} /> saved</> : (falKey ? 'Save key' : 'Add key')}
+                      </button>
                     </div>
-                    <br />
-                    <span className="text-muted">
-                      Keys are only stored in your browser. They are sent to the backend only to process your request, never stored server-side.
-                    </span>
+                    <p className="cp-help">
+                      AI presenter videos. Billed by fal.ai, not covered by your plan.{' '}
+                      <a href="https://fal.ai/dashboard/keys" target="_blank" rel="noopener noreferrer" className="text-cp-ink underline underline-offset-[3px]">Get a key</a>
+                    </p>
                   </div>
-                </div>
-              </div>
 
-                </>
-              )}
-
-              <div className="card p-4 sm:p-6 mt-8">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-input bg-paper3 flex items-center justify-center shrink-0">
-                      <Globe size={16} className="text-brass" />
+                  <div className="p-5 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <label htmlFor="elevenlabs-key" className="cp-label">ElevenLabs</label>
+                      <span className="readout">voices · dubbing</span>
                     </div>
-                    <h2 className="text-base font-medium text-ink lowercase">Video Translation</h2>
-                  </div>
-                  <span className="readout">BYOK</span>
-                </div>
-                <p className="text-xs text-muted mb-6 leading-relaxed">
-                  For <strong>AI Shorts &amp; dubbing</strong> — bring your own key. Translate your clips to different
-                  languages using <strong>ElevenLabs</strong> AI dubbing (billed by ElevenLabs). Not covered by your plan.
-                </p>
-                <div className="space-y-4">
-                  <label className="block text-sm text-muted">ElevenLabs API Key</label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input
-                      type="password"
-                      value={elevenLabsKey}
-                      onChange={(e) => setElevenLabsKey(e.target.value)}
-                      className="input-field"
-                      placeholder="sk_..."
-                    />
-                    <button
-                      onClick={() => {
-                        if (elevenLabsKey) {
-                          localStorage.setItem('elevenLabsKey_v1', encrypt(elevenLabsKey));
-                          setElevenLabsSaved(true);
-                          setTimeout(() => setElevenLabsSaved(false), 2000);
-                        }
-                      }}
-                      className={elevenLabsSaved ? 'badge-ok px-4' : 'btn-quiet py-2 px-4 text-sm'}
-                    >
-                      {elevenLabsSaved ? <><Check size={12} /> saved</> : 'Save'}
-                    </button>
-                  </div>
-                  <div className="text-xs text-muted leading-relaxed">
-                    Get your API key from ElevenLabs to enable video translation.
-                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <a href="https://elevenlabs.io/sign-up" target="_blank" rel="noopener noreferrer" className="p-2 border border-rule rounded-input hover:bg-paper3 transition-colors flex flex-col gap-1">
-                        <span className="text-ink2 font-medium">1. Sign Up</span>
-                        <span className="text-xs text-muted">Create account</span>
-                      </a>
-                      <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener noreferrer" className="p-2 border border-rule rounded-input hover:bg-paper3 transition-colors flex flex-col gap-1">
-                        <span className="text-ink2 font-medium">2. API Key</span>
-                        <span className="text-xs text-muted">Generate key</span>
-                      </a>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <input
+                        id="elevenlabs-key"
+                        type="password"
+                        value={elevenLabsKey}
+                        onChange={(e) => setElevenLabsKey(e.target.value)}
+                        className="input-field font-cp-mono"
+                        placeholder="sk_..."
+                      />
+                      <button
+                        onClick={() => {
+                          if (elevenLabsKey) {
+                            localStorage.setItem('elevenLabsKey_v1', encrypt(elevenLabsKey));
+                            setElevenLabsSaved(true);
+                            setTimeout(() => setElevenLabsSaved(false), 2000);
+                          }
+                        }}
+                        className={elevenLabsSaved ? 'badge-ok px-4 self-center' : 'btn-ghost px-5 shrink-0'}
+                      >
+                        {elevenLabsSaved ? <><Check size={12} /> saved</> : (elevenLabsKey ? 'Save key' : 'Add key')}
+                      </button>
                     </div>
-                    <br />
-                    <span className="text-muted">
-                      Keys are only stored in your browser. They are sent to the backend only to process your request, never stored server-side.
-                    </span>
+                    <p className="cp-help">
+                      Presenter voices and translating your clips into other languages. Billed by ElevenLabs.{' '}
+                      <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener noreferrer" className="text-cp-ink underline underline-offset-[3px]">Get a key</a>
+                    </p>
                   </div>
                 </div>
-              </div>
-
-              <div className="card p-4 sm:p-6 mt-8">
-                <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-input bg-paper3 flex items-center justify-center shrink-0">
-                      <Sparkles size={16} className="text-brass" />
-                    </div>
-                    <h2 className="text-base font-medium text-ink lowercase">AI Shorts (UGC Videos)</h2>
-                  </div>
-                  <span className="readout">BYOK</span>
-                </div>
-                <p className="text-xs text-muted mb-6 leading-relaxed">
-                  Generate UGC-style videos with AI actors for any product or business using <strong>fal.ai</strong>.
-                  <strong> Not covered by your plan</strong> — bring your own fal.ai + ElevenLabs keys (billed by those
-                  providers, ~$0.65-2 per video). Your plan still covers the AI script &amp; orchestration.
-                </p>
-                <div className="space-y-4">
-                  <label className="block text-sm text-muted">fal.ai API Key</label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input
-                      type="password"
-                      value={falKey}
-                      onChange={(e) => setFalKey(e.target.value)}
-                      className="input-field"
-                      placeholder="fal_..."
-                    />
-                    <button
-                      onClick={() => {
-                        if (falKey) {
-                          localStorage.setItem('falKey_v1', encrypt(falKey));
-                          setFalSaved(true);
-                          setTimeout(() => setFalSaved(false), 2000);
-                        }
-                      }}
-                      className={falSaved ? 'badge-ok px-4' : 'btn-quiet py-2 px-4 text-sm'}
-                    >
-                      {falSaved ? <><Check size={12} /> saved</> : 'Save'}
-                    </button>
-                  </div>
-                  <div className="text-xs text-muted leading-relaxed">
-                    Get your API key from fal.ai to enable AI actor video generation.
-                    <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <a href="https://fal.ai/dashboard/keys" target="_blank" rel="noopener noreferrer" className="p-2 border border-rule rounded-input hover:bg-paper3 transition-colors flex flex-col gap-1">
-                        <span className="text-ink2 font-medium">1. Sign Up</span>
-                        <span className="text-xs text-muted">Create fal.ai account</span>
-                      </a>
-                      <a href="https://fal.ai/dashboard/keys" target="_blank" rel="noopener noreferrer" className="p-2 border border-rule rounded-input hover:bg-paper3 transition-colors flex flex-col gap-1">
-                        <span className="text-ink2 font-medium">2. API Key</span>
-                        <span className="text-xs text-muted">Generate key</span>
-                      </a>
-                    </div>
-                    <br />
-                    <span className="text-muted">
-                      Keys are only stored in your browser. Sent to backend only to process requests.
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+              </SettingsSection>
+            </Screen>
           )}
 
           {/* View: SaaS Shorts */}
@@ -1750,25 +1678,21 @@ function App() {
 
           {/* View: AI Agent */}
           {activeTab === 'ai-agent' && (
-            <div className="h-full overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-10 animate-fade">
-              <div className="max-w-4xl mx-auto space-y-8">
+            <Screen>
+              <div className="space-y-8">
+                <ScreenHeader
+                  eyebrow="05 · AGENTS · BYOK"
+                  title="Let an agent do the busywork"
+                  subtitle="Connect the assistant you already use. It can clip videos, write titles and schedule posts with your keys."
+                />
 
-                {/* Header */}
-                <div className="space-y-3">
-                  <p className="eyebrow flex items-center gap-2">
-                    <Bot size={12} /> 03 · AI AGENT · AUTONOMOUS SKILL
-                  </p>
-                  <h1 className="font-display lowercase text-3xl md:text-4xl text-ink">
-                    Your Personal Clipping Team
-                  </h1>
-                  <p className="text-muted text-base md:text-lg leading-relaxed max-w-2xl">
-                    Drop your videos in a folder and a team of AI clippers picks the viral moments, edits them, and queues them for your approval — like having a 24/7 short-form editing crew on autopilot.
-                  </p>
-                </div>
+                <McpConnectCard cloud={billingEnabled} />
+
+                <h2 className="cp-h2 pt-2">Or run a clipping skill on a folder</h2>
 
                 {/* Mobile-format warning */}
-                <div className="px-4 py-3 rounded-card border border-rule bg-paper2 flex items-start gap-3">
-                  <Smartphone size={18} className="text-warn shrink-0 mt-0.5" />
+                <div className="px-5 py-4 rounded-cp-select border border-cp-line bg-cp-paper flex items-start gap-3">
+                  <Smartphone size={18} className="text-cp-ink shrink-0 mt-0.5" />
                   <div className="text-sm text-ink2">
                     <p className="font-medium text-ink mb-1">Upload videos already in vertical (9:16) mobile format.</p>
                     <p className="text-muted leading-relaxed">
@@ -1780,30 +1704,30 @@ function App() {
                 {/* Workflow */}
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="card p-5 space-y-2">
-                    <div className="w-10 h-10 rounded-input bg-paper3 flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-cp-input bg-cp-tint flex items-center justify-center">
                       <Upload size={18} className="text-brass" />
                     </div>
-                    <h3 className="font-medium text-ink lowercase">1. Drop your videos</h3>
+                    <h3 className="text-[17px] font-semibold text-cp-ink">1. Drop your videos</h3>
                     <p className="text-xs text-muted leading-relaxed">
                       Put your long-form vertical footage in the watched folder. The skill picks one video per run.
                     </p>
                   </div>
 
                   <div className="card p-5 space-y-2">
-                    <div className="w-10 h-10 rounded-input bg-paper3 flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-cp-input bg-cp-tint flex items-center justify-center">
                       <Users size={18} className="text-brass" />
                     </div>
-                    <h3 className="font-medium text-ink lowercase">2. AI clippers work</h3>
+                    <h3 className="text-[17px] font-semibold text-cp-ink">2. AI clippers work</h3>
                     <p className="text-xs text-muted leading-relaxed">
                       Whisper transcribes, Gemini 3 Flash spots viral beats, FFmpeg cuts each clip and adds a hook overlay.
                     </p>
                   </div>
 
                   <div className="card p-5 space-y-2">
-                    <div className="w-10 h-10 rounded-input bg-paper3 flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-cp-input bg-cp-tint flex items-center justify-center">
                       <CheckCircle2 size={18} className="text-brass" />
                     </div>
-                    <h3 className="font-medium text-ink lowercase">3. You validate, it ships</h3>
+                    <h3 className="text-[17px] font-semibold text-cp-ink">3. You validate, it ships</h3>
                     <p className="text-xs text-muted leading-relaxed">
                       Approve the candidates you like and the skill auto-publishes them to TikTok, Reels and YouTube Shorts via Upload-Post.
                     </p>
@@ -1814,7 +1738,7 @@ function App() {
                 <div className="card p-6 md:p-8 space-y-5">
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div>
-                      <h2 className="font-display lowercase text-xl text-ink mb-1">skill-autoshorts</h2>
+                      <h2 className="text-lg font-semibold text-cp-ink mb-1 font-cp-mono">skill-autoshorts</h2>
                       <p className="text-sm text-muted">
                         The Claude Code skill that powers this workflow. Install it once and trigger it whenever you want a fresh batch of clips.
                       </p>
@@ -1823,13 +1747,13 @@ function App() {
                       href="https://github.com/mutonby/skill-autoshorts"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-primary py-2 px-4 text-sm shrink-0"
+                      className="btn-quiet px-5 shrink-0"
                     >
                       View on GitHub <ExternalLink size={14} />
                     </a>
                   </div>
 
-                  <div className="bg-paper border border-rule rounded-card p-4 font-mono text-xs text-ink2 flex items-center justify-between gap-3">
+                  <div className="bg-cp-field border border-cp-line-strong rounded-cp-input px-4 h-12 font-cp-mono text-[13px] text-cp-ink flex items-center justify-between gap-3">
                     <span className="truncate">git clone https://github.com/mutonby/skill-autoshorts</span>
                     <button
                       onClick={() => navigator.clipboard.writeText('git clone https://github.com/mutonby/skill-autoshorts')}
@@ -1861,22 +1785,19 @@ function App() {
                 </div>
 
               </div>
-            </div>
+            </Screen>
           )}
 
           {/* View: UGC Gallery */}
           {activeTab === 'ugc-gallery' && (
-            <div className="h-full overflow-y-auto custom-scrollbar animate-fade">
-              <div className="max-w-6xl mx-auto p-4 sm:p-6 md:p-8">
-                <UGCGallery />
-              </div>
-            </div>
+            <Screen>
+              <UGCGallery />
+            </Screen>
           )}
 
           {/* View: Autopilot */}
           {activeTab === 'autopilot' && (
-            <div className="h-full overflow-y-auto custom-scrollbar animate-fade">
-              <div className="max-w-6xl mx-auto p-4 sm:p-6 md:p-8">
+            <Screen>
                 {isSignedIn ? (
                   <AutopilotTab
                     onOpenProject={restoreProject}
@@ -1894,17 +1815,14 @@ function App() {
                     <button onClick={() => setShowLogin(true)} className="btn-primary">sign in</button>
                   </div>
                 )}
-              </div>
-            </div>
+            </Screen>
           )}
 
           {/* View: History */}
           {activeTab === 'history' && (
-            <div className="h-full overflow-y-auto custom-scrollbar animate-fade">
-              <div className="max-w-6xl mx-auto p-4 sm:p-6 md:p-8">
-                <HistoryTab onReopenProject={restoreProject} />
-              </div>
-            </div>
+            <Screen>
+              <HistoryTab onReopenProject={restoreProject} />
+            </Screen>
           )}
 
           {activeTab === 'thumbnails' && (
@@ -1929,46 +1847,36 @@ function App() {
 
           {/* View: Dashboard (Idle) */}
           {activeTab === 'dashboard' && status === 'idle' && (
-            <div className="h-full overflow-y-auto custom-scrollbar animate-fade">
-              <div className="min-h-full flex flex-col items-center justify-center px-4 py-5 sm:p-6">
-              {/* On a phone the hero used to fill the fold on its own and push
-                  the uploader — the whole point of the screen — below it. The
-                  eyebrow, the display size and the gaps all shrink first. */}
-              <div className="max-w-xl w-full text-center space-y-5 sm:space-y-8">
-                <div className="space-y-2.5 sm:space-y-4">
-                  <p className="eyebrow hidden sm:block">01 · CLIP GENERATOR</p>
-                  <h1 className="font-display lowercase text-3xl sm:text-4xl md:text-5xl text-ink">
-                    Create Viral Shorts
-                  </h1>
-                  <p className="text-muted text-[15px] sm:text-lg leading-snug sm:leading-normal max-w-sm sm:max-w-none mx-auto">
-                    Drop your long-form video below to instantly generate viral clips with AI.
-                  </p>
-                  {/* The same pipeline is an MCP server: point people at the
-                      one place that explains how to drive it from an agent. */}
-                  {!tutorialLock && (
-                  <p className="text-xs text-muted">
-                    Or let an agent do it:{' '}
+            <Screen>
+              <ScreenHeader
+                eyebrow="01 · CLIP GENERATOR"
+                title="Turn long videos into shorts"
+                subtitle="Drop in a long video. We'll find the moments worth posting, reframe them and add captions."
+              >
+                {/* The same pipeline is an MCP server: point people at the
+                    one place that explains how to drive it from an agent. */}
+                {!tutorialLock && (
+                  <p className="text-sm text-cp-ink-2">
+                    Prefer to automate it?{' '}
                     <a
                       href={billingEnabled ? '#/account' : '#app'}
                       onClick={(e) => { if (!billingEnabled) { e.preventDefault(); goToTab('settings'); } }}
-                      className="text-ink2 underline underline-offset-2 hover:text-brass transition-colors"
+                      className="text-cp-ink underline underline-offset-[3px]"
                     >
-                      connect Claude, ChatGPT or n8n →
+                      Connect Claude, ChatGPT or n8n →
                     </a>
                   </p>
-                  )}
-                </div>
+                )}
+              </ScreenHeader>
 
-                <MediaInput onProcess={handleProcess} isProcessing={status === 'processing'} />
+              <MediaInput onProcess={handleProcess} isProcessing={status === 'processing'} />
 
-                <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-muted text-xs sm:text-sm">
-                  <span className="flex items-center gap-2"><Youtube size={16} /> YouTube</span>
-                  <span className="flex items-center gap-2"><Instagram size={16} /> Instagram</span>
-                  <span className="flex items-center gap-2"><TikTokIcon size={16} /> TikTok</span>
-                </div>
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-cp-ink-2 text-xs sm:text-sm">
+                <span className="flex items-center gap-2"><Youtube size={16} /> YouTube</span>
+                <span className="flex items-center gap-2"><Instagram size={16} /> Instagram</span>
+                <span className="flex items-center gap-2"><TikTokIcon size={16} /> TikTok</span>
               </div>
-              </div>
-            </div>
+            </Screen>
           )}
 
           {/* View: Processing / Results (Split View) */}
@@ -1978,9 +1886,9 @@ function App() {
               {/* Left Panel: Preview & Status */}
               <div className={`${status === 'complete' ? 'w-full md:w-[30%] lg:w-[25%]' : 'w-full md:w-[55%] lg:w-[60%]'} md:h-full flex flex-col shrink-0 md:shrink card p-3.5 sm:p-6 md:overflow-y-auto custom-scrollbar transition-all duration-700 ease-in-out`}>
                 <div className="mb-4 sm:mb-6 flex items-center justify-between gap-2">
-                  <h2 className="text-sm font-medium text-ink lowercase flex items-center gap-2">
-                    <Activity className={`text-brass ${status === 'processing' ? 'animate-pulse' : ''}`} size={18} />
-                    Live Analysis
+                  <h2 className="cp-h2 flex items-center gap-2">
+                    {status === 'processing' && <Loader2 className="animate-spin text-cp-ink-2" size={18} />}
+                    {status === 'processing' ? 'Working on your video' : status === 'complete' ? 'Your video' : 'Something went wrong'}
                   </h2>
                   <span className={status === 'processing' ? 'badge-brass' :
                     status === 'complete' ? 'badge-ok' :
@@ -2090,13 +1998,12 @@ function App() {
                     below. Wrapping them all together dropped a lone half-width
                     "schedule week" pill under the title on a phone. */}
                 <div className="mb-4 sm:mb-6 shrink-0 space-y-3">
-                  <h2 className="font-display lowercase text-lg sm:text-xl text-ink flex flex-wrap items-center gap-2">
-                    <span className="mr-auto">Generated Shorts</span>
-                    {results?.clips?.length > 0 && (
-                      <span className="readout bg-paper3 px-2.5 py-1 rounded-full">
-                        {results.clips.length} Clips
-                      </span>
-                    )}
+                  <h2 className="cp-h2 flex flex-wrap items-center gap-2">
+                    <span className="mr-auto">
+                      {results?.clips?.length > 0
+                        ? `${results.clips.length} ${results.clips.length === 1 ? 'clip' : 'clips'} worth posting`
+                        : 'Your clips'}
+                    </span>
                     {results?.cost_analysis && !isManaged && (
                       <span className="readout bg-paper3 px-2.5 py-1 rounded-full" title={`Input: ${results.cost_analysis.input_tokens} | Output: ${results.cost_analysis.output_tokens}`}>
                         GEMINI · ${results.cost_analysis.total_cost.toFixed(5)}
@@ -2112,8 +2019,8 @@ function App() {
                         title="Download all clips as a ZIP"
                       >
                         {downloadingAll
-                          ? <><Loader2 size={14} className="animate-spin" />zipping…</>
-                          : <><Download size={14} />download all</>}
+                          ? <><Loader2 size={14} className="animate-spin" />Zipping…</>
+                          : <><Download size={14} />Download all</>}
                       </button>
                       {results.clips.length > 1 && (
                         <button
@@ -2121,7 +2028,7 @@ function App() {
                           className="btn-primary px-4 py-2 text-xs"
                         >
                           <Calendar size={14} />
-                          schedule week
+                          Schedule the week
                         </button>
                       )}
                     </div>
