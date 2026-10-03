@@ -74,3 +74,57 @@ def test_parse_json_tolerates_fences_and_prose():
 
 def test_parse_json_ignores_trailing_garbage():
     assert thumbnail._parse_json('{"a": [1]}\n  ]\n}') == {"a": [1]}
+
+
+class _FakeModels:
+    """Stands in for client.models: raises the queued errors, then answers."""
+
+    def __init__(self, errors):
+        self.errors = list(errors)
+        self.calls = []
+
+    def generate_content(self, model, **kwargs):
+        self.calls.append(model)
+        if self.errors:
+            raise self.errors.pop(0)
+        return f"ok:{model}"
+
+
+class _FakeClient:
+    def __init__(self, errors):
+        self.models = _FakeModels(errors)
+
+
+UNAVAILABLE = RuntimeError("503 UNAVAILABLE. This model is currently experiencing high demand.")
+
+
+@pytest.fixture
+def no_sleep(monkeypatch):
+    monkeypatch.setattr(thumbnail.time, "sleep", lambda s: None)
+
+
+def test_generate_retries_a_503_then_succeeds(no_sleep):
+    client = _FakeClient([UNAVAILABLE, UNAVAILABLE])
+    assert thumbnail._generate(client, model=thumbnail.TEXT_MODEL, contents=["x"]) == f"ok:{thumbnail.TEXT_MODEL}"
+    assert client.models.calls == [thumbnail.TEXT_MODEL] * 3
+
+
+def test_generate_falls_back_when_the_text_model_stays_overloaded(no_sleep, monkeypatch):
+    monkeypatch.setattr(thumbnail, "FALLBACK_TEXT_MODEL", "fallback-model")
+    client = _FakeClient([UNAVAILABLE] * (len(thumbnail.RETRY_DELAYS) + 1))
+    assert thumbnail._generate(client, model=thumbnail.TEXT_MODEL, contents=["x"]) == "ok:fallback-model"
+    assert client.models.calls[-1] == "fallback-model"
+
+
+def test_generate_image_model_has_no_fallback(no_sleep):
+    client = _FakeClient([UNAVAILABLE] * (len(thumbnail.RETRY_DELAYS) + 1))
+    with pytest.raises(RuntimeError, match="503"):
+        thumbnail._generate(client, model=thumbnail.IMAGE_MODEL, contents=["x"])
+    assert set(client.models.calls) == {thumbnail.IMAGE_MODEL}
+
+
+def test_generate_does_not_retry_a_permanent_error(no_sleep):
+    client = _FakeClient([ValueError("400 INVALID_ARGUMENT: API key not valid")])
+    with pytest.raises(ValueError):
+        thumbnail._generate(client, model=thumbnail.TEXT_MODEL, contents=["x"])
+    assert len(client.models.calls) == 1
