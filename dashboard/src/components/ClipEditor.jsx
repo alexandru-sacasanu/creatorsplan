@@ -5,6 +5,7 @@ import {
     PanelLeft, PanelLeftClose, Film,
 } from 'lucide-react';
 import { getApiUrl } from '../config';
+import Toggle from './ui/Toggle';
 import { apiFetch, apiJson, QuotaError } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -1510,17 +1511,11 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
                         <div className="space-y-2.5">
                             <label className="flex items-center justify-between cursor-pointer">
                                 <span className="text-xs lowercase text-ink2">snap cuts to words</span>
-                                <span className="relative inline-flex items-center">
-                                    <input type="checkbox" checked={snapToWords} onChange={(e) => setSnapToWords(e.target.checked)} className="sr-only peer" />
-                                    <span className="w-8 h-4 rounded-full bg-paper3 peer-checked:bg-brass transition-colors after:content-[''] after:absolute after:left-0.5 after:top-0.5 after:w-3 after:h-3 after:rounded-full after:bg-ink after:transition-transform peer-checked:after:translate-x-4" />
-                                </span>
+                                <Toggle checked={snapToWords} onChange={setSnapToWords} />
                             </label>
                             <label className="flex items-center justify-between cursor-pointer">
                                 <span className="text-xs lowercase text-ink2">re-apply captions after recut</span>
-                                <span className="relative inline-flex items-center">
-                                    <input type="checkbox" checked={reapplyCaptions} onChange={(e) => setReapplyCaptions(e.target.checked)} className="sr-only peer" />
-                                    <span className="w-8 h-4 rounded-full bg-paper3 peer-checked:bg-brass transition-colors after:content-[''] after:absolute after:left-0.5 after:top-0.5 after:w-3 after:h-3 after:rounded-full after:bg-ink after:transition-transform peer-checked:after:translate-x-4" />
-                                </span>
+                                <Toggle checked={reapplyCaptions} onChange={setReapplyCaptions} />
                             </label>
                         </div>
 

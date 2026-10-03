@@ -147,26 +147,26 @@ export default function MediaInput({ onProcess, isProcessing }) {
 
     return (
         <div className="card p-4 sm:p-6 animate-fade">
-            <div className="flex gap-4 sm:gap-6 mb-6 border-b border-rule" data-tutorial="source-tabs">
+            <div className="cp-tabs mb-6" role="tablist" data-tutorial="source-tabs">
                 <button
+                    type="button"
+                    role="tab"
+                    aria-selected={mode === 'file'}
                     onClick={() => setMode('file')}
-                    className={`flex items-center gap-2 pb-3 px-1 -mb-px border-b-2 text-sm lowercase whitespace-nowrap transition-colors ${mode === 'file'
-                        ? 'text-ink border-brass'
-                        : 'text-muted border-transparent hover:text-ink2'
-                        }`}
+                    className="cp-tab"
                 >
-                    <Upload size={16} className={`hidden sm:block ${mode === 'file' ? 'text-brass' : ''}`} />
+                    <Upload size={16} />
                     Upload File
                 </button>
                 {youtubeUrlEnabled && (
                     <button
+                        type="button"
+                        role="tab"
+                        aria-selected={mode === 'url'}
                         onClick={() => setMode('url')}
-                        className={`flex items-center gap-2 pb-3 px-1 -mb-px border-b-2 text-sm lowercase whitespace-nowrap transition-colors ${mode === 'url'
-                            ? 'text-ink border-brass'
-                            : 'text-muted border-transparent hover:text-ink2'
-                            }`}
+                        className="cp-tab"
                     >
-                        <Link2 size={16} className={`hidden sm:block ${mode === 'url' ? 'text-brass' : ''}`} />
+                        <Link2 size={16} />
                         Video URL
                     </button>
                 )}
