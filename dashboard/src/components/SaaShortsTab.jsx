@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Globe, Sparkles, Download, Copy, Check, ChevronRight, ChevronLeft, Loader2, AlertCircle, Volume2, User, Film, Terminal, ChevronDown, RefreshCw, Share2, Calendar, Upload } from 'lucide-react';
+import { Globe, Download, Copy, Check, ChevronRight, ChevronLeft, Loader2, AlertCircle, Volume2, User, Film, Terminal, ChevronDown, RefreshCw, Share2, Calendar, Upload } from 'lucide-react';
 import { getApiUrl } from '../config';
 import { apiFetch } from '../lib/api';
 import StepIndicator from './ui/StepIndicator';
 import SegmentedControl from './ui/SegmentedControl';
+import { Screen, ScreenHeader } from './ui/Screen';
 
 const STYLE_OPTIONS = [
   { id: 'ugc', label: 'UGC Natural', desc: 'Authentic, talking to camera' },
@@ -394,23 +395,17 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
   // ─── Render Steps ─────────────────────────────────────────────────
 
   return (
-    <div className="h-full overflow-y-auto custom-scrollbar">
-      <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
-        {/* Header */}
-        <div className="flex items-end justify-between mb-2">
-          <div>
-            <p className="eyebrow mb-2">03 · AI SHORTS</p>
-            <h1 className="font-display lowercase text-2xl text-ink">AI Shorts</h1>
-          </div>
-          {step > 0 && (
-            <button onClick={handleReset} className="text-xs lowercase text-muted hover:text-ink flex items-center gap-1 transition-colors">
-              <RefreshCw size={12} /> Start over
+    <Screen>
+        <ScreenHeader
+          eyebrow="02 · AI SHORTS · BYOK"
+          title="Make a UGC-style ad"
+          subtitle="Describe a product and an AI presenter will talk about it on camera."
+          actions={step > 0 ? (
+            <button onClick={handleReset} className="btn-text">
+              <RefreshCw size={13} /> Start over
             </button>
-          )}
-        </div>
-        <p className="text-sm lowercase text-muted mb-6">
-          Generate viral UGC videos for any product or business
-        </p>
+          ) : null}
+        />
 
         {/* Progress Steps */}
         <div className="mb-8">
@@ -419,34 +414,32 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
 
         {/* ── Step 0: URL Input ────────────────────────────────── */}
         {step === 0 && (
-          <div className="animate-fade space-y-6">
+          <div className="cp-rise space-y-6">
             <div className="card p-4 sm:p-8 space-y-6">
               {/* Video Mode Selector */}
               <div>
-                <label className="eyebrow block mb-3">Video Mode</label>
+                <label className="cp-label block mb-3">Video quality</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
                     onClick={() => setVideoMode('lowcost')}
-                    className={`card card-hover p-4 text-left ${
-                      videoMode === 'lowcost' ? 'border-brass' : ''
-                    }`}
+                    aria-pressed={videoMode === 'lowcost'}
+                    className="cp-select-card p-4 text-left"
                   >
                     <div className="flex items-center justify-between mb-1.5 gap-2">
                       <span className={`text-sm font-medium lowercase ${videoMode === 'lowcost' ? 'text-ink' : 'text-ink2'}`}>Low Cost</span>
-                      <span className="badge-ok">recommended</span>
+                      <span className="cp-badge-ink">recommended</span>
                     </div>
                     <p className="readout mb-1.5">~$0.80 / VIDEO</p>
                     <p className="text-xs text-muted leading-relaxed">Hailuo 2.3 img2video + VEED Lipsync. Good movement + lip-sync.</p>
                   </button>
                   <button
                     onClick={() => setVideoMode('premium')}
-                    className={`card card-hover p-4 text-left ${
-                      videoMode === 'premium' ? 'border-brass' : ''
-                    }`}
+                    aria-pressed={videoMode === 'premium'}
+                    className="cp-select-card p-4 text-left"
                   >
                     <div className="flex items-center justify-between mb-1.5 gap-2">
                       <span className={`text-sm font-medium lowercase ${videoMode === 'premium' ? 'text-ink' : 'text-ink2'}`}>Premium</span>
-                      <span className="badge-brass">best quality</span>
+                      <span className="cp-badge-outline">best quality</span>
                     </div>
                     <p className="readout mb-1.5">~$2.00 / VIDEO</p>
                     <p className="text-xs text-muted leading-relaxed">Kling Avatar v2 Standard. Full integrated movement.</p>
@@ -455,7 +448,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
               </div>
 
               <div>
-                <label className="eyebrow block mb-2">Website URL <span className="opacity-60">(optional)</span></label>
+                <label className="cp-label block mb-2">Website URL <span className="cp-label-hint">(optional)</span></label>
                 <div className="flex gap-3">
                   <div className="relative flex-1">
                     <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
@@ -473,8 +466,8 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
               </div>
 
               <div>
-                <label className="eyebrow block mb-2">
-                  {url.trim() ? 'Extra context' : 'Describe your product/business'} <span className="opacity-60">{url.trim() ? '(optional)' : '(required if no URL)'}</span>
+                <label className="cp-label block mb-2">
+                  {url.trim() ? 'Extra context' : 'Describe your product/business'} <span className="cp-label-hint">{url.trim() ? '(optional)' : '(required if no URL)'}</span>
                 </label>
                 <textarea
                   value={description}
@@ -486,7 +479,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
               </div>
 
               <div>
-                <label className="eyebrow block mb-3">Language</label>
+                <label className="cp-label block mb-3">Language</label>
                 <div className="mb-6">
                   <SegmentedControl
                     options={[
@@ -498,7 +491,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                   />
                 </div>
 
-                <label className="eyebrow block mb-3">Actor</label>
+                <label className="cp-label block mb-3">Actor</label>
                 <div className="mb-6">
                   <SegmentedControl
                     options={[
@@ -510,7 +503,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                   />
                 </div>
 
-                <label className="eyebrow block mb-3">Video Style</label>
+                <label className="cp-label block mb-3">Video Style</label>
                 <SegmentedControl
                   options={STYLE_OPTIONS.map((s) => ({ value: s.id, label: s.label, hint: s.desc }))}
                   value={style}
@@ -520,7 +513,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
               </div>
 
               <div>
-                <label className="eyebrow block mb-3">Number of Scripts</label>
+                <label className="cp-label block mb-3">Number of Scripts</label>
                 <SegmentedControl
                   options={[1, 2, 3, 5].map((n) => ({ value: n, label: String(n) }))}
                   value={numScripts}
@@ -539,7 +532,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
               <button
                 onClick={handleAnalyze}
                 disabled={analyzing || (!url.trim() && !description.trim())}
-                className="btn-primary w-full"
+                className="btn-quiet w-full min-h-[52px] text-[15px]"
               >
                 {analyzing ? (
                   <>
@@ -548,8 +541,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                   </>
                 ) : (
                   <>
-                    <Sparkles size={16} className="hidden sm:block" />
-                    {url.trim() ? 'research & generate scripts' : 'generate scripts'}
+                    Analyze
                   </>
                 )}
               </button>
@@ -575,7 +567,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
 
         {/* ── Step 1: Analysis Results ─────────────────────────── */}
         {step === 1 && analysis && (
-          <div className="animate-fade space-y-6">
+          <div className="cp-rise space-y-6">
             {/* Analysis Summary */}
             <div className="card p-6">
               <div className="flex items-center justify-between mb-4 gap-3">
@@ -711,7 +703,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
             {/* Scripts */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-display lowercase text-xl text-ink">Generated Scripts</h2>
+                <h2 className="cp-h2">Pick a script</h2>
                 <span className="readout">{scripts.length} scripts</span>
               </div>
 
@@ -720,14 +712,13 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                   <div
                     key={i}
                     onClick={() => handleSelectScript(i)}
-                    className={`card card-hover p-5 cursor-pointer ${
-                      selectedScript === i ? 'border-brass' : ''
-                    }`}
+                    aria-pressed={selectedScript === i}
+                    className="cp-select-card p-5 cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
                         <span className={`w-7 h-7 rounded-full border flex items-center justify-center font-mono text-micro ${
-                          selectedScript === i ? 'border-brass text-brass' : 'border-rule text-muted'
+                          selectedScript === i ? 'border-cp-ink bg-cp-ink text-cp-paper' : 'border-cp-line-strong text-cp-ink-2'
                         }`}>
                           {String(i + 1).padStart(2, '0')}
                         </span>
@@ -737,7 +728,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                         </div>
                       </div>
                       {selectedScript === i && (
-                        <span className="badge-brass">selected</span>
+                        <span className="cp-badge-ink">selected</span>
                       )}
                     </div>
 
@@ -784,11 +775,11 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
             </div>
 
             <div className="flex justify-between">
-              <button onClick={() => setStep(0)} className="btn-ghost px-4 py-2 text-sm">
+              <button onClick={() => setStep(0)} className="btn-text">
                 <ChevronLeft size={14} /> Back
               </button>
-              <button onClick={() => setStep(2)} className="btn-primary px-6 py-2 text-sm">
-                Configure video <ChevronRight size={14} />
+              <button onClick={() => setStep(2)} className="btn-quiet px-6">
+                Continue <ChevronRight size={14} />
               </button>
             </div>
           </div>
@@ -796,16 +787,16 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
 
         {/* ── Step 2: Configure ────────────────────────────────── */}
         {step === 2 && scripts[selectedScript] && (
-          <div className="animate-fade space-y-6">
+          <div className="cp-rise space-y-6">
             <div className="card p-6 space-y-5">
-              <h2 className="font-display lowercase text-xl text-ink">Configure Video</h2>
+              <h2 className="cp-h2">Presenter and voice</h2>
               <p className="text-sm lowercase text-muted">
                 script: <strong className="text-ink2 normal-case font-medium">{scripts[selectedScript].title}</strong>
               </p>
 
               {/* Voice Selection */}
               <div>
-                <label className="eyebrow block mb-2">
+                <label className="cp-label block mb-2">
                   Voice {language === 'es' ? '(Spanish)' : '(English)'}
                 </label>
                 {(() => {
@@ -841,7 +832,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                             onClick={() => setSelectedVoice(v.voice_id)}
                             className={`w-full flex items-center gap-3 p-2.5 rounded-input border text-left transition-colors duration-200 ${
                               selectedVoice === v.voice_id
-                                ? 'border-brass bg-paper3'
+                                ? 'border-brass bg-cp-volt-soft'
                                 : 'border-rule bg-paper hover:bg-paper3'
                             }`}
                           >
@@ -902,7 +893,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
 
               {/* Actor Selection: Gallery + Generate New */}
               <div>
-                <label className="eyebrow block mb-2">
+                <label className="cp-label block mb-2">
                   AI Actor — Choose Your Actor
                 </label>
 
@@ -991,7 +982,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                           </div>
                         )}
                         {!uploadedActorPreview.serverUrl && (
-                          <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
+                          <div className="absolute inset-0 bg-paper2/90 flex items-center justify-center">
                             <Loader2 size={12} className="animate-spin text-ink" />
                           </div>
                         )}
@@ -1061,7 +1052,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                               <Check size={12} className="text-brassink" />
                             </div>
                           )}
-                          <span className="absolute bottom-1.5 left-1.5 readout bg-black/70 text-ink2 px-1.5 py-0.5 rounded-full">
+                          <span className="absolute bottom-1.5 left-1.5 readout bg-paper2/90 text-ink2 px-1.5 py-0.5 rounded-full">
                             New {i+1}
                           </span>
                         </button>
@@ -1077,7 +1068,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
 
               {/* Narration Edit */}
               <div>
-                <label className="eyebrow block mb-2">
+                <label className="cp-label block mb-2">
                   Narration Script
                 </label>
                 <textarea
@@ -1145,20 +1136,20 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
             </div>
 
             <div className="flex justify-between">
-              <button onClick={() => setStep(1)} className="btn-ghost px-4 py-2 text-sm">
+              <button onClick={() => setStep(1)} className="btn-text">
                 <ChevronLeft size={14} /> Back
               </button>
               <button
                 onClick={handleGenerate}
                 disabled={!falKey || !elevenLabsKey || !selectedActor || generating}
-                className="btn-primary px-6 py-2 text-sm"
+                className="btn-primary px-6"
               >
                 {generating ? (
                   <><Loader2 size={14} className="animate-spin" /> Generating...</>
                 ) : !selectedActor ? (
                   <><User size={14} /> Select an actor first</>
                 ) : (
-                  <><Film size={14} /> Generate video (~${videoMode === 'lowcost' ? '0.65' : '2.00'})</>
+                  <>Generate video <span className="font-cp-mono text-[13px] font-medium">~${videoMode === 'lowcost' ? '0.65' : '2.00'}</span></>
                 )}
               </button>
             </div>
@@ -1167,10 +1158,10 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
 
         {/* ── Step 3: Generation Progress ──────────────────────── */}
         {step === 3 && (
-          <div className="animate-fade space-y-6">
+          <div className="cp-rise space-y-6">
             <div className="card p-6">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="font-display lowercase text-xl text-ink">Video Generation</h2>
+                <h2 className="cp-h2">Video Generation</h2>
                 <span className={
                   genStatus === 'processing' ? 'badge-brass' :
                   genStatus === 'completed' ? 'badge-ok' :
@@ -1272,15 +1263,16 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
 
         {/* ── Step 4: Results ──────────────────────────────────── */}
         {step === 4 && genResult && (
-          <div className="animate-fade space-y-6">
+          <div className="cp-rise space-y-6">
             <div className="card p-6">
-              <h2 className="font-display lowercase text-xl text-ink mb-4">
-                Your Short is Ready
-              </h2>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="badge-ok">ready</span>
+                <h2 className="cp-h2">Your short is ready</h2>
+              </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Video Player */}
-                <div className="card aspect-[9/16] max-h-[500px] bg-black overflow-hidden relative">
+                <div className="aspect-[9/16] w-full max-w-[240px] rounded-cp-select bg-cp-ink overflow-hidden relative">
                   <video
                     src={getApiUrl(genResult.video_url)}
                     controls
@@ -1358,15 +1350,15 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                     <a
                       href={getApiUrl(genResult.video_url)}
                       download
-                      className="btn-primary px-4 py-2 text-sm"
+                      className="btn-quiet px-5"
                     >
-                      <Download size={14} /> Download
+                      <Download size={14} /> Download MP4
                     </a>
                     <button
                       onClick={handleReset}
-                      className="btn-ghost px-4 py-2 text-sm"
+                      className="btn-ghost px-5"
                     >
-                      <RefreshCw size={14} /> New video
+                      Make another
                     </button>
                   </div>
 
@@ -1487,7 +1479,6 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </Screen>
   );
 }

@@ -952,7 +952,7 @@ export default function ClipEditor({ jobId, clipIndex, clipTitle, onClose, onRer
     // ---- render -------------------------------------------------------------
     if (loadError) {
         return (
-            <div className="fixed inset-0 z-[110] bg-black/70 flex items-center justify-center p-4 animate-fade" onMouseDown={onClose}>
+            <div className="fixed inset-0 z-[110] bg-ink/40 flex items-center justify-center p-4 animate-fade" onMouseDown={onClose}>
                 <div className="card p-6 max-w-md" onMouseDown={(e) => e.stopPropagation()}>
                     <p className="eyebrow mb-2">EDITOR · CLIP {clipIndex + 1}</p>
                     <div className="flex items-center gap-2 text-danger text-sm"><AlertCircle size={16} /> {loadError}</div>
