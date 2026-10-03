@@ -6122,7 +6122,7 @@ async def thumbnail_generate(
         )
 
         if not thumbnails:
-            raise HTTPException(status_code=500, detail="Thumbnail generation failed. Please check your Gemini API key has access to image generation (gemini-3.1-flash-image-preview model).")
+            raise HTTPException(status_code=500, detail="Thumbnail generation failed. Please check your Gemini API key has quota for the image model (GEMINI_IMAGE_MODEL).")
 
         # Success — charge the reserved minutes.
         if reservation_id:
