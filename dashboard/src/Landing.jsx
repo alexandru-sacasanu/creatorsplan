@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowDown, ArrowRight } from 'lucide-react';
 import BrandFilm from './components/landing/BrandFilm';
 import HeroBackdrop from './components/landing/HeroBackdrop';
@@ -55,6 +55,42 @@ function useHeroIntro(videoRef, heroRef) {
   const startedRef = useRef(false);
   const visibleRef = useRef(true);
 
+  // Muted is what lets a browser start the video without a click, and React
+  // only sets the property: Safari also wants the attribute on the element.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.defaultMuted = true;
+    v.setAttribute('muted', '');
+  }, [videoRef]);
+
+  // play() can be refused (Low Power Mode, a site set to "never auto-play",
+  // a play() that lands before the source is ready). Retry when the video
+  // becomes playable and, failing that, on the visitor's first interaction.
+  const tryPlay = useCallback(() => {
+    const v = videoRef.current;
+    if (!v || !startedRef.current || !visibleRef.current || v.ended) return;
+    const p = v.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch((err) => console.warn('[hero] video did not start:', err?.name || err));
+    }
+  }, [videoRef]);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || reduced) return undefined;
+    const retry = () => { if (v.paused) tryPlay(); };
+    const kick = () => { retry(); if (!v.paused) gestures.forEach((e) => window.removeEventListener(e, kick)); };
+    const gestures = ['pointerdown', 'keydown', 'touchstart', 'wheel'];
+    v.addEventListener('canplay', retry);
+    gestures.forEach((e) => window.addEventListener(e, kick, { passive: true }));
+    return () => {
+      v.removeEventListener('canplay', retry);
+      gestures.forEach((e) => window.removeEventListener(e, kick));
+    };
+  }, [videoRef, reduced, tryPlay]);
+
   // Buffering -> progress, and the "can play through" signal.
   useEffect(() => {
     const v = videoRef.current;
@@ -91,11 +127,10 @@ function useHeroIntro(videoRef, heroRef) {
   useEffect(() => {
     if (phase !== 'leaving') return undefined;
     startedRef.current = true;
-    const v = videoRef.current;
-    if (v && visibleRef.current) v.play().catch(() => {});
+    tryPlay();
     const id = window.setTimeout(() => setPhase('done'), LOADER_FADE_MS);
     return () => window.clearTimeout(id);
-  }, [phase, videoRef]);
+  }, [phase, tryPlay]);
 
   // No scrolling behind the loader.
   useEffect(() => {
@@ -114,11 +149,11 @@ function useHeroIntro(videoRef, heroRef) {
       visibleRef.current = entry.isIntersecting;
       const v = videoRef.current;
       if (!v || !startedRef.current) return;
-      if (entry.isIntersecting) { if (!v.ended) v.play().catch(() => {}); } else v.pause();
+      if (entry.isIntersecting) tryPlay(); else v.pause();
     }, { threshold: 0.05 });
     io.observe(el);
     return () => io.disconnect();
-  }, [heroRef, videoRef, reduced]);
+  }, [heroRef, videoRef, reduced, tryPlay]);
 
   return { phase, progress, reduced };
 }
@@ -205,7 +240,7 @@ export default function Landing({ onLaunchApp }) {
             <a href="#app" onClick={launch} className="btn-primary min-h-[56px] px-7 text-[17px]">
               Drop in your first video <ArrowRight size={16} />
             </a>
-            <a href="#how" className="btn-ghost min-h-[56px] bg-transparent px-6 text-[17px]">How it works</a>
+            <a href="#how" className="btn-ghost min-h-[56px] border-[1.5px] border-cp-ink px-6 text-[17px]">How it works</a>
           </div>
         </section>
 

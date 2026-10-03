@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 
 // The landing hero's background: the zeus video under three paper layers.
-//   1. a 50% paper-white wash over the whole frame,
+//   1. a 42% paper-white wash over the whole frame,
 //   2. a lighter patch behind the headline so the type reads on any frame,
 //   3. a fade to the page color at the bottom, so the hero melts into the page.
 // The video never loops: after one play it holds its last frame. Playback is
@@ -23,10 +23,12 @@ const HeroBackdrop = forwardRef(function HeroBackdrop(props, ref) {
         tabIndex={-1}
         {...props}
       >
-        <source src="/media/zeus-hero.webm" type="video/webm" />
-        <source src="/media/zeus-hero.mp4" type="video/mp4" />
+        {/* The codecs string lets a browser without VP9 (older Safari) skip
+            straight to the MP4 instead of picking a WebM it cannot decode. */}
+        <source src="/media/zeus-hero.webm" type='video/webm; codecs="vp9"' />
+        <source src="/media/zeus-hero.mp4" type='video/mp4; codecs="avc1.640032"' />
       </video>
-      <div className="absolute inset-0" style={{ background: `rgba(${PAPER}, 0.5)` }} />
+      <div className="absolute inset-0" style={{ background: `rgba(${PAPER}, 0.42)` }} />
       <div
         className="absolute inset-0"
         style={{ background: `radial-gradient(ellipse 50% 42% at 50% 50%, rgba(${PAPER}, 0.62), rgba(${PAPER}, 0.3) 55%, rgba(${PAPER}, 0) 80%)` }}
