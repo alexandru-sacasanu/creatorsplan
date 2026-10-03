@@ -346,7 +346,7 @@ export default function MediaInput({ onProcess, isProcessing }) {
                                 material doesn't hold them. Leave blank to let it decide.
                             </p>
                             <div className="col-span-1 sm:col-span-3 flex flex-wrap items-center justify-between gap-3 pt-3 sm:pt-1 border-t border-rule">
-                                <span className="text-xs text-ink2">vertical layout</span>
+                                <span className="text-xs text-ink2">Vertical layout</span>
                                 <select
                                     value={layout}
                                     onChange={(e) => setLayout(e.target.value)}
@@ -367,7 +367,7 @@ export default function MediaInput({ onProcess, isProcessing }) {
                                         onChange={(e) => setAutoHook(e.target.checked)}
                                         className="w-4 h-4 shrink-0 accent-[#14120F] cursor-pointer"
                                     />
-                                    auto hook titles on clips
+                                    Auto hook titles on clips
                                 </label>
                                 {autoHook && (
                                     <select

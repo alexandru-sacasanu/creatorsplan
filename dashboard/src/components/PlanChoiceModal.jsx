@@ -49,10 +49,10 @@ export default function PlanChoiceModal({ onClose }) {
           {/* Free — the default */}
           <div className="card p-5 flex flex-col border-brass">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="font-display lowercase text-lg text-ink">free</h3>
+              <h3 className="font-display text-lg text-ink">Free</h3>
               <span className="badge-ok">$0</span>
             </div>
-            <p className="text-muted text-xs mb-3 lowercase">try it on your own videos</p>
+            <p className="text-muted text-xs mb-3">Try it on your own videos</p>
             <ul className="space-y-1.5 text-sm text-ink2 mb-4 flex-1">
               <li className="flex items-start gap-2"><Check size={15} className="text-ok shrink-0 mt-0.5" /> <span><b>{FREE_MINUTES} min</b> / month</span></li>
               <li className="flex items-start gap-2"><Check size={15} className="text-ok shrink-0 mt-0.5" /> <span>No credit card</span></li>
@@ -61,16 +61,16 @@ export default function PlanChoiceModal({ onClose }) {
             <button onClick={startFree} className="w-full btn-primary text-sm">
               Start free <ArrowRight size={15} />
             </button>
-            <p className="text-center text-[11px] text-muted mt-2 lowercase">no card · start clipping now</p>
+            <p className="text-center text-[11px] text-muted mt-2">No card · start clipping now</p>
           </div>
 
           {/* Paid — compact list */}
           <div className="card p-5 flex flex-col">
             <div className="flex items-center justify-between mb-1">
-              <h3 className="font-display lowercase text-lg text-ink">paid plans</h3>
+              <h3 className="font-display text-lg text-ink">Paid plans</h3>
               <Zap size={16} className="text-brass" />
             </div>
-            <p className="text-muted text-xs mb-3 lowercase">no watermark · more minutes · durable library</p>
+            <p className="text-muted text-xs mb-3">No watermark · more minutes · a library that stays</p>
             <div className="space-y-2 flex-1">
               {PLAN_ORDER.map((p) => {
                 const e = byPlan(p);
@@ -85,7 +85,7 @@ export default function PlanChoiceModal({ onClose }) {
               })}
             </div>
             <button onClick={() => { onClose(); window.location.hash = '#/pricing'; }}
-              className="text-center text-[11px] text-muted mt-3 lowercase hover:text-ink transition-colors">
+              className="text-center text-[11px] text-muted mt-3 hover:text-ink transition-colors">
               see full pricing & yearly →
             </button>
           </div>

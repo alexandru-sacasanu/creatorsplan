@@ -160,7 +160,7 @@ function AvatarCard({ avatar, copied, onCopy, i = 0 }) {
             </button>
           </div>
         ) : (
-          <p className="text-micro text-muted opacity-60 lowercase">No description</p>
+          <p className="text-micro text-muted opacity-60">No description</p>
         )}
         <a
           href={avatar.url}

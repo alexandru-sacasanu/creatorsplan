@@ -154,8 +154,8 @@ export default function TopUpModal({ onClose, required, remaining, partialMinute
                   Most popular
                 </span>
               )}
-              <h3 className="font-display lowercase text-lg text-ink">{entry.plan}</h3>
-              <p className="text-muted text-xs mb-3 lowercase">{PLAN_BLURBS[entry.plan] || ''}</p>
+              <h3 className="font-display text-lg text-ink">{entry.plan}</h3>
+              <p className="text-muted text-xs mb-3">{PLAN_BLURBS[entry.plan] || ''}</p>
               <div className="mb-3 flex items-baseline gap-1.5">
                 <span className="font-display text-3xl text-ink tabular-nums">{fmt(entry.amount, entry.currency)}</span>
                 <span className="readout">/mo</span>
@@ -184,7 +184,7 @@ export default function TopUpModal({ onClose, required, remaining, partialMinute
                   ? <Loader2 size={18} className="animate-spin" />
                   : `Get ${entry.plan}`}
               </button>
-              <p className="text-center text-xs text-muted mt-2 lowercase">cancel anytime.</p>
+              <p className="text-center text-xs text-muted mt-2">Cancel anytime.</p>
             </div>
           );
         })}
@@ -199,7 +199,7 @@ export default function TopUpModal({ onClose, required, remaining, partialMinute
       <div className="mt-4 text-center">
         {!showTopups ? (
           <button onClick={() => setShowTopups(true)}
-                  className="text-xs text-muted underline underline-offset-2 lowercase hover:text-ink2">
+                  className="text-xs text-muted underline underline-offset-2 hover:text-ink2">
             just need a few extra minutes? one-time packs
           </button>
         ) : (

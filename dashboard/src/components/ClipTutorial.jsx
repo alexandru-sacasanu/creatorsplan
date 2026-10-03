@@ -5,7 +5,7 @@ import Modal from './ui/Modal';
 const TOUR = [
   {
     target: '[data-tutorial="nav-clips"]',
-    title: 'Clip Generator',
+    title: 'Clip generator',
     body: 'This is the tool people come for. A long video in, vertical shorts out. The other menu items stay locked until you finish one run.',
   },
   {
@@ -57,7 +57,7 @@ function placeTip(rect, tipW, tipH, vw, vh) {
 }
 
 /**
- * First-login Clip Generator tutorial.
+ * First-login Clip generator tutorial.
  *  - intro: blocking modal
  *  - coach: Next/Back spotlight on each Clip Generator control
  *  - celebrate: modal after the first successful job
@@ -121,7 +121,7 @@ export default function ClipTutorial({ phase, jobStatus, errorText, onStart, onS
             <LayoutDashboard size={18} className="text-brass" />
           </div>
           <p className="text-sm text-ink2 leading-relaxed">
-            People come here for <b className="text-ink font-medium">Clip Generator</b>: a long video in,
+            People come here for <b className="text-ink font-medium">Clip generator</b>: a long video in,
             vertical shorts out. We will walk the screen, then you run one video.
           </p>
         </div>
@@ -131,7 +131,7 @@ export default function ClipTutorial({ phase, jobStatus, errorText, onStart, onS
         <button
           type="button"
           onClick={onSkip}
-          className="w-full mt-2 text-muted hover:text-ink text-sm lowercase py-2 transition-colors"
+          className="w-full mt-2 text-muted hover:text-ink text-sm py-2 transition-colors"
         >
           I'll explore later
         </button>
@@ -142,8 +142,7 @@ export default function ClipTutorial({ phase, jobStatus, errorText, onStart, onS
   if (phase === 'coach' && (jobStatus === 'processing' || jobStatus === 'error')) {
     return (
       <div
-        className="fixed z-[80] left-3 right-3 md:left-auto md:right-6 md:w-[22rem]
-          bottom-3 md:bottom-6 card p-4"
+        className="fixed z-[80] left-3 right-3 md:left-auto md:right-6 md:w-[22rem] bottom-3 md:bottom-6 card p-4"
         role="status"
       >
         <p className="eyebrow mb-2">First clips</p>
@@ -164,14 +163,13 @@ export default function ClipTutorial({ phase, jobStatus, errorText, onStart, onS
     if (step >= TOUR.length) {
       return (
         <div
-          className="fixed z-[80] inset-x-3 bottom-3 md:inset-x-auto md:right-6 md:bottom-6 md:max-w-sm
-            card px-4 py-3 flex flex-wrap items-center gap-x-3 gap-y-1"
+          className="fixed z-[80] inset-x-3 bottom-3 md:inset-x-auto md:right-6 md:bottom-6 md:max-w-sm card px-4 py-3 flex flex-wrap items-center gap-x-3 gap-y-1"
           role="status"
         >
           <p className="text-sm text-muted leading-snug flex-1 min-w-0">
             Your turn — add a video and generate.
           </p>
-          <button type="button" onClick={onSkip} className="text-xs lowercase text-muted hover:text-ink shrink-0">
+          <button type="button" onClick={onSkip} className="text-xs text-muted hover:text-ink shrink-0">
             skip
           </button>
         </div>
@@ -182,7 +180,7 @@ export default function ClipTutorial({ phase, jobStatus, errorText, onStart, onS
     const tip = spot?.tip;
 
     return (
-      <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-label="Clip Generator tutorial">
+      <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-label="Clip generator tutorial">
         {!hole && <div className="absolute inset-0 bg-ink/45" />}
         {hole && (
           <div
@@ -206,7 +204,7 @@ export default function ClipTutorial({ phase, jobStatus, errorText, onStart, onS
           }}
         >
           <p className="eyebrow mb-2">{String(step + 1).padStart(2, '0')} / {String(TOUR.length).padStart(2, '0')}</p>
-          <h3 className="font-display lowercase text-lg text-ink leading-tight mb-2">{spec.title}</h3>
+          <h3 className="font-display text-lg text-ink leading-tight mb-2">{spec.title}</h3>
           <p className="text-sm text-muted leading-relaxed mb-4">{spec.body}</p>
           <div className="flex flex-wrap items-center gap-2">
             {step > 0 && (
@@ -222,7 +220,7 @@ export default function ClipTutorial({ phase, jobStatus, errorText, onStart, onS
               {last ? 'Got it' : 'Next'} <ArrowRight size={14} />
             </button>
           </div>
-          <button type="button" onClick={onSkip} className="mt-3 text-xs lowercase text-muted hover:text-ink transition-colors">
+          <button type="button" onClick={onSkip} className="mt-3 text-xs text-muted hover:text-ink transition-colors">
             skip — unlock the rest
           </button>
         </div>
@@ -241,7 +239,7 @@ export default function ClipTutorial({ phase, jobStatus, errorText, onStart, onS
             That is the whole product, on one video.
           </p>
           <p className="text-sm text-muted leading-relaxed mb-6">
-            The other tools are unlocked. Come back to Clip Generator whenever you have another long video.
+            The other tools are unlocked. Come back to the clip generator whenever you have another long video.
           </p>
           <button type="button" onClick={onDismissCelebrate} className="btn-primary w-full">
             See my clips <ArrowRight size={16} />

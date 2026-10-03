@@ -23,8 +23,8 @@ export default function TikTokDraftNotice() {
     return (
         <div className="mb-4 px-3 py-2 rounded-input text-xs text-ink2 bg-paper3 flex items-start gap-2">
             <AlertCircle size={14} className="mt-0.5 shrink-0 text-brass" />
-            <div className="lowercase">
-                tiktok arrives as a <b className="text-ink">draft</b>, not a live post — you'll
+            <div className="">
+                TikTok arrives as a <b className="text-ink">draft</b>, not a live post — you'll
                 get a notification in the app. its api won't carry the title or description
                 onto a draft, so you write those there too, along with trending sounds,
                 effects and hashtags — which reaches more people than posting straight

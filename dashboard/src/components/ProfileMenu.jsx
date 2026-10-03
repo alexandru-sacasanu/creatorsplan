@@ -38,20 +38,20 @@ export default function ProfileMenu({ placement = 'down' }) {
           {!isManaged && (
             <button
               onClick={() => { setOpen(false); window.location.hash = '#/pricing'; }}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm lowercase text-brass hover:bg-paper3 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-brass hover:bg-paper3 transition-colors"
             >
               <ArrowUpRight size={16} /> Start free
             </button>
           )}
           <button
             onClick={() => { setOpen(false); window.location.hash = '#/account'; }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm lowercase text-ink2 hover:bg-paper3 transition-colors"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-ink2 hover:bg-paper3 transition-colors"
           >
             <CreditCard size={16} className="text-muted" /> Account &amp; billing
           </button>
           <button
             onClick={() => { setOpen(false); logout(); }}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm lowercase text-ink2 hover:bg-paper3 transition-colors border-t border-rule"
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-ink2 hover:bg-paper3 transition-colors border-t border-rule"
           >
             <LogOut size={16} className="text-muted" /> Sign out
           </button>

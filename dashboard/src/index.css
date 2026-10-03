@@ -123,7 +123,7 @@
 
   /* Primary (volt) button — only one per view. */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 text-[15px] font-semibold lowercase;
+    @apply inline-flex items-center justify-center gap-2 px-6 text-[15px] font-semibold;
     min-height: 52px;
     background: var(--cp-volt);
     color: var(--cp-ink);
@@ -145,7 +145,7 @@
 
   /* Secondary button — paper fill, border turns ink on hover. */
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-6 text-[15px] font-semibold lowercase;
+    @apply inline-flex items-center justify-center gap-2 px-6 text-[15px] font-semibold;
     min-height: 48px;
     color: var(--cp-ink);
     background: var(--cp-paper);
@@ -163,7 +163,7 @@
 
   /* Ink button — filled dark pill, e.g. "Analyze", "Download MP4". */
   .btn-quiet {
-    @apply inline-flex items-center justify-center gap-2 px-5 text-sm font-semibold lowercase;
+    @apply inline-flex items-center justify-center gap-2 px-5 text-sm font-semibold;
     min-height: 44px;
     background: var(--cp-ink);
     color: var(--cp-paper);
@@ -179,7 +179,7 @@
 
   /* Text button — underlined, e.g. "Back". */
   .btn-text {
-    @apply inline-flex items-center gap-1.5 text-sm font-medium lowercase text-cp-ink;
+    @apply inline-flex items-center gap-1.5 text-sm font-medium text-cp-ink;
     text-decoration: underline;
     text-underline-offset: 3px;
     transition: opacity var(--cp-dur-settle) var(--cp-ease-settle);
@@ -187,7 +187,7 @@
   .btn-text:hover { opacity: 0.7; }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm lowercase;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm;
     color: var(--cp-stop);
     border: 1px solid color-mix(in oklab, var(--cp-stop) 40%, transparent);
     border-radius: var(--cp-radius-pill);

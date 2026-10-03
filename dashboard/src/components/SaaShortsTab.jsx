@@ -7,11 +7,11 @@ import SegmentedControl from './ui/SegmentedControl';
 import { Screen, ScreenHeader } from './ui/Screen';
 
 const STYLE_OPTIONS = [
-  { id: 'ugc', label: 'UGC Natural', desc: 'Authentic, talking to camera' },
+  { id: 'ugc', label: 'UGC natural', desc: 'Authentic, talking to camera' },
   { id: 'educational', label: 'Educational', desc: 'Clear explanations' },
-  { id: 'shock', label: 'Shock/Discovery', desc: 'Surprising opener' },
+  { id: 'shock', label: 'Shock/discovery', desc: 'Surprising opener' },
   { id: 'story', label: 'Storytelling', desc: 'Mini narrative arc' },
-  { id: 'comparison', label: 'Before/After', desc: 'Comparison style' },
+  { id: 'comparison', label: 'Before/after', desc: 'Comparison style' },
 ];
 
 const STEPS = ['Setup', 'Analysis', 'Configure', 'Generate', 'Result'];
@@ -426,11 +426,11 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                     className="cp-select-card p-4 text-left"
                   >
                     <div className="flex items-center justify-between mb-1.5 gap-2">
-                      <span className={`text-sm font-medium lowercase ${videoMode === 'lowcost' ? 'text-ink' : 'text-ink2'}`}>Low Cost</span>
+                      <span className={`text-sm font-medium  ${videoMode === 'lowcost' ? 'text-ink' : 'text-ink2'}`}>Standard</span>
                       <span className="cp-badge-ink">recommended</span>
                     </div>
                     <p className="readout mb-1.5">~$0.80 / VIDEO</p>
-                    <p className="text-xs text-muted leading-relaxed">Hailuo 2.3 img2video + VEED Lipsync. Good movement + lip-sync.</p>
+                    <p className="text-xs text-muted leading-relaxed">Hailuo 2.3 + VEED Lipsync. Good movement and lip-sync.</p>
                   </button>
                   <button
                     onClick={() => setVideoMode('premium')}
@@ -438,17 +438,17 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                     className="cp-select-card p-4 text-left"
                   >
                     <div className="flex items-center justify-between mb-1.5 gap-2">
-                      <span className={`text-sm font-medium lowercase ${videoMode === 'premium' ? 'text-ink' : 'text-ink2'}`}>Premium</span>
+                      <span className={`text-sm font-medium  ${videoMode === 'premium' ? 'text-ink' : 'text-ink2'}`}>Premium</span>
                       <span className="cp-badge-outline">best quality</span>
                     </div>
                     <p className="readout mb-1.5">~$2.00 / VIDEO</p>
-                    <p className="text-xs text-muted leading-relaxed">Kling Avatar v2 Standard. Full integrated movement.</p>
+                    <p className="text-xs text-muted leading-relaxed">Kling Avatar v2. Full-body movement, best realism.</p>
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="cp-label block mb-2">Website URL <span className="cp-label-hint">(optional)</span></label>
+                <label className="cp-label block mb-2">Website <span className="cp-label-hint">(optional)</span></label>
                 <div className="flex gap-3">
                   <div className="relative flex-1">
                     <Globe size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
@@ -462,12 +462,12 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                     />
                   </div>
                 </div>
-                <p className="text-xs lowercase text-muted mt-1.5">If provided, we&apos;ll scrape and research your site automatically</p>
+                <p className="text-xs text-muted mt-1.5">We&apos;ll read your site and research it for you</p>
               </div>
 
               <div>
                 <label className="cp-label block mb-2">
-                  {url.trim() ? 'Extra context' : 'Describe your product/business'} <span className="cp-label-hint">{url.trim() ? '(optional)' : '(required if no URL)'}</span>
+                  {url.trim() ? 'Extra context' : 'What are you selling?'} <span className="cp-label-hint">{url.trim() ? '(optional)' : '(required if no URL)'}</span>
                 </label>
                 <textarea
                   value={description}
@@ -503,7 +503,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                   />
                 </div>
 
-                <label className="cp-label block mb-3">Video Style</label>
+                <label className="cp-label block mb-3">Video style</label>
                 <SegmentedControl
                   options={STYLE_OPTIONS.map((s) => ({ value: s.id, label: s.label, hint: s.desc }))}
                   value={style}
@@ -513,7 +513,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
               </div>
 
               <div>
-                <label className="cp-label block mb-3">Number of Scripts</label>
+                <label className="cp-label block mb-3">Number of scripts</label>
                 <SegmentedControl
                   options={[1, 2, 3, 5].map((n) => ({ value: n, label: String(n) }))}
                   value={numScripts}
@@ -537,7 +537,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                 {analyzing ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
-                    {url.trim() ? 'Scraping + researching web + generating scripts... (45-90s)' : 'Generating scripts... (20-40s)'}
+                    {url.trim() ? 'Reading your site and writing scripts… (45-90s)' : 'Writing scripts… (20-40s)'}
                   </>
                 ) : (
                   <>
@@ -550,16 +550,16 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
             {/* Info cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="card p-4">
-                <h3 className="eyebrow">Deep Research</h3>
-                <p className="text-xs text-muted mt-2">AI analyzes your product via URL scraping + web research, or generates directly from your description.</p>
+                <h3 className="eyebrow">Research</h3>
+                <p className="text-xs text-muted mt-2">We read your site and search the web for what people say about it, or work from your description alone.</p>
               </div>
               <div className="card p-4">
-                <h3 className="eyebrow">Pain Point Scripts</h3>
-                <p className="text-xs text-muted mt-2">Generates hook-problem-solution scripts targeting your audience&apos;s real pain points.</p>
+                <h3 className="eyebrow">Pain-point scripts</h3>
+                <p className="text-xs text-muted mt-2">Hook, problem and solution scripts built on your audience&apos;s real pain points.</p>
               </div>
               <div className="card p-4">
-                <h3 className="eyebrow">AI Actor Videos</h3>
-                <p className="text-xs text-muted mt-2">Realistic AI-generated actors with lip-sync, b-roll, and viral subtitles. From ~$0.50/video.</p>
+                <h3 className="eyebrow">AI presenter videos</h3>
+                <p className="text-xs text-muted mt-2">Presenters with lip-sync, b-roll and captions. From ~$0.50 a video.</p>
               </div>
             </div>
           </div>
@@ -590,7 +590,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="eyebrow mb-3">Pain Points</h3>
+                  <h3 className="eyebrow mb-3">Pain points</h3>
                   <div className="space-y-2">
                     {(analysis.pain_points || []).map((pp, i) => (
                       <div key={i} className="flex items-start gap-2.5 text-sm">
@@ -617,7 +617,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                   </div>
                 </div>
                 <div>
-                  <h3 className="eyebrow mb-3">Emotional Hooks</h3>
+                  <h3 className="eyebrow mb-3">Emotional hooks</h3>
                   <div className="divide-y divide-rule border-y border-rule">
                     {(analysis.emotional_hooks || []).map((h, i) => (
                       <div key={i} className="text-sm text-ink2 py-2">
@@ -633,7 +633,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
             {webResearch && (
               <div className="card p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="eyebrow">Web Research</h3>
+                  <h3 className="eyebrow">Web research</h3>
                   {webResearch.grounding_sources && (
                     <span className="readout">
                       {webResearch.grounding_sources.length} sources
@@ -644,7 +644,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                 {/* Real user reviews */}
                 {webResearch.real_reviews && webResearch.real_reviews.length > 0 && (
                   <div className="mb-4">
-                    <h4 className="eyebrow mb-2">Real User Reviews</h4>
+                    <h4 className="eyebrow mb-2">Real user reviews</h4>
                     <div className="space-y-2">
                       {webResearch.real_reviews.slice(0, 5).map((review, i) => (
                         <div key={i} className="text-xs bg-paper rounded-input p-2.5 border border-rule">
@@ -790,7 +790,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
           <div className="cp-rise space-y-6">
             <div className="card p-6 space-y-5">
               <h2 className="cp-h2">Presenter and voice</h2>
-              <p className="text-sm lowercase text-muted">
+              <p className="text-sm text-muted">
                 script: <strong className="text-ink2 normal-case font-medium">{scripts[selectedScript].title}</strong>
               </p>
 
@@ -886,7 +886,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                     </select>
                   );
                 })()}
-                <p className="text-xs lowercase text-muted mt-1.5">
+                <p className="text-xs text-muted mt-1.5">
                   {actorGender === 'female' ? 'female' : 'male'} voices &middot; multilingual model speaks your selected language &middot; click speaker to preview
                 </p>
               </div>
@@ -894,13 +894,13 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
               {/* Actor Selection: Gallery + Generate New */}
               <div>
                 <label className="cp-label block mb-2">
-                  AI Actor — Choose Your Actor
+                  Presenter
                 </label>
 
                 {/* Existing Gallery from S3 */}
                 {actorGallery.length > 0 && (
                   <div className="mb-4">
-                    <p className="text-xs lowercase text-muted mb-2">Previously generated actors (click to select)</p>
+                    <p className="text-xs text-muted mb-2">Previously generated actors (click to select)</p>
                     <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-48 overflow-y-auto pr-1">
                       {actorGallery.map((img, i) => (
                         <button
@@ -922,13 +922,13 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                   </div>
                 )}
                 {loadingGallery && (
-                  <p className="text-xs lowercase text-muted mb-3 flex items-center gap-1"><Loader2 size={12} className="animate-spin" /> Loading actor gallery...</p>
+                  <p className="text-xs text-muted mb-3 flex items-center gap-1"><Loader2 size={12} className="animate-spin" /> Loading actor gallery...</p>
                 )}
 
                 {/* Upload Custom Actor */}
                 <div className="mb-4">
                   <div className="flex items-center gap-3">
-                    <label className="flex-1 flex items-center justify-center gap-2 text-sm lowercase text-muted px-4 py-3 rounded-input border border-dashed border-rule2 hover:border-brass hover:text-ink2 transition-colors duration-200 cursor-pointer">
+                    <label className="flex-1 flex items-center justify-center gap-2 text-sm text-muted px-4 py-3 rounded-input border border-dashed border-rule2 hover:border-brass hover:text-ink2 transition-colors duration-200 cursor-pointer">
                       <Upload size={14} />
                       <span>Upload your own photo</span>
                       <input
@@ -992,7 +992,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                 </div>
 
                 {/* Generate New Actors */}
-                <p className="text-xs lowercase text-muted mb-2">{actorGallery.length > 0 ? 'Or generate new actors' : 'Or describe your actor'}</p>
+                <p className="text-xs text-muted mb-2">{actorGallery.length > 0 ? 'Or generate new actors' : 'Or describe your actor'}</p>
                 <textarea
                   value={actorDescription}
                   onChange={(e) => { setActorDescription(e.target.value); setActorOptions([]); }}
@@ -1036,7 +1036,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                 {/* Newly Generated Actor Options */}
                 {actorOptions.length > 0 && (
                   <div className="mt-3">
-                    <p className="text-xs lowercase text-muted mb-2">New actors (select one)</p>
+                    <p className="text-xs text-muted mb-2">New actors (select one)</p>
                     <div className="grid grid-cols-3 gap-3">
                       {actorOptions.map((imgUrl, i) => (
                         <button
@@ -1062,14 +1062,14 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                 )}
 
                 {!selectedActor && (actorOptions.length > 0 || actorGallery.length > 0) && (
-                  <p className="text-xs lowercase text-warn mt-2 flex items-center gap-1"><AlertCircle size={12} /> Select an actor to continue</p>
+                  <p className="text-xs text-warn mt-2 flex items-center gap-1"><AlertCircle size={12} /> Select an actor to continue</p>
                 )}
               </div>
 
               {/* Narration Edit */}
               <div>
                 <label className="cp-label block mb-2">
-                  Narration Script
+                  Narration script
                 </label>
                 <textarea
                   value={editedNarration}
@@ -1083,7 +1083,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
               {/* Cost Estimate */}
               <div className="card p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="eyebrow">Estimated Cost</span>
+                  <span className="eyebrow">Estimated cost</span>
                   <span className="readout text-ink">~${videoMode === 'lowcost' ? '0.65' : '2.50'}</span>
                 </div>
                 <div className="space-y-1">
@@ -1129,7 +1129,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                 <span>
                   Share this video in the public gallery
                   <span className="block text-xs text-muted">
-                    Your video, product name and script will be visible at openshorts.app/gallery
+                    Your video, product name and script will be visible in the public gallery
                   </span>
                 </span>
               </label>
@@ -1161,7 +1161,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
           <div className="cp-rise space-y-6">
             <div className="card p-6">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="cp-h2">Video Generation</h2>
+                <h2 className="cp-h2">Making your video</h2>
                 <span className={
                   genStatus === 'processing' ? 'badge-brass' :
                   genStatus === 'completed' ? 'badge-ok' :
@@ -1201,7 +1201,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                       ) : (
                         <span className="w-3.5 h-3.5 rounded-full border border-rule shrink-0" />
                       )}
-                      <span className={`lowercase ${stepDone ? 'text-muted' : stepActive ? 'text-ink' : 'text-muted/60'}`}>
+                      <span className={` ${stepDone ? 'text-muted' : stepActive ? 'text-ink' : 'text-muted/60'}`}>
                         {label}
                       </span>
                     </div>
@@ -1238,7 +1238,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                 <div className="mt-4 p-4 bg-danger/10 rounded-card space-y-3">
                   <div className="flex items-center gap-2">
                     <AlertCircle size={16} className="text-danger shrink-0" />
-                    <span className="text-sm text-danger">Generation failed. You can retry or go back to change settings.</span>
+                    <span className="text-sm text-danger">That didn't work. Try again, or go back and change the settings.</span>
                   </div>
                   <div className="flex gap-3">
                     <button
@@ -1291,7 +1291,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                   {/* Cost breakdown */}
                   {genResult.cost_estimate && (
                     <div className="card p-4">
-                      <div className="eyebrow mb-2">Cost Breakdown</div>
+                      <div className="eyebrow mb-2">Cost breakdown</div>
                       <div className="space-y-1">
                         {Object.entries(genResult.cost_estimate).filter(([k]) => k !== 'total').map(([k, v]) => (
                           <div key={k} className="flex justify-between readout">
@@ -1314,7 +1314,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                         <span className="eyebrow">Caption</span>
                         <button
                           onClick={() => handleCopy(genResult.script.caption, 'caption')}
-                          className="text-xs lowercase text-muted hover:text-brass flex items-center gap-1 transition-colors"
+                          className="text-xs text-muted hover:text-brass flex items-center gap-1 transition-colors"
                         >
                           {copied === 'caption' ? <Check size={10} className="text-ok" /> : <Copy size={10} />}
                           {copied === 'caption' ? 'Copied' : 'Copy'}
@@ -1331,7 +1331,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                         <span className="eyebrow">Hashtags</span>
                         <button
                           onClick={() => handleCopy(genResult.script.hashtags.join(' '), 'hashtags')}
-                          className="text-xs lowercase text-muted hover:text-brass flex items-center gap-1 transition-colors"
+                          className="text-xs text-muted hover:text-brass flex items-center gap-1 transition-colors"
                         >
                           {copied === 'hashtags' ? <Check size={10} className="text-ok" /> : <Copy size={10} />}
                           {copied === 'hashtags' ? 'Copied' : 'Copy'}
@@ -1362,12 +1362,12 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                     </button>
                   </div>
 
-                  {/* Publish to Social Media */}
+                  {/* Publish to social media */}
                   <div className="card p-4 space-y-3 mt-2">
-                    <h3 className="eyebrow">Publish to Social Media</h3>
+                    <h3 className="eyebrow">Publish to social media</h3>
 
                     {!uploadPostKey ? (
-                      <p className="text-xs lowercase text-muted">Set your Upload-Post API key in Settings to enable publishing.</p>
+                      <p className="text-xs text-muted">Set your Upload-Post API key in Settings to enable publishing.</p>
                     ) : (
                       <>
                         {/* Platform toggles */}
@@ -1390,8 +1390,8 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                         {/* Same notice as ResultCard: TikTok lands as a draft,
                             and finding nothing live reads as a failed post. */}
                         {publishPlatforms.tiktok && (
-                          <p className="mt-2 text-xs text-muted lowercase">
-                            tiktok arrives as a <b className="text-ink2">draft</b> and you'll get a
+                          <p className="mt-2 text-xs text-muted">
+                            TikTok arrives as a <b className="text-ink2">draft</b> and you'll get a
                             notification in the app — finishing it there lets you add trending sounds
                             and hashtags, which reaches more people than posting from an api.
                           </p>
@@ -1399,7 +1399,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
 
                         {/* Schedule toggle */}
                         <div className="flex items-center gap-3">
-                          <label className="flex items-center gap-2 text-xs lowercase text-muted cursor-pointer">
+                          <label className="flex items-center gap-2 text-xs text-muted cursor-pointer">
                             <input
                               type="checkbox"
                               checked={isScheduling}

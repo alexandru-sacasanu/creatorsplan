@@ -41,10 +41,10 @@ export default function InvoicesCard() {
 
   return (
     <div className="card p-6">
-      <h3 className="font-display lowercase text-lg text-ink mb-1 flex items-center gap-2">
+      <h3 className="font-display text-lg text-ink mb-1 flex items-center gap-2">
         <FileText size={16} className="text-brass" /> Invoices
       </h3>
-      <p className="text-muted text-sm mb-4 lowercase">
+      <p className="text-muted text-sm mb-4">
         Legally valid invoices for every charge on this account.
       </p>
 

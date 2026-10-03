@@ -145,7 +145,7 @@ export default function ReframeEditor({ jobId, clipIndex, clipTitle, onClose, on
                     <div className="flex items-center gap-2.5 min-w-0">
                         <Crosshair size={18} className="text-brass shrink-0" />
                         <div className="min-w-0">
-                            <h2 className="text-base font-medium text-ink lowercase truncate">reframing</h2>
+                            <h2 className="text-base font-medium text-ink truncate">Reframing</h2>
                             {clipTitle && <p className="text-xs text-muted truncate">{clipTitle}</p>}
                         </div>
                     </div>
@@ -200,7 +200,7 @@ export default function ReframeEditor({ jobId, clipIndex, clipTitle, onClose, on
                             : `${adjusted} scene${adjusted > 1 ? 's' : ''} reframed by hand`}
                     </span>
                     <div className="flex items-center gap-2 [&>button]:flex-1 sm:[&>button]:flex-none">
-                        <button onClick={onClose} className="btn-quiet py-2 px-4 text-sm">cancel</button>
+                        <button onClick={onClose} className="btn-quiet py-2 px-4 text-sm">Cancel</button>
                         <button
                             onClick={handleSave}
                             disabled={!adjusted || saving}
@@ -288,7 +288,7 @@ function SceneRow({ scene, value, widthFraction, previewUrl, touched, playing,
                 style={{ left: `${leftPct}%`, width: `${widthFraction * 100}%` }}
             >
                 {label && (
-                    <span className="absolute top-1 left-1 text-[10px] px-1 rounded bg-brass text-paper lowercase">
+                    <span className="absolute top-1 left-1 text-[10px] px-1 rounded bg-brass text-paper">
                         {label}
                     </span>
                 )}
@@ -325,7 +325,7 @@ function SceneRow({ scene, value, widthFraction, previewUrl, touched, playing,
                             <RotateCcw size={12} /> automatic
                         </button>
                     ) : (
-                        <span className="text-muted">automatic</span>
+                        <span className="text-muted">Automatic</span>
                     )}
                 </div>
             </div>

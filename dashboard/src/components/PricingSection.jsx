@@ -85,8 +85,8 @@ export default function PricingSection({ onRequireLogin }) {
       <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Free tier — no card, Google sign-in only */}
         <div className="relative card p-6 flex flex-col">
-          <h3 className="font-display lowercase text-xl text-ink">free</h3>
-          <p className="text-muted text-sm mb-4 lowercase">Try it on your own videos</p>
+          <h3 className="font-display text-xl text-ink">Free</h3>
+          <p className="text-muted text-sm mb-4">Try it on your own videos</p>
           <div className="mb-4 flex items-baseline gap-1.5">
             <span className="font-display text-4xl text-ink tabular-nums">$0</span>
             <span className="readout">/mo</span>
@@ -105,7 +105,7 @@ export default function PricingSection({ onRequireLogin }) {
           >
             Start free
           </button>
-          <p className="text-center text-xs text-muted mt-2 lowercase">free minutes reset monthly.</p>
+          <p className="text-center text-xs text-muted mt-2">Free minutes reset monthly.</p>
         </div>
 
         {PLAN_ORDER.map((plan) => {
@@ -122,8 +122,8 @@ export default function PricingSection({ onRequireLogin }) {
                   Most popular
                 </span>
               )}
-              <h3 className="font-display lowercase text-xl text-ink">{plan}</h3>
-              <p className="text-muted text-sm mb-4 lowercase">{PLAN_BLURB[plan]}</p>
+              <h3 className="font-display text-xl text-ink">{plan}</h3>
+              <p className="text-muted text-sm mb-4">{PLAN_BLURB[plan]}</p>
               <div className="mb-4 flex items-baseline gap-1.5">
                 <span className="font-display text-4xl text-ink tabular-nums">{fmt(entry.amount, entry.currency)}</span>
                 <span className="readout">/{interval === 'month' ? 'mo' : 'yr'}</span>
@@ -133,7 +133,7 @@ export default function PricingSection({ onRequireLogin }) {
                 <li className="flex items-start gap-2"><Check size={16} className="text-ok shrink-0 mt-0.5" /> <span><b>No watermark</b>, no 7-day clip expiry</span></li>
                 <li className="flex items-start gap-2"><Cpu size={16} className="text-ok shrink-0 mt-0.5" /> <span><b>GPU rendering</b>, about 50s per 8-min video</span></li>
                 <li className="flex items-start gap-2"><KeyRound size={16} className="text-ok shrink-0 mt-0.5" /> <span>Gemini key + auto-posting included</span></li>
-                <li className="flex items-start gap-2"><Bot size={16} className="text-ok shrink-0 mt-0.5" /> <span><b>MCP + API access</b> for AI agents &amp; automations</span></li>
+                <li className="flex items-start gap-2"><Bot size={16} className="text-ok shrink-0 mt-0.5" /> <span><b>MCP + API access</b> for AI agents and automations</span></li>
                 {plan === 'pro' && <li className="flex items-start gap-2"><Zap size={16} className="text-brass shrink-0 mt-0.5" /> <span>Priority processing queue</span></li>}
               </ul>
               <button
@@ -143,7 +143,7 @@ export default function PricingSection({ onRequireLogin }) {
               >
                 {busyPrice === entry.price_id ? <Loader2 size={18} className="animate-spin" /> : `Get ${plan}`}
               </button>
-              <p className="text-center text-xs text-muted mt-2 lowercase">billed {interval === 'month' ? 'monthly' : 'yearly'}. cancel anytime.</p>
+              <p className="text-center text-xs text-muted mt-2">billed {interval === 'month' ? 'monthly' : 'yearly'}. cancel anytime.</p>
             </div>
           );
         })}
@@ -173,7 +173,7 @@ export default function PricingSection({ onRequireLogin }) {
             <span className="badge-warn"><Zap size={12} /> Bring your own key</span>
           </div>
           <p className="text-sm text-muted mb-3 leading-relaxed">
-            <b className="text-ink2">AI Shorts</b> (AI-actor UGC videos) and <b className="text-ink2">voice dubbing</b> use premium generation from
+            <b className="text-ink2">AI shorts</b> (AI-actor UGC videos) and <b className="text-ink2">voice dubbing</b> use premium generation from
             <b className="text-ink2"> fal.ai</b> and <b className="text-ink2">ElevenLabs</b>. Connect your own keys for those — you're billed by those
             providers directly (typically ~$0.65-2 per video). Your plan still covers the script &amp; orchestration.
           </p>
@@ -181,7 +181,7 @@ export default function PricingSection({ onRequireLogin }) {
         </div>
       </div>
 
-      <p className="text-center text-muted text-xs mt-8 lowercase">
+      <p className="text-center text-muted text-xs mt-8">
         start free right here, upgrade for more minutes and no watermark, or run it yourself on your own hardware.
       </p>
     </div>

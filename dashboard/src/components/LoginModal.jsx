@@ -30,8 +30,8 @@ export default function LoginModal({ onClose, queued = false }) {
   };
 
   return (
-    <Modal isOpen onClose={onClose} eyebrow="ACCOUNT" title="Sign in to OpenShorts" size="md">
-      <p className="text-muted text-sm mb-6 lowercase">Access your plan and generate shorts with no API keys.</p>
+    <Modal isOpen onClose={onClose} eyebrow="ACCOUNT" title="Sign in to creatorsplan" size="md">
+      <p className="text-muted text-sm mb-6">Access your plan and generate shorts with no API keys.</p>
 
       {queued && (
         <div className="flex items-start gap-2 border border-rule2 rounded-input bg-paper2 px-3 py-2 mb-5">
@@ -44,8 +44,8 @@ export default function LoginModal({ onClose, queued = false }) {
 
       {sent ? (
         <div className="text-center py-6">
-          <span className="badge-ok px-3 py-1"><Check size={14} /> sent</span>
-          <p className="text-ink font-medium lowercase mt-4">Check your inbox</p>
+          <span className="badge-ok px-3 py-1"><Check size={14} /> Sent</span>
+          <p className="text-ink font-medium mt-4">Check your inbox</p>
           <p className="text-muted text-sm mt-1">We sent a sign-in link to <b className="text-ink font-medium">{email}</b>. It expires in 15 minutes.</p>
         </div>
       ) : (
@@ -93,7 +93,7 @@ export default function LoginModal({ onClose, queued = false }) {
               reachable from it: a magic-link signup never passes the footer. */}
           <p className="text-muted text-xs mt-5 text-center leading-relaxed">
             By signing in you agree to our{' '}
-            <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-ink2 underline underline-offset-2 hover:text-brass transition-colors">Terms of Service</a>
+            <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-ink2 underline underline-offset-2 hover:text-brass transition-colors">Terms of service</a>
             {' '}and{' '}
             <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-ink2 underline underline-offset-2 hover:text-brass transition-colors">Privacy Policy</a>.
           </p>

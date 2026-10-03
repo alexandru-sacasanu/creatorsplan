@@ -109,14 +109,14 @@ export default function GalleryCard({ clip }) {
                 </div>
 
                 <div className="space-y-2 flex-1 overflow-y-auto custom-scrollbar max-h-[150px] pr-1 mb-3">
-                    {/* YouTube Title */}
+                    {/* YouTube title */}
                     <div className="bg-paper rounded-input p-2 relative group/item">
-                        <p className="eyebrow mb-1">YouTube Title</p>
+                        <p className="eyebrow mb-1">YouTube title</p>
                         <p className="text-xs text-ink2 select-all line-clamp-2 hover:line-clamp-none transition-all">{clip.title}</p>
                         <button
                             onClick={() => handleCopy(clip.title, 'yt')}
                             className="absolute top-2 right-2 p-1 text-muted hover:text-brass transition-colors opacity-0 group-hover/item:opacity-100"
-                            title="Copy Title"
+                            title="Copy title"
                         >
                             {copied === 'yt' ? <Check size={12} className="text-ok" /> : <Copy size={12} />}
                         </button>
@@ -124,14 +124,14 @@ export default function GalleryCard({ clip }) {
 
                     {/* TikTok / IG Caption */}
                     <div className="bg-paper rounded-input p-2 relative group/item">
-                        <p className="eyebrow mb-1">TikTok · IG Caption</p>
+                        <p className="eyebrow mb-1">TikTok · IG caption</p>
                         <p className="text-xs text-ink2 select-all line-clamp-3 hover:line-clamp-none transition-all cursor-pointer">
                             {clip.tiktok_desc || clip.insta_desc}
                         </p>
                         <button
                             onClick={() => handleCopy(clip.tiktok_desc || clip.insta_desc, 'caption')}
                             className="absolute top-2 right-2 p-1 text-muted hover:text-brass transition-colors opacity-0 group-hover/item:opacity-100"
-                            title="Copy Caption"
+                            title="Copy caption"
                         >
                             {copied === 'caption' ? <Check size={12} className="text-ok" /> : <Copy size={12} />}
                         </button>

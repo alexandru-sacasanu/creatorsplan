@@ -44,7 +44,7 @@ export default function SegmentedControl({ options, value, onChange, multi = fal
             aria-checked={active}
             disabled={opt.disabled}
             onClick={() => toggle(opt.value)}
-            className={`${pad} rounded-[9px] text-[13px] font-semibold lowercase flex flex-col items-center justify-center gap-1 transition-colors duration-[var(--cp-dur-settle)]
+            className={`${pad} rounded-[9px] text-[13px] font-semibold  flex flex-col items-center justify-center gap-1 transition-colors duration-[var(--cp-dur-settle)]
               ${active
                 ? 'bg-cp-field text-cp-ink shadow-[var(--cp-shadow-segment)]'
                 : 'bg-transparent text-cp-ink-2 hover:text-cp-ink'}

@@ -283,7 +283,7 @@ export default function SubtitleModal({ isOpen, onClose, onGenerate, onApplyAll,
                     {captionsLoading ? (
                         <div className="flex items-center gap-2 text-muted">
                             <Loader2 size={16} className="animate-spin" />
-                            <span className="text-sm lowercase">Loading preview...</span>
+                            <span className="text-sm">Loading preview...</span>
                         </div>
                     ) : useRemotionPreview ? (
                         <RemotionPreview
@@ -596,7 +596,7 @@ export default function SubtitleModal({ isOpen, onClose, onGenerate, onApplyAll,
                                         <button
                                             onClick={onRemove}
                                             disabled={isProcessing}
-                                            className="text-xs text-muted underline underline-offset-2 lowercase hover:text-ink2 disabled:opacity-50"
+                                            className="text-xs text-muted underline underline-offset-2 hover:text-ink2 disabled:opacity-50"
                                         >
                                             remove captions from this clip
                                         </button>
