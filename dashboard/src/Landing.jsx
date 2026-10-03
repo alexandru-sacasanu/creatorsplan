@@ -1,5 +1,8 @@
-import { ArrowRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowDown, ArrowRight } from 'lucide-react';
 import BrandFilm from './components/landing/BrandFilm';
+import HeroBackdrop from './components/landing/HeroBackdrop';
+import LogoLoader from './components/landing/LogoLoader';
 
 // Marketing landing page (design_handoff_creatorsplan_rebrand/Landing Page.dc.html
 // + README > Landing page). Every CTA goes through onLaunchApp, which is how
@@ -16,6 +19,109 @@ const MARKS = [
   { left: '36%', width: '8%' },
   { left: '82%', width: '8%' },
 ];
+
+// The loader stays up at least this long (so its logo animation finishes) and
+// never longer than the cap, whatever the network does.
+const LOADER_MIN_MS = 1600;
+const LOADER_MAX_MS = 9000;
+const LOADER_FADE_MS = 450;
+
+function prefersReducedMotion() {
+  try { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch { return false; }
+}
+
+// How much of the video, from where playback starts, is already downloaded.
+function bufferedFraction(v) {
+  if (!v.duration || !Number.isFinite(v.duration)) return 0;
+  let end = 0;
+  for (let i = 0; i < v.buffered.length; i += 1) {
+    if (v.buffered.start(i) <= v.currentTime + 0.25) end = Math.max(end, v.buffered.end(i));
+  }
+  return Math.min(1, end / v.duration);
+}
+
+/**
+ * The hero video's lifecycle: the loader tracks its buffering, leaves after
+ * LOADER_MIN_MS once it can play through (or at LOADER_MAX_MS regardless),
+ * then the video plays once and pauses whenever the hero is off-screen.
+ * With reduced motion there is no loader and the video never plays: the
+ * poster stands in for it.
+ */
+function useHeroIntro(videoRef, heroRef) {
+  const [reduced] = useState(prefersReducedMotion);
+  const [phase, setPhase] = useState(reduced ? 'done' : 'loading'); // loading -> leaving -> done
+  const [progress, setProgress] = useState(0);
+  const readyRef = useRef(false);
+  const startedRef = useRef(false);
+  const visibleRef = useRef(true);
+
+  // Buffering -> progress, and the "can play through" signal.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v || reduced) return undefined;
+    const onProgress = () => setProgress((p) => Math.max(p, bufferedFraction(v)));
+    const onReady = () => { readyRef.current = true; setProgress(1); };
+    const events = ['progress', 'loadedmetadata', 'loadeddata'];
+    events.forEach((e) => v.addEventListener(e, onProgress));
+    v.addEventListener('canplaythrough', onReady);
+    v.addEventListener('error', onReady, true); // a broken source must not hold the page for 9s
+    if (v.readyState >= 4) onReady(); else onProgress();
+    return () => {
+      events.forEach((e) => v.removeEventListener(e, onProgress));
+      v.removeEventListener('canplaythrough', onReady);
+      v.removeEventListener('error', onReady, true);
+    };
+  }, [videoRef, reduced]);
+
+  // When to leave: min time elapsed and video ready, or the cap.
+  useEffect(() => {
+    if (phase !== 'loading') return undefined;
+    const t0 = performance.now();
+    const id = window.setInterval(() => {
+      const elapsed = performance.now() - t0;
+      if (elapsed >= LOADER_MAX_MS || (readyRef.current && elapsed >= LOADER_MIN_MS)) {
+        window.clearInterval(id);
+        setPhase('leaving');
+      }
+    }, 100);
+    return () => window.clearInterval(id);
+  }, [phase]);
+
+  // Leaving: start the video under the fading loader, then unmount it.
+  useEffect(() => {
+    if (phase !== 'leaving') return undefined;
+    startedRef.current = true;
+    const v = videoRef.current;
+    if (v && visibleRef.current) v.play().catch(() => {});
+    const id = window.setTimeout(() => setPhase('done'), LOADER_FADE_MS);
+    return () => window.clearTimeout(id);
+  }, [phase, videoRef]);
+
+  // No scrolling behind the loader.
+  useEffect(() => {
+    if (phase !== 'loading') return undefined;
+    const root = document.documentElement;
+    const before = root.style.overflow;
+    root.style.overflow = 'hidden';
+    return () => { root.style.overflow = before; };
+  }, [phase]);
+
+  // Pause off-screen, resume on return (unless it already played through).
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el || reduced || typeof IntersectionObserver === 'undefined') return undefined;
+    const io = new IntersectionObserver(([entry]) => {
+      visibleRef.current = entry.isIntersecting;
+      const v = videoRef.current;
+      if (!v || !startedRef.current) return;
+      if (entry.isIntersecting) { if (!v.ended) v.play().catch(() => {}); } else v.pause();
+    }, { threshold: 0.05 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [heroRef, videoRef, reduced]);
+
+  return { phase, progress, reduced };
+}
 
 const STEPS = [
   { n: '01', title: 'Drop it in', body: 'Upload a file or paste a YouTube link. Podcasts, vlogs, streams and talks all work.' },
@@ -50,34 +156,52 @@ function SectionHead({ title, label, dark = false }) {
 
 export default function Landing({ onLaunchApp }) {
   const launch = (e) => { e.preventDefault(); onLaunchApp(); };
+  const videoRef = useRef(null);
+  const heroRef = useRef(null);
+  const nextRef = useRef(null);
+  const { phase, progress, reduced } = useHeroIntro(videoRef, heroRef);
+  // Hero content waits for the loader, then rises in (cp-rise, staggered by --cp-i).
+  const rise = phase === 'loading' ? 'opacity-0' : 'cp-rise';
+
+  // Scrolls instead of following the hash: the landing page only owns a few
+  // hashes (main.jsx), and the section below the hero is not one of them.
+  const scrollNext = (e) => {
+    e.preventDefault();
+    nextRef.current?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+  };
 
   return (
     <div className="min-h-screen bg-cp-paper text-cp-ink">
-      <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-3 px-4 py-5 sm:gap-6 sm:px-8">
-        <a href="#landing" className="flex items-center gap-[9px]" aria-label="creatorsplan home">
-          <Mark strike />
-          <span className="text-lg font-bold tracking-[-0.04em] sm:text-xl">creatorsplan</span>
-        </a>
-        <nav className="flex items-center gap-3 whitespace-nowrap text-[15px] font-medium sm:gap-7">
-          <a href="#tools" className="hidden hover:text-cp-ink-2 sm:inline">Tools</a>
-          <a href="#keys" className="hidden hover:text-cp-ink-2 sm:inline">Your keys</a>
-          <a href="#app" onClick={launch} className="hover:text-cp-ink-2">Log in</a>
-          <a href="#app" onClick={launch} className="btn-quiet min-h-[40px] px-3.5 text-sm sm:min-h-[42px] sm:px-[18px] sm:text-[15px]">Start free</a>
-        </nav>
-      </header>
+      {phase !== 'done' && <LogoLoader progress={progress} leaving={phase === 'leaving'} />}
 
-      <main>
+      {/* First screen: header + hero over the video, exactly one viewport tall */}
+      <div ref={heroRef} className="relative isolate flex min-h-[100svh] flex-col">
+        <HeroBackdrop ref={videoRef} />
+        <header className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-3 px-4 py-5 sm:gap-6 sm:px-8">
+          <a href="#landing" className="flex items-center gap-[9px]" aria-label="creatorsplan home">
+            <Mark strike={phase !== 'loading'} />
+            <span className="text-lg font-bold tracking-[-0.04em] sm:text-xl">creatorsplan</span>
+          </a>
+          <nav className="flex items-center gap-3 whitespace-nowrap text-[15px] font-medium sm:gap-7">
+            <a href="#tools" className="hidden hover:text-cp-ink-2 sm:inline">Tools</a>
+            <a href="#keys" className="hidden hover:text-cp-ink-2 sm:inline">Your keys</a>
+            <a href="#app" onClick={launch} className="hover:text-cp-ink-2">Log in</a>
+            <a href="#app" onClick={launch} className="btn-quiet min-h-[40px] px-3.5 text-sm sm:min-h-[42px] sm:px-[18px] sm:text-[15px]">Start free</a>
+          </nav>
+        </header>
         {/* Hero */}
-        <section className="mx-auto flex w-full max-w-[1200px] flex-col items-center gap-7 px-4 pb-10 pt-12 text-center sm:px-8 sm:pt-[72px]">
-          <p className="font-cp-mono text-xs font-medium tracking-[0.08em] text-cp-ink-2">FOR PEOPLE WHO MAKE VIDEOS</p>
-          <h1 className="m-0 text-[length:var(--cp-text-display)] font-semibold leading-[0.92] tracking-[-0.05em]">
+        <section className="mx-auto flex w-full max-w-[1200px] flex-1 flex-col items-center justify-center gap-7 px-4 pb-28 pt-8 text-center sm:px-8">
+          <p className={`font-cp-mono text-xs font-medium tracking-[0.08em] text-cp-ink-2 ${rise}`} style={{ '--cp-i': 0 }}>
+            FOR PEOPLE WHO MAKE VIDEOS
+          </p>
+          <h1 className={`m-0 text-[length:var(--cp-text-display)] font-semibold leading-[0.92] tracking-[-0.05em] ${rise}`} style={{ '--cp-i': 1 }}>
             Post more.<br />Edit <span className="cp-highlight">less.</span>
           </h1>
-          <p className="m-0 max-w-[600px] text-[17px] leading-[1.55] text-cp-ink-2 sm:text-[19px]">
+          <p className={`m-0 max-w-[600px] text-[17px] leading-[1.55] text-cp-ink-2 sm:text-[19px] ${rise}`} style={{ '--cp-i': 2 }}>
             creatorsplan turns your long videos into shorts, makes UGC-style ads and packages your YouTube uploads.
             The AI tools run on your own keys.
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className={`flex flex-wrap justify-center gap-3 ${rise}`} style={{ '--cp-i': 3 }}>
             <a href="#app" onClick={launch} className="btn-primary min-h-[56px] px-7 text-[17px]">
               Drop in your first video <ArrowRight size={16} />
             </a>
@@ -85,8 +209,22 @@ export default function Landing({ onLaunchApp }) {
           </div>
         </section>
 
+        {/* Centred by a full-width row, not a translate: cp-rise animates transform. */}
+        <div className={`absolute inset-x-0 bottom-6 flex justify-center ${rise}`} style={{ '--cp-i': 5 }}>
+          <a
+            href="#how"
+            onClick={scrollNext}
+            aria-label="Scroll to the next section"
+            className="flex h-12 w-12 items-center justify-center rounded-full border-[1.5px] border-cp-ink bg-[rgba(251,250,247,0.8)] text-cp-ink backdrop-blur-sm transition-colors hover:bg-cp-volt focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cp-ink"
+          >
+            <ArrowDown size={20} className="cp-nudge" />
+          </a>
+        </div>
+      </div>
+
+      <main>
         {/* Hero visual: three shorts lift off a scanned timeline, on a 6s loop */}
-        <section className="mx-auto w-full max-w-[1200px] px-4 pb-24 pt-6 sm:px-8" aria-hidden="true">
+        <section ref={nextRef} className="mx-auto w-full max-w-[1200px] scroll-mt-0 px-4 pb-24 pt-16 sm:px-8" aria-hidden="true">
           <div className="flex flex-col gap-10 overflow-hidden rounded-[28px] bg-cp-canvas px-5 pb-8 pt-10 sm:px-10 sm:pb-10 sm:pt-12">
             <div className="flex min-h-[220px] items-end justify-center gap-[clamp(12px,3vw,40px)] sm:min-h-[300px]">
               {SHORTS.map((s, i) => (
