@@ -10,10 +10,16 @@ OpenShorts is an AI-powered vertical video generator that transforms long YouTub
 
 ### Local Development (Docker)
 ```bash
-docker compose up --build   # Build and run full stack
+docker compose up --build   # Build and run full stack (Postgres included)
 ```
-- Backend: http://localhost:8000 (FastAPI/Uvicorn)
+- Backend: http://localhost:8001 (FastAPI/Uvicorn)
 - Frontend: http://localhost:5175 (Vite proxies API calls to backend)
+- There is no separate self-host mode any more: local runs with accounts, plans
+  and the free minutes exactly like production (`BILLING_ENABLED=true`, a
+  Postgres container, a local `JWT_SECRET`). `GEMINI_API_KEY` /
+  `UPLOAD_POST_API_KEY` from `.env` become the server's managed keys. Without
+  `SMTP_*` the sign-in link is printed in `docker compose logs -f backend`.
+  Production adds its secrets with `-f docker-compose.cloud.yml`.
 
 ### Frontend Only (Dashboard)
 ```bash

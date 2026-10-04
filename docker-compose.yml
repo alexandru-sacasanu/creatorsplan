@@ -1,4 +1,27 @@
+# creatorsplan runs one way everywhere: with accounts, plans and the free
+# minutes. Locally that means a Postgres next to the backend, a dev JWT
+# secret, and your own GEMINI_API_KEY / UPLOAD_POST_API_KEY (from .env) used as
+# the server's keys. Production adds its secrets with docker-compose.cloud.yml.
+#
+# Sign-in links: with no SMTP_* settings in .env the backend prints the link in
+# its log instead of emailing it (`docker compose logs -f backend`).
 services:
+  db:
+    image: postgres:16-alpine
+    container_name: creatorsplan-db
+    environment:
+      - POSTGRES_USER=openshorts
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-creatorsplan-local}
+      - POSTGRES_DB=openshorts
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openshorts"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   backend:
     build: .
     container_name: creatorsplan-backend
@@ -8,6 +31,20 @@ services:
       - .:/app
       - /app/__pycache__
       - ./output:/app/output
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - BILLING_ENABLED=true
+      - DATABASE_URL=postgresql+asyncpg://openshorts:${POSTGRES_PASSWORD:-creatorsplan-local}@db:5432/openshorts
+      # Local default only; production sets a real one.
+      - JWT_SECRET=${JWT_SECRET:-creatorsplan-local-dev-secret}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5175}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5175,http://localhost:8001}
+      # The server's own keys power every account's minutes. Locally they fall
+      # back to the keys you already have in .env.
+      - MANAGED_GEMINI_API_KEY=${MANAGED_GEMINI_API_KEY:-${GEMINI_API_KEY:-}}
+      - MANAGED_UPLOAD_POST_API_KEY=${MANAGED_UPLOAD_POST_API_KEY:-${UPLOAD_POST_API_KEY:-}}
     restart: unless-stopped
 
   frontend:
@@ -40,3 +77,6 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+
+volumes:
+  pgdata:
