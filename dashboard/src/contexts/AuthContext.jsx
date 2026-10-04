@@ -9,6 +9,7 @@ import { getApiUrl } from '../config';
 import { apiFetch, apiJson, getToken, setToken, clearToken } from '../lib/api';
 import { track, identify, reset as resetAnalytics } from '../lib/analytics';
 import { report as reportAttribution } from '../lib/attribution';
+import { setAuthError } from '../lib/authIntent';
 
 const AuthContext = createContext(null);
 // eslint-disable-next-line react-refresh/only-export-components
@@ -49,6 +50,7 @@ export function AuthProvider({ children }) {
     try {
       if (kind === 'callback') {
         const token = params.get('token');
+        if (!token) setAuthError(params.get('error'));
         if (token) {
           setToken(token);
           // Scrub the token from the URL immediately (replaceState, no new

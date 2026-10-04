@@ -6,7 +6,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import LoginModal from './components/LoginModal'
 import ShortFrameLogo from './components/ShortFrameLogo'
 import Landing from './Landing.jsx'
-import { setAuthIntent, peekAuthIntent, takeAuthIntent } from './lib/authIntent'
+import { setAuthIntent, peekAuthIntent, takeAuthIntent, peekAuthError, clearAuthError } from './lib/authIntent'
 
 const App = lazy(() => import('./App.jsx'))
 
@@ -27,7 +27,8 @@ function GateShell({ children }) {
 function AppGate() {
   const { loading, signingIn, isSignedIn, billingEnabled } = useAuth()
   const [intent] = useState(() => peekAuthIntent() || 'login')
-  useEffect(() => { takeAuthIntent() }, [])
+  const [notice] = useState(peekAuthError)
+  useEffect(() => { takeAuthIntent(); clearAuthError() }, [])
 
   if (loading || signingIn) return <GateShell><Loader2 className="animate-spin text-cp-ink-3" size={28} aria-label="Loading" /></GateShell>
 
@@ -47,7 +48,7 @@ function AppGate() {
   if (!isSignedIn) {
     return (
       <GateShell>
-        <LoginModal mode={intent} onClose={() => { window.location.hash = '#landing' }} />
+        <LoginModal mode={intent} notice={notice} onClose={() => { window.location.hash = '#landing' }} />
       </GateShell>
     )
   }
