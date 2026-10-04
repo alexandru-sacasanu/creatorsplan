@@ -44,6 +44,18 @@ services:
       # The server's own key powers every account's minutes. Locally it falls
       # back to the key you already have in .env.
       - MANAGED_GEMINI_API_KEY=${MANAGED_GEMINI_API_KEY:-${GEMINI_API_KEY:-}}
+      # "Continue with Google" appears once both are set (see .env.example).
+      # The redirect goes straight to the backend: the Vite proxy would hand
+      # Google the internal Docker host name.
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - OAUTH_REDIRECT_URI=${OAUTH_REDIRECT_URI:-http://localhost:8001/api/auth/google/callback}
+      # Real sign-in emails; empty means the link is printed in the backend log.
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-465}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+      - EMAIL_FROM=${EMAIL_FROM:-}
     restart: unless-stopped
 
   frontend:

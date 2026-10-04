@@ -41,12 +41,12 @@ function GoogleGlyph() {
   );
 }
 
-export default function LoginModal({ onClose, queued = false, mode: initialMode = 'login' }) {
+export default function LoginModal({ onClose, queued = false, notice = '', mode: initialMode = 'login' }) {
   const { requestMagicLink, loginWithGoogle, googleAuthEnabled } = useAuth();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(notice);
   const [mode, setMode] = useState(initialMode === 'signup' ? 'signup' : 'login');
   const copy = COPY[mode];
 

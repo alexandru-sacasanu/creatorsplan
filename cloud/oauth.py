@@ -83,6 +83,11 @@ async def google_callback(request: Request):
     google_sub = userinfo.get("sub")
     if not email:
         return RedirectResponse(f"{settings.frontend_url}/#/auth/callback?error=noemail")
+    # The email is what merges this login into an existing account, so Google
+    # must vouch that the person controls it. (Gmail always does; a Workspace
+    # or federated account may not.)
+    if userinfo.get("email_verified") is not True:
+        return RedirectResponse(f"{settings.frontend_url}/#/auth/callback?error=unverified")
 
     async with database.session() as session:
         async with session.begin():
