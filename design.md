@@ -164,5 +164,5 @@ Hash routing (`#app`, `#/pricing`, `#/account`, `#legal`, `#features`,
 `isManaged` / `isSignedIn` gating, all handlers and props, localStorage keys
 (`gemini_key`, `elevenLabsKey_v1`, `falKey_v1`,
 `uploadUserId`, `openshorts_session`, `openshorts_auth`,
-`openshorts_skip_landing`), API calls and BYOK headers, QuotaError flows,
+the old landing-skip flag), API calls and BYOK headers, QuotaError flows,
 Remotion preview/render wiring. Redesign is classes + markup structure only.

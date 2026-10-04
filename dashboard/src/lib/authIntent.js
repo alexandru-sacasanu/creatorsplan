@@ -8,6 +8,17 @@ export function setAuthIntent(mode) {
   try { sessionStorage.setItem(KEY, mode); } catch { /* storage blocked: the app just opens */ }
 }
 
+// Read without consuming: a component's state initializer runs twice under
+// StrictMode, so it must not be the one to clear the key.
+export function peekAuthIntent() {
+  try {
+    const mode = sessionStorage.getItem(KEY);
+    return mode === 'login' || mode === 'signup' ? mode : null;
+  } catch {
+    return null;
+  }
+}
+
 export function takeAuthIntent() {
   try {
     const mode = sessionStorage.getItem(KEY);
