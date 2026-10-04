@@ -100,36 +100,6 @@ async def send_clips_ready_email(email: str, job_title: str, clip_count: int,
     await send_email(email, f"Your clips are ready — {title}", html)
 
 
-async def send_autopilot_clips_email(email: str, video_title: str, clip_count: int,
-                                     scheduled_count: int, dashboard_url: str):
-    """Autopilot finished clipping a new channel video on its own.
-
-    This is the email that makes Autopilot visible: the user did nothing, and
-    this is where they find out the work got done anyway.
-    """
-    import html as _html
-    title = _html.escape((video_title or "your new video").strip())
-    plural = "s" if clip_count != 1 else ""
-    if scheduled_count:
-        posting = (f"<p>The best {scheduled_count} {'is' if scheduled_count == 1 else 'are'} "
-                   f"scheduled to publish, one a day, on the accounts you picked.</p>")
-    else:
-        posting = "<p>Review them, tweak anything you like, and post the ones you want.</p>"
-    html = f"""
-      <div style="font-family:system-ui,sans-serif;max-width:480px;margin:0 auto">
-        <h2>Autopilot clipped your new video 🎬</h2>
-        <p>You published <strong>{title}</strong> and creatorsplan already turned it
-           into {clip_count} short{plural}.</p>
-        {posting}
-        <p><a href="{dashboard_url}" style="display:inline-block;background:#111;color:#fff;
-           padding:12px 20px;border-radius:8px;text-decoration:none">See my clips</a></p>
-        <p style="color:#666;font-size:13px">You can pause Autopilot anytime from the
-           Autopilot page in your dashboard.</p>
-      </div>
-    """
-    await send_email(email, f"Autopilot: {clip_count} new short{plural} from your video", html)
-
-
 async def send_clips_expiring_email(email: str, clip_count: int):
     """Free clips enter their last day before deletion — honest loss aversion.
 

@@ -1,16 +1,14 @@
 # OpenShorts + n8n
 
-Two importable workflows, from a one-shot clipper to a full channel autopilot.
-Both work out of the box with [OpenShorts Cloud](https://www.openshorts.app/)
+An importable workflow that clips a video and calls you back when it's done.
+It works out of the box with [OpenShorts Cloud](https://www.openshorts.app/)
 (free tier: 20 min of video, paid plans from $12/mo). OpenShorts is also open
-source: self-hosters can point either workflow at their own instance by
-changing the base URL (needs a GPU box, your own Gemini key, and your own
-[Upload-Post](https://www.upload-post.com/) account for the posting steps).
+source: you can point the workflow at your own instance by changing the base
+URL (needs a GPU box and your own Gemini key).
 
 | Workflow | What it does | Credentials |
 |---|---|---|
 | `openshorts-clip-and-notify.json` | A video URL goes in through a form, clips come back on a signed webhook. No polling. | OpenShorts API key |
-| `openshorts-content-machine.json` | Your YouTube channel on autopilot: daily clipping, approval buttons in Telegram, drip-scheduled posting, weekly analytics digest. | OpenShorts API key + Telegram bot |
 
 ## Shared setup
 
@@ -32,44 +30,6 @@ changing the base URL (needs a GPU box, your own Gemini key, and your own
      .update(JSON.stringify($json.body))
      .digest('hex');
    ```
-
-## The Content Machine
-
-`openshorts-content-machine.json` runs your channel in four acts:
-
-1. **Watch** — once a day it reads your channel's RSS feed
-   (`https://www.youtube.com/feeds/videos.xml?channel_id=UC...`) and clips
-   **one** video: the newest upload if there is one, otherwise the next
-   unprocessed video from your back catalog. One video a day keeps quota burn
-   predictable; a 402 (out of minutes) pauses the machine and tells you on
-   Telegram instead of failing silently.
-2. **Approve from your phone** — every finished clip lands in Telegram with
-   ✅ Publish / ❌ Skip buttons. Clips over Telegram's ~20 MB URL limit fall
-   back to a link message with the same buttons.
-3. **Drip-publish** — each approved clip takes the next free daily slot and is
-   scheduled through `POST /api/social/post` to every account you connected in
-   OpenShorts (TikTok, Instagram, YouTube). Approve five clips today, fill five
-   days of content. The slot comes from the queue the server actually holds
-   (`GET /api/social/scheduled`), so two clips approved seconds apart cannot
-   book the same one.
-4. **Sunday digest** — the machine reads the analytics of what it published
-   (`GET /api/social/analytics/*`) and reports total impressions, per-platform
-   split, and your best post of the week.
-
-Machine-specific setup, all inside sticky notes on the canvas:
-
-- Put your channel id in the **Channel RSS feed** node.
-- Create a Telegram bot with [@BotFather](https://t.me/BotFather), add the
-  `Telegram bot` credential, and replace `YOUR_TELEGRAM_CHAT_ID` in the
-  notification nodes (message your bot, then check
-  `api.telegram.org/bot<token>/getUpdates` for your chat id).
-- Connect your social accounts in your OpenShorts account page (Cloud) — the
-  posting step uses them directly; no extra social credentials in n8n.
-
-Note: the machine remembers which videos it already processed in n8n workflow
-static data, which only persists for **production** executions — test runs in
-the editor won't advance it. Scheduling deliberately does *not* use that
-mechanism (see act 3).
 
 ## Webhook payload
 

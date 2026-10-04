@@ -16,8 +16,8 @@ docker compose up --build   # Build and run full stack (Postgres included)
 - Frontend: http://localhost:5175 (Vite proxies API calls to backend)
 - There is no separate self-host mode any more: local runs with accounts, plans
   and the free minutes exactly like production (`BILLING_ENABLED=true`, a
-  Postgres container, a local `JWT_SECRET`). `GEMINI_API_KEY` /
-  `UPLOAD_POST_API_KEY` from `.env` become the server's managed keys. Without
+  Postgres container, a local `JWT_SECRET`). `GEMINI_API_KEY` from `.env`
+  becomes the server's managed key. Without
   `SMTP_*` the sign-in link is printed in `docker compose logs -f backend`.
   Production adds its secrets with `-f docker-compose.cloud.yml`.
 
@@ -49,7 +49,6 @@ uvicorn app:app --host 0.0.0.0 --port 8000
 8. **Hook Overlay** - Text overlays with styled fonts
 9. **Voice Dubbing** - Optional ElevenLabs AI translation (30+ languages)
 10. **S3 Backup** - Silent background upload
-11. **Social Distribution** - Upload-Post API (async upload)
 
 ### Key Files
 | File | Purpose |
@@ -496,13 +495,9 @@ portrait clip cannot reproduce the shrink either.
 | POST | `/api/hook` | Add text hook overlays |
 | POST | `/api/translate` | AI voice dubbing via ElevenLabs |
 | GET | `/api/translate/languages` | List supported dubbing languages |
-| POST | `/api/social/post` | Post to social media (async upload) |
 | POST | `/mcp` | MCP server (JSON-RPC): the pipeline as agent tools |
 | POST/GET/DELETE | `/api/keys` | User API keys (cloud mode, session JWT only) |
 | DELETE | `/api/account` | Erase the account and everything in it (GDPR art. 17) |
-| GET/PUT | `/api/autopilot` | Autopilot settings, connected accounts, recent runs (cloud only) |
-| GET | `/api/autopilot/videos` | Latest uploads of the connected YouTube channel + what Autopilot did |
-| POST | `/api/autopilot/run` | Clip one channel video now (`{video_id}`) |
 
 ### Agent access (MCP, API keys, webhooks)
 
@@ -513,7 +508,7 @@ portrait clip cannot reproduce the shrink either.
   endpoint changes. Key management itself refuses API-key auth: a leaked key
   cannot mint replacements.
 - **MCP server** (`mcp_server.py`, mounted always): stateless Streamable-HTTP
-  JSON-RPC at `/mcp` — no SDK dependency, ~3 methods + 8 tools. Each tool calls
+  JSON-RPC at `/mcp` — no SDK dependency, ~3 methods + 7 tools. Each tool calls
   back into this same app in-process (`httpx.ASGITransport`) forwarding the
   caller's auth headers, so it can never drift from the REST behavior. Cloud
   mode 401s without a resolvable user; self-host stays BYOK-open.
@@ -544,40 +539,19 @@ portrait clip cannot reproduce the shrink either.
   can carry durable download links; survives redeploys via the resume manifest.
   `PUBLIC_API_URL` env sets the absolute-URL base when behind a proxy.
 
-### Autopilot (`cloud/autopilot.py`, dashboard tab "Autopilot")
+### No social publishing (Upload-Post and Autopilot removed, 4-oct-2026)
 
-Cloud-only retention feature: every new video on the user's connected YouTube
-channel becomes clips on its own, and optionally the best ones are scheduled
-on their socials, one a day. Paid plans only (it spends minutes unattended).
+The product no longer publishes anywhere: clips, AI shorts and YouTube studio
+packages are downloaded (YouTube studio's last step is "Export": download the
+thumbnail, copy title and description). Upload-Post, which used to post to
+TikTok/Instagram/YouTube, and Autopilot, which listed a channel through it,
+are gone from the backend, dashboard, MCP (`publish_clip`) and docs. Our own
+YouTube publishing (YouTube Data API) is planned as a separate change.
 
-- **Channel listing** comes from Upload-Post, not scraping:
-  `GET /api/uploadposts/media?platform=youtube&user=os_<id>` reads the
-  channel's uploads playlist with the user's own OAuth token, so it includes
-  videos uploaded straight to YouTube. There is no push from Upload-Post, so a
-  loop polls (tick 5 min, each user at most once per 55 min).
-- **Jobs go through the normal pipeline**: an in-process `POST /api/process`
-  (`httpx.ASGITransport`, like the MCP server) authenticated with a freshly
-  issued session JWT for the user. Metering, the probe, the per-plan job
-  limit, the quality gate and the download proxies apply unchanged. The
-  per-job content attestation is recorded once as `rights_ack_at`.
-- **Guard rails**: only videos published after `enabled_at` (switching on never
-  clips the back catalogue) and at most 3 days old; 1 automatic job per user
-  per 24 h; `max_minutes` per video (default 30, sent as the partial-clip
-  `max_minutes`); YouTube Shorts are skipped (`HEAD /shorts/<id>` answers 200
-  for a Short and 303 to `/watch` for a regular video; the SOCS consent cookie is required, from the EU servers every request is otherwise a 302 to consent.youtube.com).
-- **Dedupe across the deploy handover**: two containers poll at once during a
-  rolling deploy, so a video is claimed by INSERTing its `autopilot_runs` row
-  (unique `user_id, video_id`) before anything is submitted. A draining
-  instance stops polling. A 429 (job limit) or 5xx drops the claim to retry.
-- **Completion**: `run_job_wrapper` calls `on_job_finished` after the R2
-  archive. A guarded UPDATE (`status='processing'` → final) makes it once-only;
-  it sends the Autopilot email (replacing the generic clips-ready one) and,
-  with autopublish on, uploads the top `clips_to_publish` clips by
-  `predicted_score` to Upload-Post in a background task, scheduled one a day at
-  `publish_hour` in the user's IANA `timezone`. Runs stuck in processing for
-  6 h are marked `timeout`.
-- `AUTOPILOT_DISABLED=1` turns the poller off without touching the API.
-- Both tables are in `account.USER_OWNED_TABLES`.
+Three tables stay as legacy models in `cloud/models.py`
+(`upload_post_profiles`, `autopilot_settings`, `autopilot_runs`): nothing
+writes them, but they remain in `account.USER_OWNED_TABLES` so erasing an
+account still deletes the rows production already has. Drop them once empty.
 
 ### Account erasure (GDPR art. 17)
 

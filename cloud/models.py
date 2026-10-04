@@ -167,6 +167,10 @@ class ApiKey(Base):
     revoked_at = Column(DateTime(timezone=True), nullable=True)
 
 
+# Legacy (Upload-Post and Autopilot were removed): nothing writes these three
+# tables any more. The models stay so production's existing rows keep their
+# schema and account erasure (cloud/account.USER_OWNED_TABLES) still deletes
+# them with the user. Drop the tables once they are empty.
 class UploadPostProfile(Base):
     __tablename__ = "upload_post_profiles"
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"),
@@ -333,7 +337,9 @@ class ProxyUsage(Base):
 
 
 class AutopilotSettings(Base):
-    """Per-user switch for Autopilot: clip every new video on the user's
+    """Legacy, no longer written (see the note above UploadPostProfile).
+
+    Per-user switch for Autopilot: clip every new video on the user's
     connected YouTube channel, and optionally publish the best clips.
 
     The channel itself is not stored here. It is whatever YouTube account the
@@ -366,7 +372,9 @@ class AutopilotSettings(Base):
 
 
 class AutopilotRun(Base):
-    """One channel video Autopilot picked up, and what happened to it.
+    """Legacy, no longer written (see the note above UploadPostProfile).
+
+    One channel video Autopilot picked up, and what happened to it.
 
     The (user_id, video_id) unique constraint is the dedupe: during a deploy two
     API containers run the poller at once, and only the one whose INSERT wins

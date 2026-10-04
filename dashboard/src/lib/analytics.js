@@ -29,9 +29,6 @@ const allows = () => true;
 //   - AutoPartial        — free source past the balance clipped to the first N
 //                          minutes by the server, no wall shown
 //   - Subscribed         — plan activated after checkout
-//   - SocialNudgeSeen    — post-generation "connect socials" banner rendered
-//   - SocialNudgeConnect — its connect button clicked (opens hosted connect page)
-//   - SocialNudgeDismissed — its X clicked (persisted, never shown again)
 //   - ClipTutorialStarted  — first-login tutorial: user hit Start
 //   - ClipTutorialSkipped  — first-login tutorial dismissed (intro or coach)
 //   - ClipTutorialCompleted— first Clip Generator job finished with clips

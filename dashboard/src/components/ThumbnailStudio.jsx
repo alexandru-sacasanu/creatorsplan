@@ -1,12 +1,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Upload, Image, Loader2, Send, Check, Download, ArrowRight, ArrowLeft, Video, Type, X, Plus, MessageSquare, FileText, Youtube, AlertCircle, Settings } from 'lucide-react';
+import { Upload, Image, Loader2, Send, Check, Copy, Download, ArrowRight, ArrowLeft, Video, Type, X, Plus, MessageSquare, FileText, AlertCircle } from 'lucide-react';
 import { getApiUrl } from '../config';
 import { apiFetch } from '../lib/api';
 import StepIndicator from './ui/StepIndicator';
 import { Screen, ScreenHeader } from './ui/Screen';
 import SegmentedControl from './ui/SegmentedControl';
 
-const STEPS = ['Input', 'Titles', 'Generate', 'Description', 'Publish'];
+const STEPS = ['Input', 'Titles', 'Generate', 'Description', 'Export'];
 
 function DragDropZone({ label, accept, onFile, file, onClear, icon }) {
   const Icon = icon;
@@ -70,7 +70,7 @@ function DragDropZone({ label, accept, onFile, file, onClear, icon }) {
   );
 }
 
-export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUserId, managed = false, onCreateClips = null }) {
+export default function ThumbnailStudio({ geminiApiKey, managed = false, onCreateClips = null }) {
   // Managed (hosted plan): Gemini runs server-side via the bearer token, no BYOK key.
   // Only send X-Gemini-Key for self-host BYOK. apiFetch attaches the bearer token.
   const keyHeader = geminiApiKey ? { 'X-Gemini-Key': geminiApiKey } : {};
@@ -110,10 +110,9 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
   const [description, setDescription] = useState('');
   const [isDescribing, setIsDescribing] = useState(false);
 
-  // Step 4 (Publish) state
+  // Step 4 (Export) state
   const [selectedThumbnail, setSelectedThumbnail] = useState(null);
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [publishResult, setPublishResult] = useState(null);
+  const [copied, setCopied] = useState(null);
 
   // Background preprocessing state
   const [preprocessSessionId, setPreprocessSessionId] = useState(null);
@@ -374,67 +373,13 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
     }
   };
 
-  // --- Publish to YouTube ---
-  const handlePublish = async () => {
-    if (!managed && (!uploadPostKey || !uploadUserId)) return alert('Please configure your Upload-Post API key and user in Settings first.');
-    const finalTitle = selectedTitle || manualTitle;
-    if (!finalTitle) return alert('No title selected.');
-    if (!selectedThumbnail) return alert('Please select a thumbnail first.');
-    if (!description) return alert('Please generate or write a description first.');
-
-    setIsPublishing(true);
-    setPublishResult(null);
+  // --- Export: copy the text, download the thumbnail ---
+  const copyText = async (key, text) => {
     try {
-      const formData = new FormData();
-      formData.append('session_id', sessionId);
-      formData.append('title', finalTitle);
-      formData.append('description', description);
-      formData.append('thumbnail_url', selectedThumbnail);
-      formData.append('api_key', uploadPostKey);
-      formData.append('user_id', uploadUserId);
-
-      // Submit the publish job — returns immediately with a publish_id
-      const res = await apiFetch('/api/thumbnail/publish', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err);
-      }
-
-      const { publish_id } = await res.json();
-
-      // Poll for status every 2 seconds (upload can take minutes for large videos)
-      await new Promise((resolve, reject) => {
-        const interval = setInterval(async () => {
-          try {
-            const statusRes = await apiFetch(`/api/thumbnail/publish/status/${publish_id}`);
-            if (!statusRes.ok) { clearInterval(interval); reject(new Error('Status check failed')); return; }
-            const statusData = await statusRes.json();
-
-            if (statusData.status === 'done') {
-              clearInterval(interval);
-              setPublishResult({ success: true, data: statusData.result });
-              resolve();
-            } else if (statusData.status === 'failed') {
-              clearInterval(interval);
-              reject(new Error(statusData.error || 'Upload failed'));
-            }
-            // 'uploading' → keep polling
-          } catch (e) {
-            clearInterval(interval);
-            reject(e);
-          }
-        }, 2000);
-      });
-
-    } catch (e) {
-      setPublishResult({ success: false, error: e.message });
-    } finally {
-      setIsPublishing(false);
-    }
+      await navigator.clipboard.writeText(text || '');
+      setCopied(key);
+      setTimeout(() => setCopied((c) => (c === key ? null : c)), 1500);
+    } catch (_) { /* clipboard blocked: the text stays selectable */ }
   };
 
   const handleReset = () => {
@@ -458,8 +403,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
     setDescription('');
     setIsDescribing(false);
     setSelectedThumbnail(null);
-    setIsPublishing(false);
-    setPublishResult(null);
+    setCopied(null);
     setPreprocessSessionId(null);
     setIsPreprocessing(false);
     setRecommended([]);
@@ -470,7 +414,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
         <ScreenHeader
           eyebrow="03 · YOUTUBE STUDIO"
           title="Package a video for YouTube"
-          subtitle="Title, thumbnail and description in one pass, then publish straight to your channel."
+          subtitle="Title, thumbnail and description in one pass, ready to paste into YouTube."
           actions={step > 0 ? (
             <button onClick={handleReset} className="btn-text">
               <Plus size={13} /> Package another
@@ -843,7 +787,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
             <div className="md:col-span-3">
               {generatedThumbnails.length > 0 ? (
                 <div className="space-y-4">
-                  <p className="text-sm text-muted">Your thumbnails · pick one to publish</p>
+                  <p className="text-sm text-muted">Your thumbnails · pick one to use</p>
                   <div className="grid gap-4">
                     {generatedThumbnails.map((thumb, i) => {
                       const url = thumb.url;
@@ -1026,14 +970,14 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                 </div>
               )}
 
-              {/* Next: Publish */}
+              {/* Next: Export */}
               {description && (
                 <button
                   onClick={() => setStep(4)}
                   className="w-full btn-primary"
                 >
                   <ArrowRight size={16} />
-                  Next: Publish
+                  Next: Export
                 </button>
               )}
             </div>
@@ -1064,7 +1008,7 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                   <p className="text-xs text-muted">
                     {mode === 'video'
                       ? "AI will generate a compelling description with chapter timestamps from your video's Whisper transcript."
-                      : "Write a description for your YouTube video. You can proceed to publish once you have a description."}
+                      : "Write a description for your YouTube video. You can export once you have a description."}
                   </p>
                 )}
               </div>
@@ -1072,19 +1016,18 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
           </div>
         )}
 
-        {/* ===== STEP 4: Publish to YouTube ===== */}
+        {/* ===== STEP 4: Export ===== */}
         {step === 4 && (
           <div className="grid md:grid-cols-5 gap-6">
-            {/* Left: Summary & Publish */}
+            {/* Left: thumbnail + title, ready to take to YouTube */}
             <div className="md:col-span-2 space-y-4">
               <button
                 onClick={() => setStep(3)}
                 className="text-xs text-muted hover:text-ink transition-colors flex items-center gap-1 mb-2"
               >
-                <ArrowLeft size={12} /> Back to Description
+                <ArrowLeft size={12} /> Back to description
               </button>
 
-              {/* Selected thumbnail Preview */}
               {selectedThumbnail && (
                 <div className="glass-panel overflow-hidden">
                   <img
@@ -1093,14 +1036,27 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                     className="w-full aspect-video object-cover"
                   />
                   <div className="p-3">
-                    <span className="text-xs text-brass flex items-center gap-1"><Check size={10} /> Selected thumbnail</span>
+                    <a
+                      href={getApiUrl(selectedThumbnail)}
+                      download="thumbnail.jpg"
+                      className="btn-primary w-full"
+                    >
+                      <Download size={16} /> Download thumbnail
+                    </a>
                   </div>
                 </div>
               )}
 
-              {/* Editable Title */}
               <div className="glass-panel p-6 space-y-3">
-                <p className="eyebrow">TITLE</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="eyebrow">TITLE</p>
+                  <button
+                    onClick={() => copyText('title', selectedTitle || manualTitle)}
+                    className="text-xs text-muted hover:text-ink flex items-center gap-1 transition-colors"
+                  >
+                    {copied === 'title' ? <><Check size={12} /> Copied</> : <><Copy size={12} /> Copy</>}
+                  </button>
+                </div>
                 <input
                   type="text"
                   value={selectedTitle || manualTitle}
@@ -1110,78 +1066,19 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                 />
               </div>
 
-              {/* Publish Button */}
-              {(!managed && (!uploadPostKey || !uploadUserId)) ? (
-                <div className="glass-panel p-6 space-y-3">
-                  <div className="flex items-center gap-2 text-warn">
-                    <AlertCircle size={16} />
-                    <span className="text-sm font-medium">Upload-Post isn't set up</span>
-                  </div>
-                  <p className="text-xs text-muted">
-                    To publish directly to YouTube, configure your Upload-Post API key and connect a profile in Settings.
-                  </p>
-                  <button
-                    onClick={() => { }}
-                    className="text-xs text-brass hover:underline flex items-center gap-1"
-                  >
-                    <Settings size={12} /> Go to Settings
-                  </button>
-                </div>
-              ) : (
+              <p className="cp-help">
+                Upload your video in YouTube Studio, then paste the title and description and set this thumbnail.
+              </p>
+
+              {onCreateClips && sessionId && (
                 <button
-                  onClick={handlePublish}
-                  disabled={isPublishing}
-                  className="w-full btn-primary"
+                  onClick={() => onCreateClips(sessionId)}
+                  className="btn-ghost w-full"
+                  title="Send this video and its transcript to the clip generator"
                 >
-                  {isPublishing ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      Publishing to YouTube...
-                    </>
-                  ) : (
-                    <>
-                      <Youtube size={16} />
-                      Publish to YouTube
-                    </>
-                  )}
+                  <Video size={16} />
+                  Create clips from this video
                 </button>
-              )}
-
-              {/* Polling status */}
-              {isPublishing && (
-                <div className="readout flex items-center gap-2">
-                  <Loader2 size={12} className="animate-spin text-brass" />
-                  UPLOADING — POLLING STATUS EVERY 2S
-                </div>
-              )}
-
-              {/* Publish Result */}
-              {publishResult && (
-                <div className="glass-panel p-4">
-                  {publishResult.success ? (
-                    <div className="space-y-2">
-                      <span className="badge-ok">PUBLISHED</span>
-                      <p className="text-sm font-medium text-ink">Published successfully!</p>
-                      <p className="text-xs text-muted">Your video is being uploaded to YouTube asynchronously.</p>
-                      {onCreateClips && sessionId && (
-                        <button
-                          onClick={() => onCreateClips(sessionId)}
-                          className="btn-primary px-4 py-2 text-xs mt-1"
-                          title="Send this video and its transcript to the clip generator"
-                        >
-                          <Video size={14} />
-                          create clips from this video
-                        </button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <span className="badge-danger">FAILED</span>
-                      <p className="text-sm font-medium text-danger">Publish failed</p>
-                      <p className="text-xs text-muted">{publishResult.error}</p>
-                    </div>
-                  )}
-                </div>
               )}
             </div>
 
@@ -1194,10 +1091,10 @@ export default function ThumbnailStudio({ geminiApiKey, uploadPostKey, uploadUse
                     YOUTUBE DESCRIPTION
                   </p>
                   <button
-                    onClick={() => setStep(3)}
+                    onClick={() => copyText('description', description)}
                     className="text-xs text-muted hover:text-ink flex items-center gap-1 transition-colors"
                   >
-                    <ArrowLeft size={10} /> Edit
+                    {copied === 'description' ? <><Check size={12} /> Copied</> : <><Copy size={12} /> Copy</>}
                   </button>
                 </div>
 

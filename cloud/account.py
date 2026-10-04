@@ -171,35 +171,6 @@ async def _cancel_subscriptions(user_id) -> Optional[str]:
     return plan
 
 
-async def _delete_upload_post_profile(user_id):
-    """Remove the user's white-label profile (and its connected socials) at
-    Upload-Post. Best effort: a stale empty profile there holds no content of
-    ours, and failing the whole erasure over a third-party 500 would be worse.
-    """
-    import httpx
-    from .social_profiles import API_BASE, _auth_headers
-
-    if not settings.managed_upload_post_key:
-        return
-    async with database.session() as session:
-        prof = await session.get(UploadPostProfile, user_id)
-        if prof is None:
-            return
-        username = prof.profile_username
-
-    try:
-        async with httpx.AsyncClient(timeout=20) as client:
-            resp = await client.request(
-                "DELETE", f"{API_BASE}/uploadposts/users",
-                headers={**_auth_headers(), "Content-Type": "application/json"},
-                json={"username": username},
-            )
-        if resp.status_code not in (200, 204, 404):
-            print(f"⚠️  Upload-Post profile delete returned {resp.status_code} for {username}")
-    except Exception as e:
-        print(f"⚠️  Upload-Post profile delete failed for {username}: {e}")
-
-
 async def _erase_rows(user_id, email, stripe_customer_id, plan, r2_deleted, reason) -> bool:
     """Swap the account for its erasure record, in one transaction.
 
@@ -309,8 +280,6 @@ async def delete_account(payload: DeleteAccountRequest, request: Request):
             await asyncio.to_thread(_local_purge, user.id)
         except Exception as e:
             print(f"⚠️  Local job purge failed for {user.id}: {e}")
-
-    await _delete_upload_post_profile(user.id)
 
     # Anything not in the closed list is dropped rather than rejected: a
     # mismatched client must not be able to fail a deletion over a label.

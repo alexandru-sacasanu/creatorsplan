@@ -293,10 +293,6 @@ class Settings:
         return os.environ.get("MANAGED_GEMINI_API_KEY", "")
 
     @property
-    def managed_upload_post_key(self) -> str:
-        return os.environ.get("MANAGED_UPLOAD_POST_API_KEY", "")
-
-    @property
     def openshorts_logo_url(self) -> str:
         return os.environ.get("OPENSHORTS_LOGO_URL", "https://openshorts.app/logo.png")
 

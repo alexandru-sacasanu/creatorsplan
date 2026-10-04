@@ -175,7 +175,7 @@ def test_resumed_job_keeps_its_safety_cap(dirs, monkeypatch):
 def test_child_env_drops_server_secrets(monkeypatch):
     for name in ("STRIPE_SECRET_KEY", "JWT_SECRET", "DATABASE_URL", "SMTP_PASSWORD",
                  "TELEGRAM_BOT_TOKEN", "AGENTLEDGER_API_KEY", "R2_SECRET_ACCESS_KEY",
-                 "MANAGED_UPLOAD_POST_API_KEY", "GOOGLE_CLIENT_SECRET"):
+                 "MANAGED_GEMINI_API_KEY", "GOOGLE_CLIENT_SECRET"):
         monkeypatch.setenv(name, "secret")
     for name in ("YOUTUBE_COOKIES", "PROXY_URL", "STATIC_PROXY_URLS", "GEMINI_API_KEY",
                  "BGUTIL_SCRIPT_PATH", "FFMPEG_ENCODER", "WHISPER_MODEL"):
@@ -242,19 +242,6 @@ def cloud_as(monkeypatch):
     monkeypatch.setattr(app_module, "BILLING_ENABLED", True)
     monkeypatch.setattr(app_module, "_user_from_request", _from_request)
     return who
-
-
-def test_publish_status_is_owner_only(cloud_as, monkeypatch):
-    monkeypatch.setattr(app_module, "publish_jobs", {
-        "p1": {"status": "done", "result": {"ok": 1}, "error": None, "user_id": "owner"}})
-    cloud_as["user"] = _User("stranger")
-    assert _client_call("get", "/api/thumbnail/publish/status/p1").status_code == 404
-    cloud_as["user"] = None
-    assert _client_call("get", "/api/thumbnail/publish/status/p1").status_code == 404
-    cloud_as["user"] = _User("owner")
-    resp = _client_call("get", "/api/thumbnail/publish/status/p1")
-    assert resp.status_code == 200
-    assert resp.json() == {"status": "done", "result": {"ok": 1}, "error": None}
 
 
 def test_render_status_is_owner_only(cloud_as, monkeypatch):

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Globe, Download, Copy, Check, ChevronRight, ChevronLeft, Loader2, AlertCircle, Volume2, User, Film, Terminal, ChevronDown, RefreshCw, Share2, Calendar, Upload } from 'lucide-react';
+import { Globe, Download, Copy, Check, ChevronRight, ChevronLeft, Loader2, AlertCircle, Volume2, User, Film, Terminal, ChevronDown, RefreshCw, Upload } from 'lucide-react';
 import { getApiUrl } from '../config';
 import { apiFetch } from '../lib/api';
 import StepIndicator from './ui/StepIndicator';
@@ -40,8 +40,8 @@ function saveCache(url, analysis, webResearch, scripts) {
   } catch { /* localStorage full */ }
 }
 
-export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uploadPostKey, uploadUserId, managed = false }) {
-  // Managed (hosted plan): Gemini (script) + Upload-Post run server-side via the
+export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, managed = false }) {
+  // Managed (hosted plan): Gemini (script) runs server-side via the
   // bearer token — no BYOK Gemini key needed. fal.ai + ElevenLabs stay BYOK.
   const geminiHeader = geminiApiKey ? { 'X-Gemini-Key': geminiApiKey } : {};
   const needsGeminiKey = !geminiApiKey && !managed;
@@ -88,13 +88,6 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
   const [genLogs, setGenLogs] = useState([]);
   const [genStatus, setGenStatus] = useState('idle');
   const [genResult, setGenResult] = useState(null);
-
-  // Publish
-  const [publishing, setPublishing] = useState(false);
-  const [publishResult, setPublishResult] = useState(null);
-  const [publishPlatforms, setPublishPlatforms] = useState({ tiktok: true, instagram: true, youtube: true });
-  const [isScheduling, setIsScheduling] = useState(false);
-  const [scheduleDate, setScheduleDate] = useState('');
 
   // UI
   const [copied, setCopied] = useState('');
@@ -1350,7 +1343,7 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                     <a
                       href={getApiUrl(genResult.video_url)}
                       download
-                      className="btn-quiet px-5"
+                      className="btn-primary px-5"
                     >
                       <Download size={14} /> Download MP4
                     </a>
@@ -1362,118 +1355,6 @@ export default function SaaShortsTab({ geminiApiKey, elevenLabsKey, falKey, uplo
                     </button>
                   </div>
 
-                  {/* Publish to social media */}
-                  <div className="card p-4 space-y-3 mt-2">
-                    <h3 className="eyebrow">Publish to social media</h3>
-
-                    {!uploadPostKey ? (
-                      <p className="text-xs text-muted">Set your Upload-Post API key in Settings to enable publishing.</p>
-                    ) : (
-                      <>
-                        {/* Platform toggles */}
-                        <SegmentedControl
-                          multi
-                          size="sm"
-                          options={[
-                            { value: 'tiktok', label: 'TikTok' },
-                            { value: 'instagram', label: 'Instagram' },
-                            { value: 'youtube', label: 'YouTube' },
-                          ]}
-                          value={Object.keys(publishPlatforms).filter((k) => publishPlatforms[k])}
-                          onChange={(arr) => setPublishPlatforms({
-                            tiktok: arr.includes('tiktok'),
-                            instagram: arr.includes('instagram'),
-                            youtube: arr.includes('youtube'),
-                          })}
-                        />
-
-                        {/* Same notice as ResultCard: TikTok lands as a draft,
-                            and finding nothing live reads as a failed post. */}
-                        {publishPlatforms.tiktok && (
-                          <p className="mt-2 text-xs text-muted">
-                            TikTok arrives as a <b className="text-ink2">draft</b> and you'll get a
-                            notification in the app — finishing it there lets you add trending sounds
-                            and hashtags, which reaches more people than posting from an api.
-                          </p>
-                        )}
-
-                        {/* Schedule toggle */}
-                        <div className="flex items-center gap-3">
-                          <label className="flex items-center gap-2 text-xs text-muted cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={isScheduling}
-                              onChange={(e) => setIsScheduling(e.target.checked)}
-                              className="w-3.5 h-3.5 rounded accent-brass"
-                            />
-                            <Calendar size={12} /> Schedule
-                          </label>
-                          {isScheduling && (
-                            <input
-                              type="datetime-local"
-                              value={scheduleDate}
-                              onChange={(e) => setScheduleDate(e.target.value)}
-                              className="input-field text-xs py-1 px-2 w-auto"
-                            />
-                          )}
-                        </div>
-
-                        {/* Publish button */}
-                        <button
-                          onClick={async () => {
-                            const selected = Object.keys(publishPlatforms).filter(k => publishPlatforms[k]);
-                            if (selected.length === 0) { setPublishResult({ ok: false, msg: 'Select at least one platform' }); return; }
-                            if (isScheduling && !scheduleDate) { setPublishResult({ ok: false, msg: 'Select a date' }); return; }
-
-                            setPublishing(true);
-                            setPublishResult(null);
-                            try {
-                              const payload = {
-                                job_id: jobId,
-                                api_key: uploadPostKey,
-                                user_id: uploadUserId,
-                                platforms: selected,
-                                title: genResult.script?.title,
-                                description: genResult.script?.caption || genResult.script?.full_narration,
-                              };
-                              if (isScheduling && scheduleDate) {
-                                payload.scheduled_date = new Date(scheduleDate).toISOString();
-                                payload.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                              }
-                              const res = await apiFetch('/api/saasshorts/post', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(payload),
-                              });
-                              if (!res.ok) {
-                                const err = await res.json().catch(() => ({ detail: 'Failed' }));
-                                throw new Error(err.detail || 'Failed');
-                              }
-                              setPublishResult({ ok: true, msg: isScheduling ? 'Scheduled!' : 'Published!' });
-                            } catch (e) {
-                              setPublishResult({ ok: false, msg: e.message });
-                            } finally {
-                              setPublishing(false);
-                            }
-                          }}
-                          disabled={publishing}
-                          className="btn-primary w-full py-2 text-sm"
-                        >
-                          {publishing ? (
-                            <><Loader2 size={14} className="animate-spin" /> {isScheduling ? 'Scheduling...' : 'Publishing...'}</>
-                          ) : (
-                            <><Share2 size={14} /> {isScheduling ? 'Schedule post' : 'Publish now'}</>
-                          )}
-                        </button>
-
-                        {publishResult && (
-                          <p className={`text-xs ${publishResult.ok ? 'text-ok' : 'text-danger'}`}>
-                            {publishResult.msg}
-                          </p>
-                        )}
-                      </>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>

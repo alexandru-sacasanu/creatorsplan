@@ -78,7 +78,7 @@ def _cooldown_ok(kind: str) -> bool:
 
 
 # Prefix on every OpenShorts Telegram message. The chat is shared with other
-# products (Upload-Post, …), so this tags which one each alert is from.
+# products, so this tags which one each alert is from.
 TELEGRAM_PREFIX = "OPENSHORTS ✂️ - "
 
 
