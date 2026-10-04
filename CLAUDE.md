@@ -539,6 +539,16 @@ portrait clip cannot reproduce the shrink either.
   can carry durable download links; survives redeploys via the resume manifest.
   `PUBLIC_API_URL` env sets the absolute-URL base when behind a proxy.
 
+### Your own Gemini key (Settings → Gemini key)
+
+Signed-in users may paste their own Gemini key. The dashboard sends it as
+`X-Gemini-Key`; `resolve_gemini` uses it instead of `MANAGED_GEMINI_API_KEY`
+for an entitled user, so Gemini calls bill their Google account. It changes
+nothing else: entitlement is still required and minutes are still metered
+(the transcription, GPU and bandwidth are ours). The key is never stored; a
+job that used it records `byok` in its resume manifest and a resumed job does
+not fall back to the server's key.
+
 ### No social publishing (Upload-Post and Autopilot removed, 4-oct-2026)
 
 The product no longer publishes anywhere: clips, AI shorts and YouTube studio

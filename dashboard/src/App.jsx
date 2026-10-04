@@ -1311,7 +1311,22 @@ function App() {
                 </p>
               </ScreenHeader>
 
-              {/* Plan, or the Gemini key when the server runs without accounts. */}
+              {/* Gemini key first: optional with a plan (ours is used when empty),
+                  required when the server has no accounts or local LLM. */}
+              <SettingsSection
+                title="Gemini key"
+                description={billingEnabled
+                  ? 'Optional. Add your own and Gemini calls bill your Google account instead of ours.'
+                  : 'The clip generator and YouTube studio run on Gemini.'}
+              >
+                <div className="space-y-6">
+                  <KeyInput onKeySet={setApiKey} savedKey={apiKey} />
+                  {billingEnabled && !apiKey && (
+                    <p className="cp-help">Nothing to add? Your plan already covers the clip generator and YouTube studio.</p>
+                  )}
+                </div>
+              </SettingsSection>
+
               <SettingsSection
                 title={billingEnabled ? 'Your plan' : 'Core keys'}
                 description={billingEnabled
@@ -1342,11 +1357,7 @@ function App() {
                       Choose a plan
                     </button>
                   </div>
-                ) : (
-                  <div className="space-y-6">
-                    <KeyInput onKeySet={setApiKey} savedKey={apiKey} />
-                  </div>
-                )}
+                ) : null}
               </SettingsSection>
 
               <SettingsSection

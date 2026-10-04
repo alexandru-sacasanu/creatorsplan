@@ -162,15 +162,20 @@ async def _user_from_request(request: Request):
 async def resolve_gemini(request: Request) -> Optional[str]:
     """Resolve the Gemini API key for a request.
 
-    Cloud (hosted) is PAID-ONLY: there is no BYOK for the core pipeline, so the
-    ``X-Gemini-Key`` header is ignored — an entitled user (active plan or trial)
-    gets the managed server key, everyone else gets ``None`` (→ 402, start trial).
-    Self-host keeps BYOK: header wins, else the env fallback.
+    With accounts: an entitled user (active plan or free minutes) gets their
+    own ``X-Gemini-Key`` if they set one in Settings, else the managed server
+    key; everyone else gets ``None`` (→ 402). Metering never looks at the
+    header, so a key only moves the Gemini bill, never the minutes.
+    Without accounts the header wins, else the env fallback.
     """
     if BILLING_ENABLED:
         user = await _user_from_request(request)
         if managed_keys.has_active_entitlement(user):
-            return managed_keys.gemini_key()
+            # The user's own key (Settings -> Gemini key) wins over ours: their
+            # Gemini calls then bill their Google account. Minutes are still
+            # metered, because the compute is ours either way.
+            own = (request.headers.get("X-Gemini-Key") or "").strip()
+            return own or managed_keys.gemini_key()
         return None
     header = request.headers.get("X-Gemini-Key")
     if header:
@@ -302,10 +307,10 @@ async def reserve_process_minutes(request, url, input_path, job_id, max_minutes=
     duration, enforces the per-user concurrent-job limit, and reserves minutes —
     raising 402 (quota) or 429 (too many jobs) as needed.
 
-    NOTE: in cloud mode ``resolve_gemini`` ignores ``X-Gemini-Key`` (paid-only,
-    no BYOK), so we must NOT skip metering just because that header is present —
-    otherwise a client could send a dummy header and run unlimited managed jobs
-    on the operator's key for free. Only skip metering when billing is off.
+    NOTE: a user's own ``X-Gemini-Key`` moves only the Gemini bill. Metering
+    must NOT be skipped because that header is present: the transcription, GPU
+    and bandwidth are ours whichever key makes the Gemini calls. Only skip
+    metering when billing is off.
     """
     if not BILLING_ENABLED:
         return None, 2, None, None, None
@@ -1295,7 +1300,7 @@ def _resume_interrupted_jobs() -> set:
                 env.pop("PROXY_URL", None)  # daily paid-proxy budget hit
         except Exception:
             pass
-        if BILLING_ENABLED and user_id is not None:
+        if BILLING_ENABLED and user_id is not None and not m.get("byok"):
             try:
                 env["GEMINI_API_KEY"] = managed_keys.gemini_key()
             except Exception:
@@ -3192,6 +3197,9 @@ async def process_endpoint(
         'base_url': api_base,
         # Read by the ClipsDelivered/JobFailed analytics event (plan).
         'user_plan': user_plan,
+        # The user's own Gemini key is never persisted, so a resume must not
+        # quietly swap in ours.
+        'byok': bool(BILLING_ENABLED and api_key and api_key != managed_keys.gemini_key()),
     }
 
     # Persist the owner so recovered jobs keep their multi-tenant guard after a
