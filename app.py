@@ -10,6 +10,7 @@ import shutil
 import glob
 import hashlib
 import hmac
+import httpx
 import time
 import zipfile
 import math
@@ -18,11 +19,11 @@ import functools
 import asyncio
 import signal
 import socket
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 from typing import Any, Dict, Optional, List
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request, Header, BackgroundTasks
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
@@ -47,15 +48,6 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 MAX_CONCURRENT_JOBS = int(os.environ.get("MAX_CONCURRENT_JOBS", "5"))
 MAX_FILE_SIZE_MB = 2048  # 2GB limit
 
-# How TikTok receives our uploads. MEDIA_UPLOAD lands the video in the user's
-# TikTok drafts so they finish the post inside TikTok's own editor; DIRECT_POST
-# publishes straight to their feed, which is Upload-Post's default.
-#
-# Drafts are the safer default for an automated pipeline: nothing reaches an
-# audience without the account owner seeing it first, and TikTok's own editor is
-# where covers, sounds and hashtags actually get chosen. The UI must say so —
-# a user who expects a published post and finds a draft will read it as a bug.
-TIKTOK_POST_MODE = os.environ.get("TIKTOK_POST_MODE", "MEDIA_UPLOAD").strip()
 # Ceiling for the working directory once it lives on a persistent volume: the
 # age-based sweep alone can't stop a burst of long videos from filling the disk.
 # 0 disables the cap.
@@ -85,7 +77,7 @@ CHILD_ENV_DENYLIST = frozenset({
     "TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID",
     "GOOGLE_CLIENT_SECRET",
     "AGENTLEDGER_API_KEY",
-    "MANAGED_UPLOAD_POST_API_KEY", "MANAGED_GEMINI_API_KEY", "UPLOAD_POST_API_KEY",
+    "MANAGED_GEMINI_API_KEY",
     "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY",
     "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY",
     "OPENPANEL_CLIENT_SECRET", "ELEVENLABS_API_KEY",
@@ -184,50 +176,6 @@ async def resolve_gemini(request: Request) -> Optional[str]:
     if header:
         return header
     return os.environ.get("GEMINI_API_KEY")
-
-
-async def resolve_upload_post(request: Request, body_key: Optional[str] = None):
-    """Resolve the Upload-Post key and the profile to post as.
-
-    Returns ``(api_key, forced_profile_username_or_None)``. Cloud is paid-only:
-    an entitled user gets the managed key + their own forced profile (body key /
-    user_id ignored); a non-entitled user gets ``(None, None)``. Self-host keeps
-    BYOK: header, then body key, then env.
-    """
-    if BILLING_ENABLED:
-        user = await _user_from_request(request)
-        if managed_keys.has_active_entitlement(user):
-            profile = await cloud.social_profiles.ensure_profile(user)
-            return managed_keys.upload_post_key(), profile
-        return None, None
-    header = request.headers.get("X-Upload-Post-Key")
-    key = header or body_key or os.environ.get("UPLOAD_POST_API_KEY")
-    return key, None
-
-
-def resolve_post_profile(forced_profile: Optional[str], client_profile: Optional[str]) -> str:
-    """The Upload-Post profile to act as, for posting/scheduling/analytics.
-
-    Fails closed on purpose. Every call site used to read
-    ``forced_profile or client_profile``, which quietly honours whatever
-    profile the *client* asked for if the server ever failed to resolve its
-    own — one refactor of ``resolve_upload_post`` away from letting a cloud
-    user schedule into someone else's connected accounts. In cloud mode the
-    client value is never consulted: either the server knows the caller's
-    profile or the request is refused.
-    """
-    if BILLING_ENABLED:
-        if not forced_profile:
-            raise HTTPException(
-                status_code=503,
-                detail="Could not resolve your social profile. Please try again.")
-        return forced_profile
-    # Self-host: no user model, the caller owns the Upload-Post account whose
-    # key resolved above, so it picks its own profile.
-    profile = forced_profile or client_profile
-    if not profile:
-        raise HTTPException(status_code=400, detail="Missing Upload-Post user profile")
-    return profile
 
 
 def gemini_missing_error():
@@ -562,7 +510,6 @@ job_queue = asyncio.PriorityQueue()
 _job_seq = itertools.count()
 jobs: Dict[str, Dict] = {}
 thumbnail_sessions: Dict[str, Dict] = {}
-publish_jobs: Dict[str, Dict] = {}  # {publish_id: {status, result, error}}
 # Semester to limit concurrency to MAX_CONCURRENT_JOBS
 concurrency_semaphore = asyncio.Semaphore(MAX_CONCURRENT_JOBS)
 
@@ -1753,9 +1700,6 @@ async def run_job_wrapper(job_id):
         await _settle_reservation(job_id, job)
         # Archive the completed clips to the user's durable R2 library (history).
         await _archive_managed_job(job_id)
-        # Autopilot bookkeeping + autopublish (before the generic clips-ready
-        # email, which it replaces for its own jobs).
-        await _autopilot_job_finished(job_id, job)
         # Fire the caller's webhook (after archive, so durable links exist).
         await _notify_job_webhook(job_id)
         # Operational alerting for managed jobs (proxy out of credits / failures).
@@ -1880,18 +1824,6 @@ def _archive_clip_edit_bg(job_id: str, clip_index: int, filename: str):
             print(f"⚠️  R2 edit archive error for {job_id}: {e}")
 
     asyncio.create_task(_run())
-
-
-async def _autopilot_job_finished(job_id, job):
-    if not BILLING_ENABLED or not job or not job.get('user_id'):
-        return
-    try:
-        reason = None
-        if job.get('status') != 'completed':
-            reason = _alerts._classify_failure(_job_error_text(job.get('logs', [])))
-        await cloud.autopilot.on_job_finished(job_id, job, reason)
-    except Exception as e:
-        print(f"⚠️  Autopilot completion error for {job_id}: {e}")
 
 
 async def _notify_clips_ready(job_id):
@@ -2282,9 +2214,6 @@ async def lifespan(app: FastAPI):
         # re-points their clips at the clean twins in R2 and hands us each
         # one so the working copy (and an open dashboard) follows.
         cloud.videos.register_local_unmark(_unmark_local_job)
-        # Autopilot: watch connected YouTube channels for new videos. Paused
-        # while this instance drains so only the new container submits jobs.
-        cloud.autopilot.start(app, is_active=lambda: not _draining)
         # Welcome / first-clip / win-back emails (cloud/lifecycle.py).
         cloud.lifecycle.start(is_active=lambda: not _draining)
         # Nag on Telegram while the residential proxy is down/out of credits —
@@ -5372,395 +5301,6 @@ async def translate_clip(
         "new_video_url": f"/videos/{req.job_id}/{output_filename}"
     }
 
-class SocialPostRequest(BaseModel):
-    job_id: str
-    clip_index: int
-    api_key: Optional[str] = None  # BYOK; ignored for managed users
-    user_id: Optional[str] = None  # BYOK profile; ignored for managed users
-    platforms: List[str] # ["tiktok", "instagram", "youtube"]
-    # Optional overrides if frontend wants to edit them
-    title: Optional[str] = None
-    description: Optional[str] = None
-    scheduled_date: Optional[str] = None # ISO-8601 string
-    timezone: Optional[str] = "UTC"
-
-import httpx
-
-
-def _post_video_blocking(url, headers, data, file_path, filename, timeout):
-    """Multipart POST of a video to Upload-Post. Blocking: call it through
-    asyncio.to_thread from a request handler, never inline."""
-    with open(file_path, "rb") as f:
-        files = {"video": (filename, f.read(), "video/mp4")}
-    with httpx.Client(timeout=timeout) as client:
-        return client.post(url, headers=headers, data=data, files=files)
-
-
-@app.post("/api/social/post")
-async def post_to_socials(req: SocialPostRequest, request: Request):
-    await _ensure_job_files(req.job_id, request)
-    if req.job_id not in jobs:
-        raise HTTPException(status_code=404, detail="Job not found")
-
-    # Resolve the Upload-Post key + profile. For managed users the server key is
-    # used and their own profile is forced (body api_key / user_id are ignored).
-    upload_key, forced_profile = await resolve_upload_post(request, req.api_key)
-    if not upload_key:
-        raise HTTPException(status_code=400, detail="Missing Upload-Post API key")
-    post_user = resolve_post_profile(forced_profile, req.user_id)
-
-    job = jobs[req.job_id]
-    await _assert_job_owner(request, job)
-    if 'result' not in job or 'clips' not in job['result']:
-        raise HTTPException(status_code=400, detail="Job result not available")
-
-    try:
-        clip = job['result']['clips'][req.clip_index]
-        # Video URL is relative /videos/..., we need absolute file path
-        # clip['video_url'] is like "/videos/{job_id}/{filename}"
-        # We constructed it as: f"/videos/{job_id}/{clip_filename}"
-        # And file is at f"{OUTPUT_DIR}/{job_id}/{clip_filename}"
-        
-        filename = clip['video_url'].split('/')[-1]
-        file_path = os.path.join(OUTPUT_DIR, req.job_id, filename)
-        
-        if not os.path.exists(file_path):
-             raise HTTPException(status_code=404, detail=f"Video file not found: {file_path}")
-
-        # Construct parameters for Upload-Post API
-        # Fallbacks
-        final_title = req.title or clip.get('title', 'Viral Short')
-        final_description = req.description or clip.get('video_description_for_instagram') or clip.get('video_description_for_tiktok') or "Check this out!"
-        
-        # Prepare form data
-        url = "https://api.upload-post.com/api/upload"
-        headers = {
-            "Authorization": f"Apikey {upload_key}"
-        }
-
-        # Prepare data as dict (httpx handles lists for multiple values)
-        data_payload = {
-            "user": post_user,
-            "title": final_title,
-            "platform[]": req.platforms, # Pass list directly
-            "async_upload": "true"  # Enable async upload
-        }
-
-        # Add scheduling if present
-        if req.scheduled_date:
-            data_payload["scheduled_date"] = req.scheduled_date
-            if req.timezone:
-                data_payload["timezone"] = req.timezone
-        
-        # Add Platform specifics
-        if "tiktok" in req.platforms:
-             data_payload["tiktok_title"] = final_description
-             data_payload["post_mode"] = TIKTOK_POST_MODE
-             
-        if "instagram" in req.platforms:
-             data_payload["instagram_title"] = final_description
-             data_payload["media_type"] = "REELS"
-
-        if "youtube" in req.platforms:
-             yt_title = req.title or clip.get('video_title_for_youtube_short', final_title)
-             data_payload["youtube_title"] = yt_title
-             data_payload["youtube_description"] = final_description
-             data_payload["privacyStatus"] = "public"
-
-        # The upload is a blocking multipart POST of the whole clip (tens of
-        # seconds for TikTok+YouTube). Run inline, it froze the event loop:
-        # 23-sep-2026 19:47:48 UTC one post stalled every request, /health
-        # included, for 42 s and the uptime monitor paged "openshorts-api
-        # down". It runs in a worker thread so the API keeps answering.
-        print(f"📡 Sending to Upload-Post for platforms: {req.platforms}")
-        response = await asyncio.to_thread(
-            _post_video_blocking, url, headers, data_payload, file_path, filename, 120.0
-        )
-
-        if response.status_code not in [200, 201, 202]: # Added 201
-             print(f"❌ Upload-Post Error: {response.text}")
-             raise HTTPException(status_code=response.status_code, detail=f"Vendor API Error: {response.text}")
-
-        return response.json()
-
-    except Exception as e:
-        print(f"❌ Social Post Exception: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/api/social/user")
-async def get_social_user(request: Request):
-    """Proxy to fetch user profiles from Upload-Post.
-
-    BYOK: uses the caller's key and returns all profiles on that account.
-    Managed: uses the server key but returns ONLY the caller's own profile.
-    """
-    api_key, forced_profile = await resolve_upload_post(request, None)
-    if not api_key:
-         raise HTTPException(status_code=400, detail="Missing X-Upload-Post-Key header")
-
-    url = "https://api.upload-post.com/api/uploadposts/users"
-    print(f"🔍 Fetching User ID from: {url}")
-    headers = {"Authorization": f"Apikey {api_key}"}
-    
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        try:
-            resp = await client.get(url, headers=headers)
-            if resp.status_code != 200:
-                print(f"❌ Upload-Post User Fetch Error: {resp.text}")
-                raise HTTPException(status_code=resp.status_code, detail=f"Failed to fetch user: {resp.text}")
-            
-            data = resp.json()
-            # Never log the body: on the managed key it lists every profile
-            # on the account (usernames, redirect URLs), ~2 MB per call.
-            _n = len(data.get('profiles') or []) if isinstance(data, dict) else 0
-            print(f"🔍 Upload-Post users: {_n} profiles")
-            
-            user_id = None
-            # The structure is {'success': True, 'profiles': [{'username': '...'}, ...]}
-            profiles_list = []
-            if isinstance(data, dict):
-                 raw_profiles = data.get('profiles', [])
-                 if isinstance(raw_profiles, list):
-                     for p in raw_profiles:
-                         username = p.get('username')
-                         if username:
-                             # Determine connected platforms
-                             socials = p.get('social_accounts', {})
-                             connected = []
-                             # Check typical platforms
-                             for platform in ['tiktok', 'instagram', 'youtube']:
-                                 account_info = socials.get(platform)
-                                 # If it's a dict and typically has data, or just not empty string
-                                 if isinstance(account_info, dict):
-                                     connected.append(platform)
-                             
-                             profiles_list.append({
-                                 "username": username,
-                                 "connected": connected
-                             })
-            
-            # Managed users must only ever see their own profile.
-            if forced_profile is not None:
-                profiles_list = [p for p in profiles_list if p.get("username") == forced_profile]
-
-            if not profiles_list:
-                # Fallback if no profiles found
-                return {"profiles": [], "error": "No profiles found"}
-
-            return {"profiles": profiles_list}
-            
-            
-        except Exception as e:
-             raise HTTPException(status_code=500, detail=str(e))
-
-
-# --- Social analytics (thin proxies over Upload-Post) ---
-# Read-only mirrors of the posting flow above: managed users are locked to their
-# own profile (the body/query profile is ignored), BYOK callers bring their own
-# key and pick the profile with ?user=.
-
-# Separate bucket from _probe_times: analytics polling must not eat into the
-# metering-probe allowance, and vice versa. Protects the managed Upload-Post
-# key's vendor rate limits from a runaway polling loop.
-_analytics_times: dict = {}  # user_id -> [monotonic timestamps]
-ANALYTICS_PER_HOUR = 60
-
-
-def _check_analytics_rate(user_id):
-    now = time.monotonic()
-    times = _analytics_times.setdefault(str(user_id), [])
-    times[:] = [t for t in times if now - t < 3600]
-    if len(times) >= ANALYTICS_PER_HOUR:
-        raise HTTPException(status_code=429,
-                            detail="Too many analytics requests this hour. Please slow down.")
-    times.append(now)
-
-
-async def _social_analytics_auth(request: Request, byok_profile: Optional[str]):
-    api_key, forced_profile = await resolve_upload_post(request, None)
-    if not api_key:
-        if BILLING_ENABLED:
-            # Signed-in free user (or no auth at all): social posting is
-            # paid-only in cloud, so there are no posts to measure either.
-            raise HTTPException(status_code=402, detail={
-                "error": "no_plan",
-                "message": "Social analytics needs an active plan.",
-            })
-        raise HTTPException(status_code=400, detail="Missing X-Upload-Post-Key header")
-    if forced_profile:
-        user = await _user_from_request(request)
-        if user:
-            _check_analytics_rate(user.id)
-    return api_key, resolve_post_profile(forced_profile, byok_profile)
-
-
-async def _upload_post_get(api_key: str, url: str, params: dict):
-    headers = {"Authorization": f"Apikey {api_key}"}
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        resp = await client.get(url, headers=headers, params=params)
-    if resp.status_code != 200:
-        raise HTTPException(status_code=resp.status_code, detail=f"Vendor API Error: {resp.text}")
-    return resp.json()
-
-
-@app.get("/api/social/analytics")
-async def social_profile_analytics(
-    request: Request,
-    platforms: str = "tiktok,instagram,youtube",
-    user: Optional[str] = None,
-):
-    """Aggregated profile analytics: followers, views, engagement per platform."""
-    api_key, profile = await _social_analytics_auth(request, user)
-    return await _upload_post_get(
-        api_key,
-        f"https://api.upload-post.com/api/analytics/{profile}",
-        {"platforms": platforms},
-    )
-
-
-@app.get("/api/social/analytics/posts")
-async def social_post_analytics(
-    request: Request,
-    platform: Optional[str] = None,
-    limit: Optional[int] = None,
-    cursor: Optional[str] = None,
-    since: Optional[str] = None,
-    until: Optional[str] = None,
-    user: Optional[str] = None,
-):
-    """Per-post metrics for the profile's published posts (Upload-Post cache)."""
-    api_key, profile = await _social_analytics_auth(request, user)
-    params = {"user": profile}
-    for key, value in (("platform", platform), ("limit", limit),
-                       ("cursor", cursor), ("since", since), ("until", until)):
-        if value is not None:
-            params[key] = value
-    return await _upload_post_get(
-        api_key,
-        "https://api.upload-post.com/api/uploadposts/post-analytics/cached",
-        params,
-    )
-
-
-_PERIOD_DAYS = {"last_day": 1, "last_week": 7, "last_month": 30,
-                "last_3months": 90, "last_year": 365}
-
-
-def _post_row_views(row: dict) -> float:
-    metrics = row.get("post_metrics") or row.get("metrics") or row
-    for key in ("views", "impressions", "plays"):
-        value = metrics.get(key)
-        if value is not None:
-            try:
-                return float(value)
-            except (TypeError, ValueError):
-                return 0.0
-    return 0.0
-
-
-@app.get("/api/social/analytics/impressions")
-async def social_total_impressions(
-    request: Request,
-    period: Optional[str] = None,     # last_day | last_week | last_month | last_3months | last_year
-    start_date: Optional[str] = None,  # YYYY-MM-DD
-    end_date: Optional[str] = None,
-    platform: Optional[str] = None,
-    breakdown: Optional[bool] = None,
-    user: Optional[str] = None,
-):
-    """Total impressions for the profile over a window.
-
-    Computed by aggregating the profile-scoped post cache instead of proxying
-    Upload-Post's /total-impressions: that endpoint echoes the requested
-    profile but returns account-wide numbers (observed 2026-08-21 — a profile
-    with zero posts got 85K Instagram impressions), which for managed users
-    would leak other tenants' aggregates. The cache endpoint IS scoped by
-    ?user=, so summing it is both correct and cheap.
-    """
-    api_key, profile = await _social_analytics_auth(request, user)
-
-    days = _PERIOD_DAYS.get(period or "", 30)
-    since = start_date or (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
-    params = {"user": profile, "since": since, "limit": 200}
-    if end_date:
-        params["until"] = end_date
-    if platform:
-        params["platform"] = platform
-
-    total = 0.0
-    per_platform: dict = {}
-    for _page in range(5):  # 1000 posts is far beyond any real profile window
-        data = await _upload_post_get(
-            api_key,
-            "https://api.upload-post.com/api/uploadposts/post-analytics/cached",
-            params,
-        )
-        rows = data.get("posts") or data.get("data") or data.get("items") or []
-        for row in rows:
-            if not isinstance(row, dict):
-                continue
-            views = _post_row_views(row)
-            total += views
-            name = row.get("platform")
-            if name:
-                per_platform[name] = per_platform.get(name, 0) + views
-        cursor = data.get("next_cursor")
-        if not cursor or not data.get("has_more"):
-            break
-        params["cursor"] = cursor
-
-    result = {
-        "profile_username": profile,
-        "total_impressions": round(total),
-        "per_platform": {k: round(v) for k, v in per_platform.items()},
-    }
-    return result
-
-
-async def _scheduled_posts_for(api_key: str, profile: str) -> list:
-    """The caller's pending scheduled posts.
-
-    Upload-Post's GET /uploadposts/schedule takes no profile filter and returns
-    everything the *account* has pending — with the managed key that is every
-    OpenShorts user's queue, so the filter below is what keeps one tenant from
-    seeing (or cancelling) another's. Same class of bug as the impressions
-    endpoint; do not "simplify" it away.
-    """
-    data = await _upload_post_get(
-        api_key, "https://api.upload-post.com/api/uploadposts/schedule", {})
-    rows = data.get("scheduled_posts") or data.get("data") or []
-    return [r for r in rows
-            if isinstance(r, dict) and r.get("profile_username") == profile]
-
-
-@app.get("/api/social/scheduled")
-async def social_scheduled(request: Request, user: Optional[str] = None):
-    """Pending scheduled posts for the caller's profile, soonest first."""
-    api_key, profile = await _social_analytics_auth(request, user)
-    rows = await _scheduled_posts_for(api_key, profile)
-    rows.sort(key=lambda r: r.get("scheduled_date") or "")
-    return {"profile_username": profile, "scheduled_posts": rows}
-
-
-@app.delete("/api/social/scheduled/{job_id}")
-async def social_cancel_scheduled(job_id: str, request: Request, user: Optional[str] = None):
-    """Cancel one pending scheduled post, if it belongs to the caller."""
-    api_key, profile = await _social_analytics_auth(request, user)
-    rows = await _scheduled_posts_for(api_key, profile)
-    if not any(r.get("job_id") == job_id for r in rows):
-        # 404 rather than 403: never confirm that someone else's job exists.
-        raise HTTPException(status_code=404, detail="Scheduled post not found")
-    headers = {"Authorization": f"Apikey {api_key}"}
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        resp = await client.delete(
-            f"https://api.upload-post.com/api/uploadposts/schedule/{job_id}",
-            headers=headers)
-    if resp.status_code not in (200, 202, 204):
-        raise HTTPException(status_code=resp.status_code,
-                            detail=f"Vendor API Error: {resp.text}")
-    return {"success": True, "job_id": job_id}
-
-
 # --- Thumbnail Studio Endpoints ---
 
 @app.post("/api/thumbnail/upload")
@@ -6214,112 +5754,6 @@ async def thumbnail_describe(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/thumbnail/publish")
-async def thumbnail_publish(
-    request: Request,
-    background_tasks: BackgroundTasks,
-    session_id: str = Form(...),
-    title: str = Form(...),
-    description: str = Form(...),
-    thumbnail_url: str = Form(...),
-    api_key: Optional[str] = Form(None),   # BYOK; ignored for managed users
-    user_id: Optional[str] = Form(None),   # BYOK profile; ignored for managed users
-):
-    """Kick off a background upload to YouTube via Upload-Post and return immediately."""
-    if session_id not in thumbnail_sessions:
-        raise HTTPException(status_code=404, detail="Session not found")
-
-    # Managed users: server key + forced own profile; body fields ignored.
-    upload_key, forced_profile = await resolve_upload_post(request, api_key)
-    if not upload_key:
-        raise HTTPException(status_code=400, detail="Missing Upload-Post API key")
-    post_user = forced_profile or user_id
-    if not post_user:
-        raise HTTPException(status_code=400, detail="Missing Upload-Post user profile")
-
-    session = thumbnail_sessions[session_id]
-    await _assert_job_owner(request, session)
-    video_path = session.get("video_path")
-    if not video_path or not os.path.exists(video_path):
-        raise HTTPException(status_code=404, detail="Original video file not found")
-
-    # Resolve thumbnail path from URL — sanitize against path traversal so a
-    # crafted thumbnail_url (e.g. "thumbnails/../../.env") can't read server
-    # files and exfiltrate them via the Upload-Post multipart body.
-    thumb_relative = thumbnail_url.lstrip("/")
-    if thumb_relative.startswith("thumbnails/"):
-        thumb_path = _safe_under(OUTPUT_DIR, thumb_relative)
-    else:
-        thumb_path = _safe_under(THUMBNAILS_DIR, thumb_relative)
-
-    if not thumb_path:
-        raise HTTPException(status_code=400, detail="Invalid thumbnail path")
-    if not os.path.exists(thumb_path):
-        raise HTTPException(status_code=404, detail="Thumbnail file not found")
-
-    # Generate a unique ID for this publish job so the frontend can poll
-    publish_id = str(uuid.uuid4())
-    publish_jobs[publish_id] = {"status": "uploading", "result": None, "error": None,
-                                "user_id": session.get("user_id")}
-
-    def do_upload():
-        """Runs in a thread via BackgroundTasks — does the actual multipart upload."""
-        try:
-            upload_url = "https://api.upload-post.com/api/upload"
-            headers = {"Authorization": f"Apikey {upload_key}"}
-            data_payload = {
-                "user": post_user,
-                "platform[]": ["youtube"],
-                "title": title,          # required base field (fallback)
-                "async_upload": "true",
-                "youtube_title": title,
-                "youtube_description": description,
-                "privacyStatus": "public",
-            }
-            video_filename = os.path.basename(video_path)
-            thumb_filename = os.path.basename(thumb_path)
-
-            print(f"📡 [Thumbnail] Publishing to YouTube via Upload-Post... (publish_id={publish_id})")
-            with open(video_path, "rb") as vf, open(thumb_path, "rb") as tf:
-                files = {
-                    "video": (video_filename, vf.read(), "video/mp4"),
-                    "thumbnail": (thumb_filename, tf.read(), "image/jpeg"),
-                }
-
-            # Use a long timeout — video uploads can take several minutes
-            with httpx.Client(timeout=600.0) as client:
-                response = client.post(upload_url, headers=headers, data=data_payload, files=files)
-
-            if response.status_code not in [200, 201, 202]:
-                err = f"Upload-Post API Error ({response.status_code}): {response.text}"
-                print(f"❌ {err}")
-                publish_jobs[publish_id]["status"] = "failed"
-                publish_jobs[publish_id]["error"] = err
-            else:
-                print(f"✅ [Thumbnail] Published successfully (publish_id={publish_id})")
-                publish_jobs[publish_id]["status"] = "done"
-                publish_jobs[publish_id]["result"] = response.json()
-
-        except Exception as e:
-            err = str(e)
-            print(f"❌ Thumbnail Publish Background Error: {err}")
-            publish_jobs[publish_id]["status"] = "failed"
-            publish_jobs[publish_id]["error"] = err
-
-    background_tasks.add_task(do_upload)
-    return {"publish_id": publish_id, "status": "uploading"}
-
-
-@app.get("/api/thumbnail/publish/status/{publish_id}")
-async def thumbnail_publish_status(publish_id: str, request: Request):
-    """Poll the status of a background publish job (owner only in cloud mode)."""
-    if publish_id not in publish_jobs:
-        raise HTTPException(status_code=404, detail="Publish job not found")
-    record = publish_jobs[publish_id]
-    await _assert_job_owner(request, record)
-    return {k: v for k, v in record.items() if k != "user_id"}
-
-
 # @app.get("/api/gallery/clips")
 # async def get_gallery_clips(limit: int = 20, offset: int = 0, refresh: bool = False):
 #     """
@@ -6537,93 +5971,6 @@ async def saasshorts_video_gallery(limit: int = 50):
         videos = await loop.run_in_executor(None, list_video_gallery, limit)
         return {"videos": videos, "total": len(videos)}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-class SaaSPostRequest(BaseModel):
-    job_id: str
-    api_key: Optional[str] = None  # BYOK; ignored for managed users
-    user_id: Optional[str] = None  # BYOK profile; ignored for managed users
-    platforms: List[str]
-    title: Optional[str] = None
-    description: Optional[str] = None
-    scheduled_date: Optional[str] = None
-    timezone: Optional[str] = "UTC"
-
-
-@app.post("/api/saasshorts/post")
-async def saasshorts_post_to_socials(req: SaaSPostRequest, request: Request):
-    """Post an AI Shorts video to social media via Upload-Post."""
-    if req.job_id not in saas_jobs:
-        raise HTTPException(status_code=404, detail="Job not found")
-
-    upload_key, forced_profile = await resolve_upload_post(request, req.api_key)
-    if not upload_key:
-        raise HTTPException(status_code=400, detail="Missing Upload-Post API key")
-    post_user = resolve_post_profile(forced_profile, req.user_id)
-
-    job = saas_jobs[req.job_id]
-    await _assert_job_owner(request, job)
-    result = job.get("result")
-    if not result or not result.get("video_url"):
-        raise HTTPException(status_code=400, detail="No video available for this job")
-
-    try:
-        # Resolve video file path
-        video_url = result["video_url"]  # e.g. /videos/saas_xxx/slug_final.mp4
-        rel_path = video_url.replace("/videos/", "")
-        file_path = os.path.join(OUTPUT_DIR, rel_path)
-
-        if not os.path.exists(file_path):
-            raise HTTPException(status_code=404, detail=f"Video file not found")
-
-        script = result.get("script", {})
-        final_title = req.title or script.get("title", "AI Short")
-        final_description = req.description or script.get("caption", "")
-        if not final_description:
-            final_description = script.get("full_narration", "Check this out!")
-
-        url = "https://api.upload-post.com/api/upload"
-        headers = {"Authorization": f"Apikey {upload_key}"}
-
-        data_payload = {
-            "user": post_user,
-            "title": final_title,
-            "platform[]": req.platforms,
-            "async_upload": "true",
-        }
-
-        if req.scheduled_date:
-            data_payload["scheduled_date"] = req.scheduled_date
-            if req.timezone:
-                data_payload["timezone"] = req.timezone
-
-        if "tiktok" in req.platforms:
-            data_payload["tiktok_title"] = final_description
-            data_payload["post_mode"] = TIKTOK_POST_MODE
-        if "instagram" in req.platforms:
-            data_payload["instagram_title"] = final_description
-            data_payload["media_type"] = "REELS"
-        if "youtube" in req.platforms:
-            data_payload["youtube_title"] = final_title
-            data_payload["youtube_description"] = final_description
-            data_payload["privacyStatus"] = "public"
-
-        filename = os.path.basename(file_path)
-        print(f"📡 [AI Shorts] Sending to Upload-Post: {req.platforms}")
-        response = await asyncio.to_thread(
-            _post_video_blocking, url, headers, data_payload, file_path, filename, 120.0
-        )
-
-        if response.status_code not in [200, 201, 202]:
-            raise HTTPException(status_code=response.status_code, detail=f"Upload-Post Error: {response.text}")
-
-        return response.json()
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"❌ [AI Shorts] Post Exception: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

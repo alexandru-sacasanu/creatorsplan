@@ -162,7 +162,7 @@ soup — use rounded-card/rounded-input/rounded-full deliberately. No
 Hash routing (`#app`, `#/pricing`, `#/account`, `#legal`, `#features`,
 `#how-it-works`, `#pricing`, `#comparison`, `#faq` anchors), `billingEnabled` /
 `isManaged` / `isSignedIn` gating, all handlers and props, localStorage keys
-(`gemini_key`, `uploadPostKey_v3`, `elevenLabsKey_v1`, `falKey_v1`,
+(`gemini_key`, `elevenLabsKey_v1`, `falKey_v1`,
 `uploadUserId`, `openshorts_session`, `openshorts_auth`,
 `openshorts_skip_landing`), API calls and BYOK headers, QuotaError flows,
 Remotion preview/render wiring. Redesign is classes + markup structure only.

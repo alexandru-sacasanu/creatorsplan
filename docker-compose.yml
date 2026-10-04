@@ -1,7 +1,7 @@
 # creatorsplan runs one way everywhere: with accounts, plans and the free
 # minutes. Locally that means a Postgres next to the backend, a dev JWT
-# secret, and your own GEMINI_API_KEY / UPLOAD_POST_API_KEY (from .env) used as
-# the server's keys. Production adds its secrets with docker-compose.cloud.yml.
+# secret, and your own GEMINI_API_KEY (from .env) used as the server's key.
+# Production adds its secrets with docker-compose.cloud.yml.
 #
 # Sign-in links: with no SMTP_* settings in .env the backend prints the link in
 # its log instead of emailing it (`docker compose logs -f backend`).
@@ -41,10 +41,9 @@ services:
       - JWT_SECRET=${JWT_SECRET:-creatorsplan-local-dev-secret}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5175}
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5175,http://localhost:8001}
-      # The server's own keys power every account's minutes. Locally they fall
-      # back to the keys you already have in .env.
+      # The server's own key powers every account's minutes. Locally it falls
+      # back to the key you already have in .env.
       - MANAGED_GEMINI_API_KEY=${MANAGED_GEMINI_API_KEY:-${GEMINI_API_KEY:-}}
-      - MANAGED_UPLOAD_POST_API_KEY=${MANAGED_UPLOAD_POST_API_KEY:-${UPLOAD_POST_API_KEY:-}}
     restart: unless-stopped
 
   frontend:

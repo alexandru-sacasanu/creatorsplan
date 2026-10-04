@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { Upload, Youtube, Instagram, Share2, ChevronDown, Check, Activity, LayoutDashboard, Settings, Plus, History, X, Terminal, Shield, LayoutGrid, Image, Globe, RotateCcw, Calendar, AlertTriangle, KeyRound, Bot, Users, Smartphone, ExternalLink, Copy, CheckCircle2, Loader2, Download, Menu, Lock, Rocket, Clapperboard, SquareUser, SlidersHorizontal, CreditCard } from 'lucide-react';
+import { Upload, Youtube, Instagram, ChevronDown, Check, Activity, LayoutDashboard, Settings, Plus, History, X, Terminal, Shield, LayoutGrid, Image, Globe, RotateCcw, AlertTriangle, KeyRound, Bot, Users, Smartphone, ExternalLink, Copy, CheckCircle2, Loader2, Download, Menu, Lock, Clapperboard, SquareUser, SlidersHorizontal, CreditCard } from 'lucide-react';
 import KeyInput from './components/KeyInput';
 import MediaInput from './components/MediaInput';
 import McpConnectCard from './components/McpConnectCard';
@@ -9,7 +9,6 @@ import ProcessingAnimation from './components/ProcessingAnimation';
 import ThumbnailStudio from './components/ThumbnailStudio';
 import SaaShortsTab from './components/SaaShortsTab';
 import UGCGallery from './components/UGCGallery';
-import ScheduleWeekModal from './components/ScheduleWeekModal';
 import ClipEditor from './components/ClipEditor';
 import ReframeEditor from './components/ReframeEditor';
 import PlanCard from './components/PlanCard';
@@ -25,7 +24,6 @@ import { takeAuthIntent } from './lib/authIntent';
 import TrialGate from './components/TrialGate';
 import AdvancedBanner from './components/AdvancedBanner';
 import HistoryTab from './components/HistoryTab';
-import AutopilotTab from './components/AutopilotTab';
 import ProfileMenu from './components/ProfileMenu';
 import ShortFrameLogo from './components/ShortFrameLogo';
 import Modal from './components/ui/Modal';
@@ -79,10 +77,6 @@ const TikTokIcon = ({ size = 16, className = "" }) => (
     <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 0 1 3.183-4.51v-3.5a6.329 6.329 0 0 0-5.394 10.692 6.33 6.33 0 0 0 10.857-4.424V8.687a8.182 8.182 0 0 0 4.773 1.526V6.79a4.831 4.831 0 0 1-1.003-.104z" />
   </svg>
 );
-
-// Cloud accounts get an auto-generated opaque id (os_<hash>) as username —
-// meaningless to the user, so the selector shows connected networks instead.
-const isAutoProfileId = (username) => /^os_[0-9a-f]/i.test(username || "");
 
 /* The job a signed-out visitor started, parked until they come back signed in.
  *
@@ -139,107 +133,6 @@ const formatRetention = (seconds) => {
   if (seconds >= 86400) return `${Math.round(seconds / 86400)} day${seconds >= 172800 ? 's' : ''}`;
   if (seconds >= 3600) return `${Math.round(seconds / 3600)} hour${seconds >= 7200 ? 's' : ''}`;
   return `${Math.max(1, Math.round(seconds / 60))} min`;
-};
-
-const ProfileNetworkIcons = ({ profile, size = 12 }) => (
-  <span className="flex items-center gap-1.5">
-    <span className={profile?.connected?.includes('tiktok') ? 'text-ink' : 'text-muted opacity-40'}>
-      <TikTokIcon size={size} />
-    </span>
-    <span className={profile?.connected?.includes('instagram') ? 'text-ink' : 'text-muted opacity-40'}>
-      <Instagram size={size} />
-    </span>
-    <span className={profile?.connected?.includes('youtube') ? 'text-ink' : 'text-muted opacity-40'}>
-      <Youtube size={size} />
-    </span>
-  </span>
-);
-
-const UserProfileSelector = ({ profiles, selectedUserId, onSelect, onConnect }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  if (!profiles || profiles.length === 0) return null;
-
-  const selectedProfile = profiles.find(p => p.username === selectedUserId) || profiles[0];
-  const autoId = isAutoProfileId(selectedProfile?.username);
-
-  return (
-    <div className="relative z-50">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="social profile"
-        /* Phone: avatar + chevron only. A 180px pill next to the menu button,
-           the section title and the minutes meter overflowed a 360px header. */
-        className="flex items-center justify-between gap-1 bg-paper2 border border-rule2 rounded-input px-2 sm:px-3 py-2 text-sm text-ink2 hover:bg-paper3 transition-colors sm:min-w-[180px]"
-      >
-        <span className="flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-paper3 border border-rule flex items-center justify-center font-mono text-micro text-brass shrink-0">
-            {autoId ? "S" : (selectedProfile?.username?.substring(0, 1).toUpperCase() || "U")}
-          </div>
-          {autoId ? (
-            <span className="hidden sm:flex"><ProfileNetworkIcons profile={selectedProfile} size={13} /></span>
-          ) : (
-            <span className="hidden sm:block font-medium text-ink truncate max-w-[100px]">{selectedProfile?.username || "Select User"}</span>
-          )}
-        </span>
-        <ChevronDown size={14} className={`text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full mt-2 right-0 w-64 card overflow-hidden">
-          <div className="max-h-60 overflow-y-auto custom-scrollbar">
-            {profiles.map((profile) => (
-              <button
-                key={profile.username}
-                onClick={() => {
-                  onSelect(profile.username);
-                  setIsOpen(false);
-                }}
-                className="w-full flex items-center justify-between px-4 py-3 hover:bg-paper3 transition-colors text-left group border-b border-rule last:border-0"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-paper3 flex items-center justify-center font-mono text-micro text-ink border border-rule shrink-0">
-                    {isAutoProfileId(profile.username) ? "S" : profile.username.substring(0, 2).toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium text-ink2 group-hover:text-ink transition-colors truncate">
-                      {isAutoProfileId(profile.username)
-                        ? `Social profile ${profiles.indexOf(profile) + 1}`
-                        : profile.username}
-                    </div>
-                    <div className="flex gap-2 mt-0.5">
-                      {/* Status indicators */}
-                      <div className={`flex items-center gap-1 ${profile.connected.includes('tiktok') ? 'text-ink2' : 'text-muted opacity-40'}`}>
-                        <TikTokIcon size={10} />
-                      </div>
-                      <div className={`flex items-center gap-1 ${profile.connected.includes('instagram') ? 'text-ink2' : 'text-muted opacity-40'}`}>
-                        <Instagram size={10} />
-                      </div>
-                      <div className={`flex items-center gap-1 ${profile.connected.includes('youtube') ? 'text-ink2' : 'text-muted opacity-40'}`}>
-                        <Youtube size={10} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {selectedUserId === profile.username && <Check size={14} className="text-brass shrink-0" />}
-              </button>
-            ))}
-          </div>
-          {/* For managed users this dropdown otherwise does nothing (one profile,
-              nothing to switch) — its real job is being the door to connecting
-              the greyed-out networks it displays. */}
-          {onConnect && (
-            <button
-              onClick={() => { setIsOpen(false); onConnect(); }}
-              className="w-full flex items-center gap-2 px-4 py-3 text-sm text-brass hover:bg-paper3 transition-colors text-left border-t border-rule"
-            >
-              <Share2 size={14} /> Connect / manage accounts
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
 };
 
 const SESSION_KEY = 'openshorts_session';
@@ -304,12 +197,6 @@ function App() {
   const [durableClips, setDurableClips] = useState({});
 
   const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_key') || '');
-  // Social API State - Load encrypted or plain
-  const [uploadPostKey, setUploadPostKey] = useState(() => {
-    const stored = localStorage.getItem('uploadPostKey_v3');
-    if (stored) return decrypt(stored);
-    return '';
-  });
   // ElevenLabs API State - Load encrypted
   const [elevenLabsKey, setElevenLabsKey] = useState(() => {
     const stored = localStorage.getItem('elevenLabsKey_v1');
@@ -324,15 +211,6 @@ function App() {
     return '';
   });
 
-  const [uploadUserId, setUploadUserId] = useState(() => localStorage.getItem('uploadUserId') || '');
-  const [userProfiles, setUserProfiles] = useState([]); // List of {username, connected: []}
-  // Post-generation social nudge: shown at the results peak until the user
-  // either connects a network or dismisses it. Only 2.7% of cloud users who
-  // reach the social flow ever connect an account — this is the moment (clips
-  // just appeared) with the best odds of moving that number.
-  const [socialNudgeDismissed, setSocialNudgeDismissed] = useState(() => {
-    try { return localStorage.getItem('os_social_nudge_dismissed') === '1'; } catch (_) { return false; }
-  });
   const [showKeyModal, setShowKeyModal] = useState(false);
   const [jobId, setJobId] = useState(null);
   const [status, setStatus] = useState('idle'); // idle, processing, complete, error
@@ -384,7 +262,6 @@ function App() {
   const [noSource, setNoSource] = useState(false);
 
   const [sessionRecovered, setSessionRecovered] = useState(false);
-  const [showScheduleWeek, setShowScheduleWeek] = useState(false);
   // Clip editor overlay: index of the clip being edited, or null.
   const [editingClip, setEditingClip] = useState(null);
   const [reframingClip, setReframingClip] = useState(null);
@@ -719,15 +596,6 @@ function App() {
   }, [apiKey]);
 
   useEffect(() => {
-    if (uploadPostKey) {
-      localStorage.setItem('uploadPostKey_v3', encrypt(uploadPostKey));
-    }
-    if (uploadUserId) {
-      localStorage.setItem('uploadUserId', uploadUserId);
-    }
-  }, [uploadPostKey, uploadUserId]);
-
-  useEffect(() => {
     if (elevenLabsKey) {
       localStorage.setItem('elevenLabsKey_v1', encrypt(elevenLabsKey));
     }
@@ -738,13 +606,6 @@ function App() {
       localStorage.setItem('falKey_v1', encrypt(falKey));
     }
   }, [falKey]);
-
-  useEffect(() => {
-    if ((uploadPostKey || isManaged) && userProfiles.length === 0) {
-      fetchUserProfiles({ silent: true });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadPostKey, isManaged]);
 
   // For managed users, fetch the durable R2 URLs of the current job's clips. The
   // preview player prefers them (free egress, edge-served, and not competing with
@@ -832,37 +693,11 @@ function App() {
   }, [status, jobId, refreshMe]);
 
 
-  // silent: background auto-fetch — never alert(), just log. Managed users need
-  // no local key (the server resolves its own); BYOK sends the header.
-  const fetchUserProfiles = async ({ silent = false } = {}) => {
-    if (!uploadPostKey && !isManaged) return;
-    try {
-      const res = await apiFetch('/api/social/user', {
-        headers: uploadPostKey ? { 'X-Upload-Post-Key': uploadPostKey } : {}
-      });
-      if (!res.ok) throw new Error("Failed to fetch");
-      const data = await res.json();
-      if (data.profiles && data.profiles.length > 0) {
-        setUserProfiles(data.profiles);
-        // Auto select first if none selected
-        if (!uploadUserId) {
-          setUploadUserId(data.profiles[0].username);
-        }
-      } else if (!silent) {
-        alert("No profiles found for this API Key.");
-      }
-    } catch (e) {
-      if (!silent) alert("Error fetching User Profiles. Please check key.");
-      console.error(e);
-    }
-  };
-
   // Hosted is paid-only (no BYOK core). Self-host uses BYOK keys.
   // `keysMissing` now means "self-host BYOK keys missing" — it never fires on hosted.
   // A self-hosted server running the moment picker on a local LLM
   // (LLM_BASE_URL) does not need a Gemini key for the core pipeline.
   const geminiOk = !!apiKey || !!localLlm;
-  // Upload-Post is only needed to publish to social; clip generation/download doesn't need it.
   const keysMissing = !billingEnabled && !geminiOk;
   const needsPlan = billingEnabled && !isManaged;   // hosted, signed-out or no active plan/trial
 
@@ -923,12 +758,10 @@ function App() {
     if (tutorialLock && activeTab !== 'dashboard') setActiveTab('dashboard');
   }, [tutorialLock, activeTab]);
 
-  // Deep links into a tab: #app?tab=autopilot (Autopilot emails, the social
-  // connect page's return URL). Read once per hash change, then the query is
-  // dropped so a reload does not keep forcing the tab.
-  const [autopilotConnected, setAutopilotConnected] = useState(false);
+  // Deep links into a tab: #app?tab=history (emails). Read once per hash
+  // change, then the query is dropped so a reload does not keep forcing the tab.
   useEffect(() => {
-    const DEEP_LINK_TABS = ['autopilot', 'history', 'settings', 'thumbnails', 'dashboard'];
+    const DEEP_LINK_TABS = ['history', 'settings', 'thumbnails', 'dashboard'];
     const apply = () => {
       const hash = window.location.hash || '';
       if (!hash.startsWith('#app?')) return;
@@ -936,7 +769,6 @@ function App() {
       const tab = params.get('tab');
       if (!tab || !DEEP_LINK_TABS.includes(tab)) return;  // e.g. #app?tutorial=1
       setActiveTab(tab);
-      if (tab === 'autopilot' && params.get('connected') === '1') setAutopilotConnected(true);
       try { window.history.replaceState(null, '', '#app'); } catch (_) { /* ignore */ }
     };
     apply();
@@ -974,43 +806,6 @@ function App() {
   const TOOL_NAMES = { dashboard: 'the Clip Generator', thumbnails: 'the YouTube Studio' };
   const gateThisTab = needsPlan && INCLUDED_TOOL_TABS.includes(activeTab);      // included tool, no plan yet
   const advancedThisTab = billingEnabled && ADVANCED_TOOL_TABS.includes(activeTab); // BYOK-notice tools
-
-  // Social nudge visibility: managed users with clips on screen and no network
-  // connected yet. userProfiles being empty (not yet fetched / none created)
-  // also counts as "not connected" — that is the 97% case.
-  const connectedSocials = ((userProfiles.find((p) => p.username === uploadUserId) || userProfiles[0])?.connected) || [];
-  const showSocialNudge = isManaged && !socialNudgeDismissed && connectedSocials.length === 0 && !tutorialLock;
-
-  // One Seen event per job, only when the banner actually rendered.
-  const socialNudgeSeenRef = useRef(null);
-  useEffect(() => {
-    if (status === 'complete' && (results?.clips?.length > 0) && showSocialNudge && socialNudgeSeenRef.current !== jobId) {
-      socialNudgeSeenRef.current = jobId;
-      track('SocialNudgeSeen', { props: { clips: results.clips.length } });
-    }
-  }, [status, results, showSocialNudge, jobId]);
-
-  // Managed users connect their socials via Upload-Post's branded hosted page.
-  const handleConnectSocials = async () => {
-    try {
-      const { access_url } = await apiJson('/api/social/connect', { method: 'POST' });
-      // Same tab so the connect page's redirectUrl brings the user back into the app.
-      if (access_url) window.location.href = access_url;
-    } catch (e) {
-      alert('Could not open the connection page. Please try again.');
-    }
-  };
-
-  // Open the Upload-Post white-label page (which includes the scheduling calendar)
-  // in a new tab, for consulting/managing scheduled posts from the dashboard.
-  const handleOpenCalendar = async () => {
-    try {
-      const { access_url } = await apiJson('/api/social/connect', { method: 'POST' });
-      if (access_url) window.open(access_url, '_blank', 'noopener');
-    } catch (e) {
-      alert('Could not open the calendar. Please try again.');
-    }
-  };
 
   const handleProcess = async (data, forceLowQuality = false) => {
     // Hosted: must be signed in AND on an active plan/trial. Self-host: BYOK keys.
@@ -1205,8 +1000,6 @@ function App() {
   // wraps to two lines in a 5-up bar on a 360px phone.
   const navItems = [
     { id: 'dashboard', group: 'create', icon: Clapperboard, label: 'Clip generator', short: 'clips', primary: true },
-    // Cloud only: it runs on the managed pipeline and the Upload-Post connection.
-    ...(billingEnabled ? [{ id: 'autopilot', group: 'create', icon: Rocket, label: 'Autopilot', short: 'autopilot', isNew: true }] : []),
     { id: 'saasshorts', group: 'create', icon: SquareUser, label: 'AI shorts', short: 'ai shorts', byok: true, primary: true },
     { id: 'thumbnails', group: 'create', icon: Youtube, label: 'YouTube studio', short: 'studio', primary: true },
     { id: 'ugc-gallery', group: 'library', icon: LayoutDashboard, label: 'Gallery', short: 'gallery', primary: true },
@@ -1421,15 +1214,6 @@ function App() {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-            {userProfiles.length > 0 && (
-              <UserProfileSelector
-                profiles={userProfiles}
-                selectedUserId={uploadUserId}
-                onSelect={setUploadUserId}
-                onConnect={isManaged ? handleConnectSocials : undefined}
-              />
-            )}
-
             {billingEnabled && isSignedIn && !isManaged && (
               <button onClick={() => setShowPlanChoice(true)}
                 className="btn-primary px-4 py-2 text-xs">
@@ -1461,13 +1245,7 @@ function App() {
                 title="Configure API keys or choose a plan"
               >
                 <AlertTriangle size={12} />
-                <span className="hidden md:inline">
-                  {!geminiOk && !uploadPostKey
-                    ? 'Gemini and Upload-Post keys missing'
-                    : !geminiOk
-                      ? 'Gemini API key missing'
-                      : 'Upload-Post API key missing'}
-                </span>
+                <span className="hidden md:inline">Gemini API key missing</span>
                 <span className="md:hidden">Keys missing</span>
               </button>
             )}
@@ -1480,14 +1258,8 @@ function App() {
             <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 text-sm text-ink2 min-w-0 flex-1">
               <KeyRound size={16} className="shrink-0 text-warn mt-0.5 sm:mt-0" />
               <div className="min-w-0">
-                <span className="font-medium text-ink">Required API keys are missing.</span>{' '}
-                <span className="text-muted">
-                  {!geminiOk && !uploadPostKey
-                    ? 'Set your Gemini and Upload-Post API keys to use creatorsplan.'
-                    : !geminiOk
-                      ? 'Set your Gemini API key to use creatorsplan.'
-                      : 'Set your Upload-Post API key to use creatorsplan.'}
-                </span>
+                <span className="font-medium text-ink">Your Gemini API key is missing.</span>{' '}
+                <span className="text-muted">Set it to use creatorsplan.</span>
               </div>
             </div>
             <button
@@ -1532,19 +1304,19 @@ function App() {
               <ScreenHeader
                 eyebrow="06 · SETTINGS"
                 title="Settings"
-                subtitle="Your plan, your keys and where your clips get published."
+                subtitle="Your plan and your keys."
               >
                 <p className="flex items-center gap-2 text-sm text-cp-ink-2">
                   <Shield size={14} className="text-cp-go shrink-0" /> Keys only live in your browser. They're sent to the backend just to process a job.
                 </p>
               </ScreenHeader>
 
-              {/* Plan (cloud) or the Gemini + Upload-Post keys (self-host). */}
+              {/* Plan, or the Gemini key when the server runs without accounts. */}
               <SettingsSection
                 title={billingEnabled ? 'Your plan' : 'Core keys'}
                 description={billingEnabled
                   ? 'Clip generator and YouTube studio run on our keys. Nothing to set up.'
-                  : 'The clip generator and YouTube studio run on Gemini. Publishing goes through Upload-Post.'}
+                  : 'The clip generator and YouTube studio run on Gemini.'}
               >
                 {isManaged ? (
                   <div className="space-y-4">
@@ -1554,17 +1326,8 @@ function App() {
                     </div>
                     <p className="cp-help">
                       Your plan covers the clip generator and YouTube studio, fully managed: no API keys needed.
-                      AI shorts and dubbing use your own fal.ai and ElevenLabs keys (below). Connect your social
-                      accounts to publish directly.
+                      AI shorts and dubbing use your own fal.ai and ElevenLabs keys (below).
                     </p>
-                    <div className="flex flex-wrap gap-2">
-                      <button onClick={handleConnectSocials} className="btn-quiet px-5">
-                        <Share2 size={16} /> Connect social accounts
-                      </button>
-                      <button onClick={handleOpenCalendar} className="btn-ghost px-5">
-                        <Calendar size={16} /> Content calendar
-                      </button>
-                    </div>
                   </div>
                 ) : billingEnabled ? (
                   <div className="space-y-4">
@@ -1582,32 +1345,6 @@ function App() {
                 ) : (
                   <div className="space-y-6">
                     <KeyInput onKeySet={setApiKey} savedKey={apiKey} />
-
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <label htmlFor="upload-post-key" className="cp-label">Upload-Post API key</label>
-                        <span className="cp-badge-outline">required</span>
-                      </div>
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <input
-                          id="upload-post-key"
-                          type="password"
-                          value={uploadPostKey}
-                          onChange={(e) => setUploadPostKey(e.target.value)}
-                          className="input-field font-cp-mono"
-                          placeholder="ey..."
-                        />
-                        <button onClick={fetchUserProfiles} className="btn-quiet px-5 shrink-0">
-                          Connect
-                        </button>
-                      </div>
-                      <p className="cp-help">
-                        Publishes your clips to TikTok, Instagram Reels and YouTube Shorts. Has a free tier, no card needed:{' '}
-                        <a href="https://app.upload-post.com/login" target="_blank" rel="noopener noreferrer" className="text-cp-ink underline underline-offset-[3px]">sign up</a>,{' '}
-                        <a href="https://app.upload-post.com/manage-users" target="_blank" rel="noopener noreferrer" className="text-cp-ink underline underline-offset-[3px]">connect a profile</a>, then{' '}
-                        <a href="https://app.upload-post.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-cp-ink underline underline-offset-[3px]">create a key</a>.
-                      </p>
-                    </div>
                   </div>
                 )}
               </SettingsSection>
@@ -1689,7 +1426,7 @@ function App() {
 
           {/* View: SaaS Shorts */}
           {activeTab === 'saasshorts' && (
-            <SaaShortsTab geminiApiKey={apiKey} elevenLabsKey={elevenLabsKey} falKey={falKey} uploadPostKey={uploadPostKey} uploadUserId={uploadUserId} managed={isManaged} />
+            <SaaShortsTab geminiApiKey={apiKey} elevenLabsKey={elevenLabsKey} falKey={falKey} managed={isManaged} />
           )}
 
           {/* View: AI Agent */}
@@ -1699,7 +1436,7 @@ function App() {
                 <ScreenHeader
                   eyebrow="05 · AGENTS · BYOK"
                   title="Let an agent do the busywork"
-                  subtitle="Connect the assistant you already use. It can clip videos, write titles and schedule posts with your keys."
+                  subtitle="Connect the assistant you already use. It can clip videos, add captions and write titles with your keys."
                 />
 
                 <McpConnectCard cloud={billingEnabled} />
@@ -1743,9 +1480,9 @@ function App() {
                     <div className="w-11 h-11 rounded-cp-input bg-cp-tint flex items-center justify-center">
                       <CheckCircle2 size={18} className="text-brass" />
                     </div>
-                    <h3 className="text-[17px] font-semibold text-cp-ink">3. You approve, it publishes</h3>
+                    <h3 className="text-[17px] font-semibold text-cp-ink">3. You pick the keepers</h3>
                     <p className="text-xs text-muted leading-relaxed">
-                      Approve the candidates you like and the skill auto-publishes them to TikTok, Reels and YouTube Shorts via Upload-Post.
+                      Approve the candidates you like and download them, ready for TikTok, Reels and YouTube Shorts.
                     </p>
                   </div>
                 </div>
@@ -1795,7 +1532,7 @@ function App() {
                     </div>
                     <div className="flex items-start gap-2 text-ink2">
                       <Check size={16} className="text-brass shrink-0 mt-0.5" />
-                      <span>Auto-publish to TikTok, Reels and YouTube Shorts</span>
+                      <span>Vertical clips ready for TikTok, Reels and YouTube Shorts</span>
                     </div>
                   </div>
                 </div>
@@ -1811,29 +1548,6 @@ function App() {
             </Screen>
           )}
 
-          {/* View: Autopilot */}
-          {activeTab === 'autopilot' && (
-            <Screen>
-                {isSignedIn ? (
-                  <AutopilotTab
-                    onOpenProject={restoreProject}
-                    onUpgrade={() => setShowPlanChoice(true)}
-                    justConnected={autopilotConnected}
-                  />
-                ) : (
-                  <div className="max-w-2xl mx-auto card p-8 text-center">
-                    <Rocket size={28} className="mx-auto mb-4 text-brass" />
-                    <h1 className="font-display text-2xl text-ink mb-2">Your channel, clipped on its own</h1>
-                    <p className="text-muted text-sm mb-6">
-                      Connect your YouTube channel and every new video turns into shorts automatically.
-                      Sign in to set it up.
-                    </p>
-                    <button onClick={() => openAuth()} className="btn-primary">Log in</button>
-                  </div>
-                )}
-            </Screen>
-          )}
-
           {/* View: History */}
           {activeTab === 'history' && (
             <Screen>
@@ -1844,8 +1558,6 @@ function App() {
           {activeTab === 'thumbnails' && (
             <ThumbnailStudio
               geminiApiKey={apiKey}
-              uploadPostKey={uploadPostKey}
-              uploadUserId={uploadUserId}
               managed={isManaged}
               onCreateClips={(sessionId) => {
                 setActiveTab('dashboard');
@@ -2010,9 +1722,7 @@ function App() {
 
               {/* Right Panel: Results Grid */}
               <div className={`${status === 'complete' ? 'w-full md:w-[70%] lg:w-[75%]' : 'w-full md:w-[45%] lg:w-[40%]'} md:h-full flex flex-col shrink-0 md:shrink card p-3.5 sm:p-6 transition-all duration-700 ease-in-out`}>
-                {/* Title + counters on one row, the two actions on their own row
-                    below. Wrapping them all together dropped a lone half-width
-                    "schedule week" pill under the title on a phone. */}
+                {/* Title + counters on one row, the actions on their own row below. */}
                 <div className="mb-4 sm:mb-6 shrink-0 space-y-3">
                   <h2 className="cp-h2 flex flex-wrap items-center gap-2">
                     <span className="mr-auto">
@@ -2031,22 +1741,13 @@ function App() {
                       <button
                         onClick={handleDownloadAll}
                         disabled={downloadingAll}
-                        className="btn-ghost px-3 py-2 text-xs"
+                        className="btn-primary px-4 py-2 text-xs"
                         title="Download all clips as a ZIP"
                       >
                         {downloadingAll
                           ? <><Loader2 size={14} className="animate-spin" />Zipping…</>
                           : <><Download size={14} />Download all</>}
                       </button>
-                      {results.clips.length > 1 && (
-                        <button
-                          onClick={() => setShowScheduleWeek(true)}
-                          className="btn-primary px-4 py-2 text-xs"
-                        >
-                          <Calendar size={14} />
-                          Schedule the week
-                        </button>
-                      )}
                     </div>
                   )}
                 </div>
@@ -2086,49 +1787,6 @@ function App() {
                         <span className="text-brass font-medium">Remove the watermark →</span>
                       </button>
                     )}
-                    {/* Distribution nudge at the same peak: clips on screen,
-                        publishing them is one connect away. Hidden once any
-                        network is linked or the user dismisses it. */}
-                    {showSocialNudge && (
-                      <div className="w-full flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 px-3 py-2.5 rounded-input bg-paper3 border border-rule text-sm">
-                        <div className="flex items-start gap-3 flex-1 min-w-0">
-                          <div className="min-w-0 leading-relaxed">
-                            <span className="text-ink">Publish these clips straight from here.</span>{' '}
-                            <span className="text-muted">Connect your YouTube, TikTok or Instagram once — after that every clip is one click from posted.</span>
-                          </div>
-                          {/* On a phone the dismiss X rides the copy, so the CTA
-                              below can run the full width of the card. */}
-                          <button
-                            onClick={() => {
-                              track('SocialNudgeDismissed');
-                              setSocialNudgeDismissed(true);
-                              try { localStorage.setItem('os_social_nudge_dismissed', '1'); } catch (_) { /* ignore */ }
-                            }}
-                            aria-label="dismiss"
-                            className="sm:hidden shrink-0 -m-1 p-1 text-muted hover:text-ink"
-                          >
-                            <X size={16} />
-                          </button>
-                        </div>
-                        <button
-                          onClick={() => { track('SocialNudgeConnect'); handleConnectSocials(); }}
-                          className="btn-quiet shrink-0 text-xs py-1.5 px-3 w-full sm:w-auto"
-                        >
-                          Connect socials →
-                        </button>
-                        <button
-                          onClick={() => {
-                            track('SocialNudgeDismissed');
-                            setSocialNudgeDismissed(true);
-                            try { localStorage.setItem('os_social_nudge_dismissed', '1'); } catch (_) { /* ignore */ }
-                          }}
-                          aria-label="dismiss"
-                          className="hidden sm:block shrink-0 p-1 text-muted hover:text-ink"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    )}
                     {/* Self-host only: cloud archives clips to the video library,
                         here they really are gone once the retention sweep runs. */}
                     {!billingEnabled && jobRetentionSeconds > 0 && (
@@ -2155,13 +1813,9 @@ function App() {
                           initialState={projectState?.clips?.find((c) => c.index === i) || null}
                           onStateChange={handleClipStateChange}
                           durable={durableClips[i]}
-                          uploadPostKey={uploadPostKey}
-                          uploadUserId={uploadUserId}
                           geminiApiKey={apiKey}
                           elevenLabsKey={elevenLabsKey}
                           isManaged={isManaged}
-                          connectedPlatforms={(userProfiles.find((p) => p.username === uploadUserId) || userProfiles[0])?.connected ?? null}
-                          onConnectSocials={isManaged ? handleConnectSocials : null}
                           onPlay={(time) => handleClipPlay(time)}
                           onPause={handleClipPause}
                           onBulkSubtitle={handleBulkSubtitles}
@@ -2204,11 +1858,7 @@ function App() {
         isOpen={showKeyModal}
         onClose={() => setShowKeyModal(false)}
         eyebrow="SETUP"
-        title={!geminiOk && !uploadPostKey
-          ? 'Required API Keys Missing'
-          : !geminiOk
-            ? 'Gemini API Key Required'
-            : 'Upload-Post API Key Required'}
+        title="Gemini API key required"
         footer={
           <div className="flex gap-3">
             <button
@@ -2228,14 +1878,14 @@ function App() {
       >
         <div className="space-y-4">
           <p className="text-sm text-muted">
-            creatorsplan needs both a <strong className="text-ink2">Gemini</strong> API key and an <strong className="text-ink2">Upload-Post</strong> API key. Both have free tiers.
+            creatorsplan needs a <strong className="text-ink2">Gemini</strong> API key. It has a free tier.
           </p>
 
           {/* Gemini block */}
           <div className={`rounded-input p-4 space-y-2 border ${!apiKey ? 'border-rule2' : 'border-rule opacity-70'}`}>
             <p className="text-xs font-medium text-ink flex items-center gap-2">
               {apiKey ? <Check size={12} className="text-ok" /> : <AlertTriangle size={12} className="text-warn" />}
-              Gemini API Key {apiKey && <span className="text-ok">— set</span>}
+              Gemini API key {apiKey && <span className="text-ok">— set</span>}
             </p>
             {!apiKey && (
               <>
@@ -2259,48 +1909,8 @@ function App() {
             )}
           </div>
 
-          {/* Upload-Post block */}
-          <div className={`rounded-input p-4 space-y-2 border ${!uploadPostKey ? 'border-rule2' : 'border-rule opacity-70'}`}>
-            <p className="text-xs font-medium text-ink flex items-center gap-2">
-              {uploadPostKey ? <Check size={12} className="text-ok" /> : <AlertTriangle size={12} className="text-warn" />}
-              Upload-Post API Key {uploadPostKey && <span className="text-ok">— set</span>}
-            </p>
-            {!uploadPostKey && (
-              <>
-                <p className="text-xs text-muted">
-                  Required to publish your clips to TikTok, Instagram Reels, and YouTube Shorts. Free tier available, no credit card needed.
-                </p>
-                <ol className="text-xs text-muted space-y-1 list-decimal list-inside">
-                  <li>Register at <a href="https://app.upload-post.com/login" target="_blank" rel="noopener noreferrer" className="text-brass underline">app.upload-post.com</a></li>
-                  <li>Connect your TikTok, Instagram, or YouTube accounts</li>
-                  <li>Go to <a href="https://app.upload-post.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-brass underline">API Keys</a> and generate one</li>
-                  <li>Paste it below</li>
-                </ol>
-                <input
-                  type="text"
-                  placeholder="Paste your Upload-Post API key here..."
-                  className="input-field"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && e.target.value.trim()) {
-                      setUploadPostKey(e.target.value.trim());
-                    }
-                  }}
-                />
-              </>
-            )}
-          </div>
         </div>
       </Modal>
-
-      <ScheduleWeekModal
-        isOpen={showScheduleWeek}
-        onClose={() => setShowScheduleWeek(false)}
-        clips={results?.clips || []}
-        jobId={jobId}
-        uploadPostKey={uploadPostKey}
-        uploadUserId={uploadUserId}
-        isManaged={isManaged}
-      />
 
       {/* Pre-flight quality gate */}
       {qualityGate && (

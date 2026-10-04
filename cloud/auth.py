@@ -19,7 +19,7 @@ from sqlalchemy import select, func
 
 from .config import settings
 from . import config, database, metering, email_policy
-from .models import User, MagicLinkToken, UploadPostProfile, SignupAttribution
+from .models import User, MagicLinkToken, SignupAttribution
 
 router = APIRouter()
 
@@ -67,12 +67,11 @@ class CurrentUser:
     ``managed_keys.has_active_entitlement`` can read it without awaiting.
     """
 
-    def __init__(self, id, email, entitled=False, plan=None, upload_post_profile=None):
+    def __init__(self, id, email, entitled=False, plan=None):
         self.id = id
         self.email = email
         self.entitled = entitled
         self.plan = plan
-        self.upload_post_profile = upload_post_profile
 
 
 async def _load_current_user(session, user_id) -> Optional["CurrentUser"]:
@@ -84,7 +83,6 @@ async def _load_current_user(session, user_id) -> Optional["CurrentUser"]:
     topup_remaining = sum(
         (float(t.minutes_total) - float(t.minutes_consumed) for t in topups), 0.0
     )
-    profile = await session.get(UploadPostProfile, user_id)
     # Entitled to managed keys with an active plan, any top-up credit, or the
     # free monthly allowance (Google-authenticated accounts only).
     free = sub is None and metering.free_plan_eligible(user)
@@ -94,7 +92,6 @@ async def _load_current_user(session, user_id) -> Optional["CurrentUser"]:
         email=user.email,
         entitled=entitled,
         plan=sub.plan if sub else ("free" if free else None),
-        upload_post_profile=profile.profile_username if profile else None,
     )
 
 
@@ -393,6 +390,5 @@ async def get_me(request: Request):
             "topup_remaining": bal["topup_remaining"],
             "remaining": bal["remaining"],
         },
-        "upload_post_profile": user.upload_post_profile,
         "onboarding_survey_pending": survey_pending,
     }

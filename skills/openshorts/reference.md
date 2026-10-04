@@ -17,13 +17,11 @@ endpoints, forwarding your auth headers, so the two paths cannot drift.
   "plan": "free",
   "entitled": false,
   "minutes": { "plan_allowance": 20, "plan_used": 4, "plan_remaining": 16,
-               "topup_remaining": 0, "remaining": 16 },
-  "upload_post_profile": null
+               "topup_remaining": 0, "remaining": 16 }
 }
 ```
 
-`upload_post_profile` is null when no social account is connected, which means
-publishing will fail. On a self-hosted instance this endpoint is not mounted at
+On a self-hosted instance this endpoint is not mounted at
 all and returns 404, which simply means there is no quota to report.
 
 ## Start a job

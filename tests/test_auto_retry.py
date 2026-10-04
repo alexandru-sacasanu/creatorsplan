@@ -34,9 +34,6 @@ def env(tmp_path, monkeypatch):
             return None
         monkeypatch.setattr(app_module, name, _noop)
 
-    async def _noop2(*a, **k):
-        return None
-    monkeypatch.setattr(app_module, "_autopilot_job_finished", _noop2)
     monkeypatch.setattr(app_module, "_settle_reservation", fake_settle)
     monkeypatch.setattr(app_module, "_enqueue_job",
                         lambda job_id, priority=2: calls["enqueued"].append((job_id, priority)))

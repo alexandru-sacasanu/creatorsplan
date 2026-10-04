@@ -161,14 +161,14 @@ function useHeroIntro(videoRef, heroRef) {
 const STEPS = [
   { n: '01', title: 'Drop it in', body: 'Upload a file or paste a YouTube link. Podcasts, vlogs, streams and talks all work.' },
   { n: '02', title: 'We find the moments', body: 'Each clip gets a hook score, reframing around the speaker and captions you can edit.' },
-  { n: '03', title: 'Post or schedule', body: 'Download, or publish straight to YouTube. An agent can run the whole loop for you.' },
+  { n: '03', title: 'Download and post', body: 'Download each clip with its title and caption ready. An agent can run the whole loop for you.' },
 ];
 
 const TOOLS = [
   { name: 'Clip generator', body: 'Long video to 9:16, 1:1 or 16:9 clips with captions and a hook score.' },
   { name: 'AI shorts', byok: true, body: 'UGC-style ads from a website or one sentence. Pick a presenter, a language and a length.' },
-  { name: 'YouTube studio', body: 'Titles, thumbnails, descriptions and chapters, then publish without leaving the app.' },
-  { name: 'Agents', byok: true, body: 'Connect Claude, ChatGPT or n8n and have them clip, title and schedule for you.' },
+  { name: 'YouTube studio', body: 'Titles, thumbnails, descriptions and chapters, ready to paste into YouTube.' },
+  { name: 'Agents', byok: true, body: 'Connect Claude, ChatGPT or n8n and have them clip, caption and recut for you.' },
 ];
 
 function Mark({ width = 16, height = 26, strike = false }) {

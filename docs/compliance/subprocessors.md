@@ -45,7 +45,6 @@ puede pedirlo en info@openshorts.app.
 
 | Proveedor | Entidad y país | Qué recibe | Garantía | DPA |
 |---|---|---|---|---|
-| **Upload-Post** | TONVI TECH SL | Publicación en las redes que el usuario conecta; **custodia los tokens OAuth** de TikTok/YouTube/Instagram (OpenShorts no almacena ninguno, solo el nombre de perfil) | Mismo responsable | Sistema interno — su política debe cubrir esta custodia |
 | **OpenPanel** (instancia propia) | TONVI TECH SL — servidores en Alemania | Eventos de uso con el uuid de la cuenta como `profileId`. **Nunca el email** (retirado del `identify` del navegador el 4-sep-2026). Solo tras consentimiento | Dentro del EEE; script servido desde el propio dominio | Sistema interno |
 | **Google (iniciar sesión con Google)** | Google Ireland Ltd. / Google LLC | Solo el ámbito `openid email profile`: dirección e identificador de cuenta | DPF + CCT | Google Terms |
 
@@ -80,11 +79,10 @@ Nada de esto se puede hacer desde el repositorio; queda para el responsable:
 5. **Confirmar dónde están físicamente los dos servidores de producción.** La política dice
    "Hetzner y Contabo, Alemania"; si alguno es hardware propio fuera de un CPD,
    hay que decirlo y aplicar cifrado de disco.
-6. **Comprobar que la política de Upload-Post** describe la custodia de tokens
-   de redes sociales en nombre de usuarios de OpenShorts.
 
 ## Historial de cambios
 
 | Fecha | Cambio |
 |---|---|
+| 2026-10-04 | Baja: Upload-Post (la publicación en redes y Autopilot se retiraron del producto). |
 | 2026-09-04 | Primera versión publicada. Altas documentadas (ya en uso, no listadas antes): fal.ai, Cloudflare CDN/DNS, Aikount, OpenPanel, proxies de descarga, Google OAuth. Bajas: Google Fonts, script de openpanel.dev y datos personales hacia Telegram. |

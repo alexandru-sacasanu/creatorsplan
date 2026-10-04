@@ -278,8 +278,8 @@ async def create_portal(request: Request):
 # --------------------------------------------------------------------------- #
 # Stripe stays the payment processor; the legally valid Spanish invoice is
 # issued by AgentLedger (aikount.com) and surfaced here with signed public
-# links, so the customer never needs the Stripe-hosted PDF. Same flow as
-# Upload-Post: read by stripe_customer_id, and when AgentLedger has nothing yet
+# links, so the customer never needs the Stripe-hosted PDF. Read by
+# stripe_customer_id, and when AgentLedger has nothing yet
 # (just-subscribed user) ask it to import this customer's history on the spot.
 _AGENTLEDGER_TIMEOUT = 8.0
 _AGENTLEDGER_BACKFILL_TIMEOUT = 20.0
