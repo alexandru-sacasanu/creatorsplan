@@ -1,29 +1,62 @@
 import { StrictMode, useEffect, useState, lazy, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { AuthProvider } from './contexts/AuthContext'
+import { Loader2 } from 'lucide-react'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
+import LoginModal from './components/LoginModal'
+import ShortFrameLogo from './components/ShortFrameLogo'
 import Landing from './Landing.jsx'
-import { setAuthIntent } from './lib/authIntent'
+import { setAuthIntent, peekAuthIntent, takeAuthIntent } from './lib/authIntent'
 
 const App = lazy(() => import('./App.jsx'))
 
-// Someone who has launched the app once goes straight to it on their next
-// visit; #landing (the logo) always brings the marketing page back. Same key
-// as before the rebrand, so returning users keep skipping it.
-const SKIP_LANDING_KEY = 'openshorts_skip_landing'
-const LANDING_HASHES = ['#landing', '#how', '#tools', '#keys']
+// The bare URL (/) and #landing are the same page: the marketing site. The app
+// is everything else (#app, #/account, #/pricing, #/auth/...), and it is behind
+// an account: AppGate shows the sign-in screen to anyone who is not signed in.
+const LANDING_HASHES = ['', '#', '#landing', '#how', '#tools', '#keys']
 
-function skipsLanding() {
-  try { return localStorage.getItem(SKIP_LANDING_KEY) === '1' } catch { return false }
+function resolveView() {
+  return LANDING_HASHES.includes(window.location.hash || '') ? 'landing' : 'app'
 }
 
-// The landing page owns only the bare URL and its own anchors. Every other
-// hash (#app, #/auth/…, #/account, #/pricing…) is the app's, exactly as before.
-function resolveView() {
-  const hash = window.location.hash || ''
-  if (LANDING_HASHES.includes(hash)) return 'landing'
-  if (hash === '' || hash === '#') return skipsLanding() ? 'app' : 'landing'
-  return 'app'
+function GateShell({ children }) {
+  return <div className="flex min-h-screen items-center justify-center bg-cp-canvas px-4">{children}</div>
+}
+
+// Nothing of the app renders (or fetches) until there is a signed-in user.
+function AppGate() {
+  const { loading, signingIn, isSignedIn, billingEnabled } = useAuth()
+  const [intent] = useState(() => peekAuthIntent() || 'login')
+  useEffect(() => { takeAuthIntent() }, [])
+
+  if (loading || signingIn) return <GateShell><Loader2 className="animate-spin text-cp-ink-3" size={28} aria-label="Loading" /></GateShell>
+
+  if (!billingEnabled) {
+    return (
+      <GateShell>
+        <div className="max-w-sm text-center">
+          <ShortFrameLogo width={22} height={36} />
+          <h1 className="m-0 mt-5 text-[26px] font-semibold tracking-[-0.03em] text-cp-ink">Can’t reach creatorsplan</h1>
+          <p className="m-0 mt-2 text-[15px] leading-[1.5] text-cp-ink-2">The server did not answer. Check that it is running, then try again.</p>
+          <button type="button" onClick={() => window.location.reload()} className="btn-primary mt-6 min-h-[48px] px-6">Try again</button>
+        </div>
+      </GateShell>
+    )
+  }
+
+  if (!isSignedIn) {
+    return (
+      <GateShell>
+        <LoginModal mode={intent} onClose={() => { window.location.hash = '#landing' }} />
+      </GateShell>
+    )
+  }
+
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-cp-canvas" />}>
+      <App />
+    </Suspense>
+  )
 }
 
 function Root() {
@@ -35,27 +68,14 @@ function Root() {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
-  // Reaching the app by any route (a sign-in link, a bookmark of #app) counts
-  // as having launched it: code inside the app that clears the hash must not
-  // drop a working user back on the marketing page.
-  useEffect(() => {
-    if (view !== 'app') return
-    try { localStorage.setItem(SKIP_LANDING_KEY, '1') } catch { /* ignore */ }
-  }, [view])
-
-  // `intent` ('login' | 'signup') opens that auth screen once the app is up.
+  // `intent` ('login' | 'signup') picks which sign-in screen the gate opens on.
   const launchApp = (intent) => {
     if (intent) setAuthIntent(intent)
     window.location.hash = '#app'
     setView('app')
   }
 
-  if (view === 'landing') return <Landing onLaunchApp={launchApp} />
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-cp-canvas" />}>
-      <App />
-    </Suspense>
-  )
+  return view === 'landing' ? <Landing onLaunchApp={launchApp} /> : <AppGate />
 }
 
 createRoot(document.getElementById('root')).render(
